@@ -20,7 +20,6 @@
 #include "task.h"
 #include "trig.h"
 #include "util.h"
-#include "outfit_menu.h"
 #include "battle_setup.h"
 #include "data.h"
 #include "constants/field_effects.h"
@@ -2519,8 +2518,8 @@ static void HBlankCB_Mugshots(void)
 static void Mugshots_CreateTrainerPics(struct Task *task)
 {
     struct Sprite *opponentSprite, *playerSprite;
-    u32 trainerPicId = GetTrainerPicFromId(gTrainerBattleOpponent_A);
-    u32 playerPicId = GetPlayerTrainerPicIdByOutfitGenderType(gSaveBlock2Ptr->currOutfitId, gSaveBlock2Ptr->playerGender, 0);
+
+    u8 trainerPicId = GetTrainerPicFromId(gTrainerBattleOpponent_A);
     s16 opponentRotationScales = 0;
 
     gReservedSpritePaletteCount = 10;
@@ -2530,7 +2529,10 @@ static void Mugshots_CreateTrainerPics(struct Task *task)
                                                   0, gDecompressionBuffer);
     gReservedSpritePaletteCount = 12;
 
-    task->tPlayerSpriteId = CreateTrainerSprite(playerPicId, DISPLAY_WIDTH + 32, 106, 0, gDecompressionBuffer);
+    task->tPlayerSpriteId = CreateTrainerSprite(PlayerGenderToFrontTrainerPicId(gSaveBlock2Ptr->playerGender),
+                                                DISPLAY_WIDTH + 32,
+                                                106,
+                                                0, gDecompressionBuffer);
 
     opponentSprite = &gSprites[task->tOpponentSpriteId];
     playerSprite = &gSprites[task->tPlayerSpriteId];

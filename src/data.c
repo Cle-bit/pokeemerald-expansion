@@ -233,5 +233,3 @@ const struct Trainer gTrainers[] =
 };
 
 #include "data/text/follower_messages.h"
-#include "data/outfit_tables.h"
-
