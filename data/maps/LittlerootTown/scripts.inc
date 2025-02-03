@@ -248,14 +248,18 @@ LittlerootTown_EventScript_SetRivalBirchPosForDexUpgradeFemale::
 
 LittlerootTown_EventScript_FatMan::
 	msgbox LittlerootTown_Text_CanUsePCToStoreItems, MSGBOX_NPC
-	compare VAR_UNUSED_0x404E, SEASON_AUTUMN
-	goto_if_eq LittlerootTown_EventScript_FatMan_Winter
-	setvar VAR_UNUSED_0x404E, SEASON_AUTUMN
+	fadescreen FADE_TO_BLACK
+	setvar VAR_0x8004, 3
+	setvar VAR_0x8005, FALSE
+	special DoSlidingPuzzle
+	waitstate
+	goto_if_eq VAR_RESULT, TRUE, LittlerootTown_EventScript_PuzzleSolved
 	release
 	end
 
-LittlerootTown_EventScript_FatMan_Winter::
-	setvar VAR_UNUSED_0x404E, SEASON_WINTER
+LittlerootTown_EventScript_PuzzleSolved::
+	setvar VAR_0x8005, TRUE
+	msgbox LittlerootTown_Text_BirchSpendsDaysInLab, MSGBOX_NPC
 	release
 	end
 
