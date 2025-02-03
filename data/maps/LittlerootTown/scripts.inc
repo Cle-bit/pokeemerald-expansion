@@ -248,6 +248,15 @@ LittlerootTown_EventScript_SetRivalBirchPosForDexUpgradeFemale::
 
 LittlerootTown_EventScript_FatMan::
 	msgbox LittlerootTown_Text_CanUsePCToStoreItems, MSGBOX_NPC
+	compare VAR_UNUSED_0x404E, SEASON_AUTUMN
+	goto_if_eq LittlerootTown_EventScript_FatMan_Winter
+	setvar VAR_UNUSED_0x404E, SEASON_AUTUMN
+	release
+	end
+
+LittlerootTown_EventScript_FatMan_Winter::
+	setvar VAR_UNUSED_0x404E, SEASON_WINTER
+	release
 	end
 
 LittlerootTown_EventScript_Boy::
