@@ -249,7 +249,7 @@ LittlerootTown_EventScript_SetRivalBirchPosForDexUpgradeFemale::
 LittlerootTown_EventScript_FatMan::
 	msgbox LittlerootTown_Text_CanUsePCToStoreItems, MSGBOX_NPC
 	fadescreen FADE_TO_BLACK
-	setvar VAR_0x8004, 3
+	setvar VAR_0x8004, 4
 	setvar VAR_0x8005, FALSE
 	special DoSlidingPuzzle
 	waitstate
