@@ -51,6 +51,7 @@ enum {
 
 static u16 FeebasRandom(void);
 static void FeebasSeedRng(u16 seed);
+static void UpdateChainFishingStreak();
 static bool8 IsWildLevelAllowedByRepel(u8 level);
 static void ApplyFluteEncounterRateMod(u32 *encRate);
 static void ApplyCleanseTagEncounterRateMod(u32 *encRate);
@@ -872,7 +873,7 @@ u32 CalculateChainFishingShinyRolls(void)
     return (2 * min(gChainFishingDexNavStreak, FISHING_CHAIN_SHINY_STREAK_MAX));
 }
 
-void UpdateChainFishingStreak()
+static void UpdateChainFishingStreak()
 {
     if (!I_FISHING_CHAIN)
         return;
@@ -899,7 +900,10 @@ void FishingWildEncounter(u8 rod)
     {
         species = GenerateFishingWildMon(gWildMonHeaders[GetCurrentMapWildMonHeaderId()].fishingMonsInfo, rod);
     }
+
+    IncrementGameStat(GAME_STAT_FISHING_ENCOUNTERS);
     SetPokemonAnglerSpecies(species);
+    BattleSetup_StartWildBattle();
 }
 
 u16 GetLocalWildMon(bool8 *isWaterMon)
