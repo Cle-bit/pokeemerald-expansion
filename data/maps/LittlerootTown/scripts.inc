@@ -258,7 +258,7 @@ LittlerootTown_EventScript_FatMan::
 	end
 
 LittlerootTown_EventScript_PuzzleSolved::
-	setvar VAR_0x8005, TRUE
+	setvar VAR_UNUSED_0x404E, SEASON_AUTUMN
 	msgbox LittlerootTown_Text_BirchSpendsDaysInLab, MSGBOX_NPC
 	release
 	end
