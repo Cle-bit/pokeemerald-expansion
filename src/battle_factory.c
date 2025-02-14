@@ -331,7 +331,7 @@ static void GenerateOpponentMons(void)
             continue;
 
         // "High tier" Pokémon are only allowed for AI
-        //if (lvlMode == FRONTIER_LVL_50) && monId <= FRONTIER_MONS_HIGH_TIER)
+        //if (lvlMode == FRONTIER_LVL_50 && monId <= FRONTIER_MONS_HIGH_TIER)
             //continue;
 
         // Ensure this species hasn't already been chosen for the opponent
@@ -725,31 +725,74 @@ void FillFactoryBrainParty(void)
 static u16 GetFactoryMonId(u8 lvlMode, u8 challengeNum, bool8 useBetterRange)
 {
     u16 numMons, monId;
+    u16 betterRangeStart = 2238;
+    u16 betterRangeEnd = 2468;
+    u16 normalRangeEnd = 2237;
 
     if (useBetterRange)
     {
-        // 2238-2468范围
-        numMons = 2468 - 2238 + 1;          // 231个选项
-        monId = Random() % numMons;         // 生成0-230的随机数
-        monId += 2238;                      // 偏移到2238-2468
-    }
-    else
-    {
-        if (challengeNum < 2)
+        u8 probability;
+        if (challengeNum <= 2)
+            probability = 20;
+        else if (challengeNum <= 4)
+            probability = 40;
+        else if (challengeNum <= 6)
+            probability = 60;
+        else if (challengeNum <= 8)
+            probability = 80;
+        else
+            probability = 100;
+
+        if (Random() % 100 < probability)
         {
-            // 2238-2468范围
-            numMons = 2468 - 2238 + 1;
-            monId = Random() % numMons;
-            monId += 2238;
+            numMons = betterRangeEnd - betterRangeStart + 1;
+            monId = Random() % numMons + betterRangeStart;
         }
         else
         {
-            // 0-2237范围
-            numMons = 2237 + 1;            // 2238个选项
-            monId = Random() % numMons;    // 直接生成0-2237
+            numMons = normalRangeEnd + 1;
+            monId = Random() % numMons;
         }
     }
-
+    else
+    {
+        if (challengeNum == 1)
+        {
+            numMons = betterRangeEnd - betterRangeStart + 1;
+            monId = Random() % numMons + betterRangeStart;
+        }
+        else if (challengeNum == 2)
+        {
+            if (Random() % 100 < 60)
+            {
+                numMons = betterRangeEnd - betterRangeStart + 1;
+                monId = Random() % numMons + betterRangeStart;
+            }
+            else
+            {
+                numMons = normalRangeEnd + 1;
+                monId = Random() % numMons;
+            }
+        }
+        else if (challengeNum == 3)
+        {
+            if (Random() % 100 < 20)
+            {
+                numMons = betterRangeEnd - betterRangeStart + 1;
+                monId = Random() % numMons + betterRangeStart;
+            }
+            else
+            {
+                numMons = normalRangeEnd + 1;
+                monId = Random() % numMons;
+            }
+        }
+        else
+        {
+            numMons = normalRangeEnd + 1;
+            monId = Random() % numMons;
+        }
+    }
     return monId;
 }
 
