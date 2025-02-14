@@ -315,7 +315,7 @@ static void GenerateOpponentMons(void)
     i = 0;
     while (i != FRONTIER_PARTY_SIZE)
     {
-        u16 monId = GetFactoryMonId(lvlMode, challengeNum, FALSE);
+        u16 monId = GetFactoryMonId(lvlMode, challengeNum, TRUE);
 
         // Unown (FRONTIER_MON_UNOWN) is forbidden on opponent Factory teams.
         //if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
@@ -330,9 +330,9 @@ static void GenerateOpponentMons(void)
         if (j != (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons))
             continue;
 
-        // "High tier" Pokémon are only allowed on open level mode
-        if (lvlMode == FRONTIER_LVL_50) //&& monId > FRONTIER_MONS_HIGH_TIER)
-            continue;
+        // "High tier" Pokémon are only allowed for AI
+        //if (lvlMode == FRONTIER_LVL_50) && monId <= FRONTIER_MONS_HIGH_TIER)
+            //continue;
 
         // Ensure this species hasn't already been chosen for the opponent
         for (k = firstMonId; k < firstMonId + i; k++)
@@ -437,7 +437,6 @@ static void GenerateInitialRentalMons(void)
     u8 challengeNum;
     u8 factoryLvlMode;
     u8 factoryBattleMode;
-    u8 rentalRank;
     u16 monId;
     u16 currSpecies;
     u16 species[PARTY_SIZE];
@@ -470,19 +469,16 @@ static void GenerateInitialRentalMons(void)
         factoryLvlMode = FRONTIER_LVL_50;
         firstMonId = 0;
     }
-    rentalRank = GetNumPastRentalsRank(factoryBattleMode, factoryLvlMode);
 
     currSpecies = SPECIES_NONE;
     i = 0;
     while (i != PARTY_SIZE)
     {
-        if (i < rentalRank) // The more times the player has rented, the more initial rentals are generated from a better set of Pokémon
-            monId = GetFactoryMonId(factoryLvlMode, challengeNum, TRUE);
-        else
-            monId = GetFactoryMonId(factoryLvlMode, challengeNum, FALSE);
+        // The more challenges the player has made, the more initial rentals are generated from a commoner set of Pokémon
+        monId = GetFactoryMonId(factoryLvlMode, challengeNum, FALSE);
 
-        if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
-            continue;
+        //if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
+            //continue;
 
         // Cannot have two Pokémon of the same species.
         for (j = firstMonId; j < firstMonId + i; j++)
@@ -728,10 +724,32 @@ void FillFactoryBrainParty(void)
 
 static u16 GetFactoryMonId(u8 lvlMode, u8 challengeNum, bool8 useBetterRange)
 {
-    const u16 NUM_MONS = 2270;  // 使用常量定义
-    u16 monId;
+    u16 numMons, monId;
 
-    monId = Random() % NUM_MONS;
+    if (useBetterRange)
+    {
+        // 2238-2468范围
+        numMons = 2468 - 2238 + 1;          // 231个选项
+        monId = Random() % numMons;         // 生成0-230的随机数
+        monId += 2238;                      // 偏移到2238-2468
+    }
+    else
+    {
+        if (challengeNum < 2)
+        {
+            // 2238-2468范围
+            numMons = 2468 - 2238 + 1;
+            monId = Random() % numMons;
+            monId += 2238;
+        }
+        else
+        {
+            // 0-2237范围
+            numMons = 2237 + 1;            // 2238个选项
+            monId = Random() % numMons;    // 直接生成0-2237
+        }
+    }
+
     return monId;
 }
 

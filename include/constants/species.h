@@ -394,7 +394,7 @@
 #define SPECIES_RAYQUAZA 384//烈空坐
 #define SPECIES_JIRACHI 385//基拉祈
 #define SPECIES_DEOXYS                                  SPECIES_DEOXYS_NORMAL
-#define SPECIES_DEOXYS_NORMAL 386//代欧奇希斯-普通形态
+#define SPECIES_DEOXYS_NORMAL 386//代欧奇希斯
 #define SPECIES_TURTWIG 387//草苗龟
 #define SPECIES_GROTLE 388//树林龟
 #define SPECIES_TORTERRA 389//土台龟
@@ -508,7 +508,7 @@
 #define SPECIES_MANAPHY 490//玛纳霏
 #define SPECIES_DARKRAI 491//达克莱伊
 #define SPECIES_SHAYMIN                                 SPECIES_SHAYMIN_LAND
-#define SPECIES_SHAYMIN_LAND 492//谢米-陆地形态
+#define SPECIES_SHAYMIN_LAND 492//谢米
 #define SPECIES_ARCEUS                                  SPECIES_ARCEUS_NORMAL
 #define SPECIES_ARCEUS_NORMAL 493//阿尔宙斯
 #define SPECIES_VICTINI 494//比克提尼
@@ -674,7 +674,7 @@
 #define SPECIES_KELDEO                                  SPECIES_KELDEO_ORDINARY
 #define SPECIES_KELDEO_ORDINARY 647//凯路迪欧-平常的样子
 #define SPECIES_MELOETTA                                SPECIES_MELOETTA_ARIA
-#define SPECIES_MELOETTA_ARIA 648//美洛耶塔-歌声形态
+#define SPECIES_MELOETTA_ARIA 648//美洛耶塔
 #define SPECIES_GENESECT 649//盖诺赛克特
 #define SPECIES_CHESPIN 650//哈力栗
 #define SPECIES_QUILLADIN 651//胖胖哈力
@@ -757,7 +757,7 @@
 #define SPECIES_XERNEAS_NEUTRAL 716//哲尔尼亚斯
 #define SPECIES_YVELTAL 717//伊裴尔塔尔
 #define SPECIES_ZYGARDE                                 SPECIES_ZYGARDE_50
-#define SPECIES_ZYGARDE_50 718//基格尔德５０％形态
+#define SPECIES_ZYGARDE_50 718//基格尔德
 #define SPECIES_DIANCIE 719//蒂安希
 #define SPECIES_HOOPA                                   SPECIES_HOOPA_CONFINED
 #define SPECIES_HOOPA_CONFINED 720//惩戒胡帕
@@ -1268,10 +1268,10 @@
 #define SPECIES_MINIOR_BLUE                             SPECIES_MINIOR_METEOR_BLUE
 #define SPECIES_MINIOR_INDIGO                           SPECIES_MINIOR_METEOR_INDIGO
 #define SPECIES_MINIOR_VIOLET                           SPECIES_MINIOR_METEOR_VIOLET
-#define SPECIES_MINIOR_METEOR_ORANGE                    1193
-#define SPECIES_MINIOR_METEOR_YELLOW                    1194
-#define SPECIES_MINIOR_METEOR_GREEN                     1195
-#define SPECIES_MINIOR_METEOR_BLUE                      1196
+#define SPECIES_MINIOR_METEOR_ORANGE                    1193//小陨星橘
+#define SPECIES_MINIOR_METEOR_YELLOW                    1194//小陨星黄
+#define SPECIES_MINIOR_METEOR_GREEN                     1195//小陨星绿
+#define SPECIES_MINIOR_METEOR_BLUE                      1196//小陨星蓝
 #define SPECIES_MINIOR_METEOR_INDIGO                    1197
 #define SPECIES_MINIOR_METEOR_VIOLET                    1198
 #define SPECIES_MINIOR_CORE                             SPECIES_MINIOR_CORE_RED
@@ -1517,7 +1517,7 @@
 #define SPECIES_POLTCHAGEIST_ARTISAN 1410//斯魔茶ARTISAN
 #define SPECIES_SINISTCHA                               SPECIES_SINISTCHA_UNREMARKABLE
 #define SPECIES_SINISTCHA_UNREMARKABLE 1411//来悲粗茶
-#define SPECIES_SINISTCHA_MASTERPIECE 1412//来悲粗茶MASTERPIECE
+#define SPECIES_SINISTCHA_MASTERPIECE 1412//来悲粗茶杰作
 #define SPECIES_OKIDOGI 1413//够赞狗
 #define SPECIES_MUNKIDORI 1414//愿增猿
 #define SPECIES_FEZANDIPITI 1415//吉雉鸡
@@ -1530,7 +1530,7 @@
 #define SPECIES_OGERPON_WELLSPRING_TERA                 1421
 #define SPECIES_OGERPON_HEARTHFLAME_TERA                1422
 #define SPECIES_OGERPON_CORNERSTONE_TERA                1423
-#define SPECIES_URSALUNA_BLOODMOON 1424//月月熊血月
+#define SPECIES_URSALUNA_BLOODMOON 1424//月月熊赫月
 // Indigo Disk
 #define SPECIES_ARCHALUDON 1425//铝钢桥龙
 #define SPECIES_HYDRAPPLE 1426//蜜集大蛇
@@ -1539,7 +1539,7 @@
 #define SPECIES_IRON_BOULDER 1429//铁磐岩
 #define SPECIES_IRON_CROWN 1430//铁头壳
 #define SPECIES_TERAPAGOS                               SPECIES_TERAPAGOS_NORMAL
-#define SPECIES_TERAPAGOS_NORMAL 1431//太乐巴戈斯-普通形态
+#define SPECIES_TERAPAGOS_NORMAL 1431//太乐巴戈斯
 #define SPECIES_TERAPAGOS_TERASTAL 1432//太乐巴戈斯-太晶形态
 #define SPECIES_TERAPAGOS_STELLAR 1433//太乐巴戈斯-星晶形态
 #define SPECIES_PECHARUNT 1434//桃歹郎
