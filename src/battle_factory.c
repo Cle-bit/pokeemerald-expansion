@@ -756,7 +756,7 @@ static u16 GetFactoryMonId(u8 lvlMode, u8 challengeNum, bool8 useBetterRange)
     }
     else
     {
-        if (challengeNum == 1)
+        if (challengeNum <= 1)
         {
             numMons = betterRangeEnd - betterRangeStart + 1;
             monId = Random() % numMons + betterRangeStart;
