@@ -32,3 +32,6 @@ https://github.com/Bivurnum/pokeemerald-expansion/tree/fishing-game-dev-expansio
 
 6.Follower-choose
 https://github.com/Kasenn/pokeemerald-expansion-kasen/tree/toggle_follower_from_party_menu
+
+7.Registered_items_menu
+https://github.com/iriv24/pokeemerald-expansion/tree/iriv24/tx_registered_items_menu
