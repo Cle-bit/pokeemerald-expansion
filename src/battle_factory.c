@@ -38,7 +38,7 @@ static void GenerateInitialRentalMons(void);
 static void GetOpponentMostCommonMonType(void);
 static void GetOpponentBattleStyle(void);
 static void RestorePlayerPartyHeldItems(void);
-static u16 GetFactoryMonId(u8 lvlMode, u8 challengeNum, bool8 useBetterRange);
+static u16 GetFactoryMonId(u32 RecordWinStreak, bool8 useBetterRange);
 static u8 GetMoveBattleStyle(u16 move);
 
 // Number of moves needed on the team to be considered using a certain battle style
@@ -293,8 +293,8 @@ static void GenerateOpponentMons(void)
     u16 trainerId = 0;
     u32 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     u32 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
-    u32 winStreak = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode];
-    u32 challengeNum = winStreak / FRONTIER_STAGES_PER_CHALLENGE;
+    u32 challengeNum = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode] / FRONTIER_STAGES_PER_CHALLENGE;
+    u32 RecordWinStreak = gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[battleMode][lvlMode];
     gFacilityTrainers = gBattleFrontierTrainers;
 
     do
@@ -315,7 +315,7 @@ static void GenerateOpponentMons(void)
     i = 0;
     while (i != FRONTIER_PARTY_SIZE)
     {
-        u16 monId = GetFactoryMonId(lvlMode, challengeNum, TRUE);
+        u16 monId = GetFactoryMonId(RecordWinStreak, TRUE);
 
         // Unown (FRONTIER_MON_UNOWN) is forbidden on opponent Factory teams.
         //if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
@@ -432,16 +432,14 @@ static void GenerateInitialRentalMons(void)
 {
     int i, j;
     u8 firstMonId;
-    u8 battleMode;
-    u8 lvlMode;
-    u8 challengeNum;
-    u8 factoryLvlMode;
-    u8 factoryBattleMode;
+    u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
+    u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     u16 monId;
     u16 currSpecies;
     u16 species[PARTY_SIZE];
     u16 monIds[PARTY_SIZE];
     u16 heldItems[PARTY_SIZE];
+    u32 RecordWinStreak = gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[battleMode][lvlMode];
 
     gFacilityTrainers = gBattleFrontierTrainers;
     for (i = 0; i < PARTY_SIZE; i++)
@@ -450,32 +448,16 @@ static void GenerateInitialRentalMons(void)
         monIds[i] = 0;
         heldItems[i] = ITEM_NONE;
     }
-    lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
-    battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
-    challengeNum = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode] / FRONTIER_STAGES_PER_CHALLENGE;
-    if (VarGet(VAR_FRONTIER_BATTLE_MODE) == FRONTIER_MODE_DOUBLES)
-        factoryBattleMode = FRONTIER_MODE_DOUBLES;
-    else
-        factoryBattleMode = FRONTIER_MODE_SINGLES;
 
     gFacilityTrainerMons = gBattleFrontierMons;
-    if (gSaveBlock2Ptr->frontier.lvlMode != FRONTIER_LVL_50)
-    {
-        factoryLvlMode = FRONTIER_LVL_OPEN;
-        firstMonId = 0;
-    }
-    else
-    {
-        factoryLvlMode = FRONTIER_LVL_50;
-        firstMonId = 0;
-    }
+    firstMonId = 0;
 
     currSpecies = SPECIES_NONE;
     i = 0;
     while (i != PARTY_SIZE)
     {
         // The more challenges the player has made, the more initial rentals are generated from a commoner set of Pokémon
-        monId = GetFactoryMonId(factoryLvlMode, challengeNum, FALSE);
+        monId = GetFactoryMonId(RecordWinStreak, FALSE);
 
         //if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
             //continue;
@@ -657,10 +639,6 @@ static void RestorePlayerPartyHeldItems(void)
 u8 GetFactoryMonFixedIV(u8 challengeNum, bool8 isLastBattle)
 {
     u8 ivSet = 31;
-    
-// The Factory has an out-of-bounds access when generating the rental draft for round 9 (challengeNum==8),
-// or the "elevated" rentals from round 8 (challengeNum+1==8)
-// This happens to land on a number higher than 31, which is interpreted as "random IVs"
     return ivSet;
 }
 
@@ -675,14 +653,14 @@ void FillFactoryBrainParty(void)
 
     u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
-    u8 challengeNum = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode] / FRONTIER_STAGES_PER_CHALLENGE;
+    u32 RecordWinStreak = gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[battleMode][lvlMode];
     monLevel = SetFacilityPtrsGetLevel();
     i = 0;
     otId = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
 
     while (i != FRONTIER_PARTY_SIZE)
     {
-        u16 monId = GetFactoryMonId(lvlMode, challengeNum, FALSE);
+        u16 monId = GetFactoryMonId(RecordWinStreak, TRUE);
 
         if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
             continue;
@@ -721,8 +699,8 @@ void FillFactoryBrainParty(void)
         i++;
     }
 }
-
-static u16 GetFactoryMonId(u8 lvlMode, u8 challengeNum, bool8 useBetterRange)
+     
+static u16 GetFactoryMonId(u32 RecordWinStreak, bool8 useBetterRange)
 {
     u16 numMons, monId;
     u16 betterRangeStart = 2238;
@@ -732,14 +710,22 @@ static u16 GetFactoryMonId(u8 lvlMode, u8 challengeNum, bool8 useBetterRange)
     if (useBetterRange)
     {
         u8 probability;
-        if (challengeNum <= 2)
+        if (RecordWinStreak <= 7)
+            probability = 0;
+        else if (RecordWinStreak <= 14)
+            probability = 5;
+        else if (RecordWinStreak <= 21)
+            probability = 10;
+        else if (RecordWinStreak <= 28)
+            probability = 15;
+        else if (RecordWinStreak <= 35)
             probability = 20;
-        else if (challengeNum <= 4)
+        else if (RecordWinStreak <= 42)
+            probability = 30;
+        else if (RecordWinStreak <= 49)
             probability = 40;
-        else if (challengeNum <= 6)
-            probability = 60;
-        else if (challengeNum <= 8)
-            probability = 80;
+        else if (RecordWinStreak <= 56)
+            probability = 50;
         else
             probability = 100;
 
@@ -756,12 +742,12 @@ static u16 GetFactoryMonId(u8 lvlMode, u8 challengeNum, bool8 useBetterRange)
     }
     else
     {
-        if (challengeNum <= 1)
+        if (RecordWinStreak < 7)
         {
             numMons = betterRangeEnd - betterRangeStart + 1;
             monId = Random() % numMons + betterRangeStart;
         }
-        else if (challengeNum == 2)
+        else if (RecordWinStreak < 14)
         {
             if (Random() % 100 < 60)
             {
@@ -774,7 +760,7 @@ static u16 GetFactoryMonId(u8 lvlMode, u8 challengeNum, bool8 useBetterRange)
                 monId = Random() % numMons;
             }
         }
-        else if (challengeNum == 3)
+        else if (RecordWinStreak < 21)
         {
             if (Random() % 100 < 20)
             {

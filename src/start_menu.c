@@ -156,7 +156,7 @@ static const struct WindowTemplate sWindowTemplate_StartClock = {
     .bg = 0, 
     .tilemapLeft = 1, 
     .tilemapTop = 1, 
-    .width = 9, // If you want to shorten the dates to Sat., Sun., etc., change this to 9
+    .width = 11, // If you want to shorten the dates to Sat., Sun., etc., change this to 9
     .height = 2, 
     .paletteNum = 15,
     .baseBlock = 0x30
@@ -471,7 +471,7 @@ static void ShowPyramidFloorWindow(void)
 }
 
 // If you want to shorten the dates to Sat., Sun., etc., change this to 70
-#define CLOCK_WINDOW_WIDTH 70
+#define CLOCK_WINDOW_WIDTH 90
 
 const u8 gText_Saturday[] = _("Saturday,");
 const u8 gText_Sunday[] = _("Sunday,");
