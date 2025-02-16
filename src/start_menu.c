@@ -156,7 +156,7 @@ static const struct WindowTemplate sWindowTemplate_StartClock = {
     .bg = 0, 
     .tilemapLeft = 1, 
     .tilemapTop = 1, 
-    .width = 10, // If you want to shorten the dates to Sat., Sun., etc., change this to 9
+    .width = 14, // If you want to shorten the dates to Sat., Sun., etc., change this to 9
     .height = 2, 
     .paletteNum = 15,
     .baseBlock = 0x30
@@ -471,15 +471,15 @@ static void ShowPyramidFloorWindow(void)
 }
 
 // If you want to shorten the dates to Sat., Sun., etc., change this to 70
-#define CLOCK_WINDOW_WIDTH 80
+#define CLOCK_WINDOW_WIDTH 105//星期与时间的距离
 
-const u8 gText_Saturday[] = _("Saturday,");
-const u8 gText_Sunday[] = _("Sunday,");
-const u8 gText_Monday[] = _("Monday,");
-const u8 gText_Tuesday[] = _("Tuesday,");
-const u8 gText_Wednesday[] = _("Wednesday,");
-const u8 gText_Thursday[] = _("Thursday,");
-const u8 gText_Friday[] = _("Friday,");
+const u8 gText_Saturday[] = _("Saturday");
+const u8 gText_Sunday[] = _("Sunday");
+const u8 gText_Monday[] = _("Monday");
+const u8 gText_Tuesday[] = _("Tuesday");
+const u8 gText_Wednesday[] = _("Wednesday");
+const u8 gText_Thursday[] = _("Thursday");
+const u8 gText_Friday[] = _("Friday");
 
 const u8 *const gDayNameStringsTable[7] = {
     gText_Saturday,
@@ -493,46 +493,28 @@ const u8 *const gDayNameStringsTable[7] = {
 
 static void ShowTimeWindow(void)
 {
-    const u8 *suffix;
     u8* ptr;
-    u8 convertedHours;
 
-    // print window
+    // 创建窗口
     sStartClockWindowId = AddWindow(&sWindowTemplate_StartClock);
     PutWindowTilemap(sStartClockWindowId);
     DrawStdWindowFrame(sStartClockWindowId, FALSE);
 
-    if (gLocalTime.hours < 12)
-    {
-        if (gLocalTime.hours == 0)
-            convertedHours = 12;
-        else
-            convertedHours = gLocalTime.hours;
-        suffix = gText_AM;
-    }
-    else if (gLocalTime.hours == 12)
-    {
-        convertedHours = 12;
-        if (suffix == gText_AM);
-            suffix = gText_PM;
-    }
-    else
-    {
-        convertedHours = gLocalTime.hours - 12;
-        suffix = gText_PM;
-    }
-
+    // 显示星期
     StringExpandPlaceholders(gStringVar4, gDayNameStringsTable[(gLocalTime.days % 7)]);
-    StringExpandPlaceholders(gStringVar4, gText_ContinueMenuTime); // prints "time" word, from version before weekday was added and leaving it here in case anyone would prefer to use it
     AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, 0, 1, 0xFF, NULL); 
 
-    ptr = ConvertIntToDecimalStringN(gStringVar4, convertedHours, STR_CONV_MODE_LEFT_ALIGN, 3);
-    *ptr = 0xF0;
+    // 构建时间字符串 HH:MM:SS
+    ptr = ConvertIntToDecimalStringN(gStringVar4, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2); // 两位小时
+    *ptr++ = 0xF0; // 冒号
+    ConvertIntToDecimalStringN(ptr, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2); // 两位分钟
+    ptr += 2;
+    *ptr++ = 0xF0; // 第二个冒号
+    ConvertIntToDecimalStringN(ptr, gLocalTime.seconds, STR_CONV_MODE_LEADING_ZEROS, 2); // 两位秒数
 
-    ConvertIntToDecimalStringN(ptr + 1, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, GetStringRightAlignXOffset(1, suffix, CLOCK_WINDOW_WIDTH) - (CLOCK_WINDOW_WIDTH - GetStringRightAlignXOffset(1, gStringVar4, CLOCK_WINDOW_WIDTH) + 3), 1, 0xFF, NULL); // print time
-
-    AddTextPrinterParameterized(sStartClockWindowId, 1, suffix, GetStringRightAlignXOffset(1, suffix, CLOCK_WINDOW_WIDTH), 1, 0xFF, NULL); // print am/pm
+    // 计算右对齐坐标并打印时间
+    u8 xPos = GetStringRightAlignXOffset(1, gStringVar4, CLOCK_WINDOW_WIDTH);
+    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, xPos, 1, 0xFF, NULL);
 
     CopyWindowToVram(sStartClockWindowId, COPYWIN_GFX);
 }
