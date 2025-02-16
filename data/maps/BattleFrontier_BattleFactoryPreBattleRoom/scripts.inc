@@ -144,6 +144,7 @@ BattleFrontier_BattleFactoryPreBattleRoom_EventScript_AskSwapMon::
 	setorcopyvar VAR_0x8006, VAR_RESULT
 	call BattleFrontier_BattleFactoryPreBattleRoom_EventScript_CommentOnOpponentType
 	call BattleFrontier_BattleFactoryPreBattleRoom_EventScript_CommentOnOpponentStyle
+	goto_if_set FLAG_DIFFICULTY_MODE, BattleFrontier_BattleFactoryPreBattleRoom_EventScript_EnterBattleRoom
 	msgbox BattleFrontier_BattleFactoryPreBattleRoom_Text_LikeToSwapMon, MSGBOX_YESNO
 	switch VAR_RESULT
 	case NO, BattleFrontier_BattleFactoryPreBattleRoom_EventScript_EnterBattleRoom
@@ -375,6 +376,7 @@ BattleFrontier_BattleFactoryPreBattleRoom_EventScript_AskReadyForHeadNoRecord::
 	case MULTI_B_PRESSED, BattleFrontier_BattleFactoryPreBattleRoom_EventScript_AskReadyForHead
 
 BattleFrontier_BattleFactoryPreBattleRoom_EventScript_AskSwapBeforeHead::
+	goto_if_set FLAG_DIFFICULTY_MODE, BattleFrontier_BattleFactoryPreBattleRoom_EventScript_EnterBattleRoom
 	msgbox BattleFrontier_BattleFactoryPreBattleRoom_Text_CantTellAnythingAboutHead, MSGBOX_DEFAULT
 	msgbox BattleFrontier_BattleFactoryPreBattleRoom_Text_LikeToSwapMon, MSGBOX_YESNO
 	switch VAR_RESULT
@@ -613,7 +615,7 @@ BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleUnrestrained:
 	.string "be free-spirited and unrestrained.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_LikeToSwapMon:
-	.string "Before starting the battle, would you\n"
+	.string "Before fucking the battle, would you\n"
 	.string "like to swap a POKéMON?$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_YourSwapIsComplete:
