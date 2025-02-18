@@ -3509,4 +3509,8 @@ void ScriptHideItemDescription(struct ScriptContext *ctx)
 }
 #endif // OW_SHOW_ITEM_DESCRIPTIONS
 
-
+void SetCurrentSeason(void)
+{
+    u8 CurrentSeason = (gLocalTime.days /*/ 10*/) % 4;
+    VarSet(VAR_CURRENT_SEASON, CurrentSeason);
+}
