@@ -47,7 +47,6 @@
 #include "constants/battle_frontier.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
-#include "rtc.h"
 
 // Menu actions
 enum
@@ -82,7 +81,6 @@ COMMON_DATA bool8 (*gMenuCallback)(void) = NULL;
 
 // EWRAM
 EWRAM_DATA static u8 sSafariBallsWindowId = 0;
-EWRAM_DATA static u8 sStartClockWindowId = 0;
 EWRAM_DATA static u8 sBattlePyramidFloorWindowId = 0;
 EWRAM_DATA static u8 sStartMenuCursorPos = 0;
 EWRAM_DATA static u8 sNumStartMenuActions = 0;
@@ -145,21 +143,11 @@ static bool8 FieldCB_ReturnToFieldStartMenu(void);
 static const struct WindowTemplate sWindowTemplate_SafariBalls = {
     .bg = 0,
     .tilemapLeft = 1,
-    .tilemapTop = 5,
+    .tilemapTop = 1,
     .width = 9,
     .height = 4,
     .paletteNum = 15,
     .baseBlock = 0x8
-};
-
-static const struct WindowTemplate sWindowTemplate_StartClock = {
-    .bg = 0, 
-    .tilemapLeft = 1, 
-    .tilemapTop = 1, 
-    .width = 9, // If you want to shorten the dates to Sat., Sun., etc., change this to 9
-    .height = 2, 
-    .paletteNum = 15,
-    .baseBlock = 0x30
 };
 
 static const u8 *const sPyramidFloorNames[FRONTIER_STAGES_PER_CHALLENGE + 1] =
@@ -177,7 +165,7 @@ static const u8 *const sPyramidFloorNames[FRONTIER_STAGES_PER_CHALLENGE + 1] =
 static const struct WindowTemplate sWindowTemplate_PyramidFloor = {
     .bg = 0,
     .tilemapLeft = 1,
-    .tilemapTop = 5,
+    .tilemapTop = 1,
     .width = 10,
     .height = 4,
     .paletteNum = 15,
@@ -187,7 +175,7 @@ static const struct WindowTemplate sWindowTemplate_PyramidFloor = {
 static const struct WindowTemplate sWindowTemplate_PyramidPeak = {
     .bg = 0,
     .tilemapLeft = 1,
-    .tilemapTop = 5,
+    .tilemapTop = 1,
     .width = 12,
     .height = 4,
     .paletteNum = 15,
@@ -285,7 +273,6 @@ static void ShowSaveInfoWindow(void);
 static void RemoveSaveInfoWindow(void);
 static void HideStartMenuWindow(void);
 static void HideStartMenuDebug(void);
-static void ShowTimeWindow(void);
 
 void SetDexPokemonPokenavFlags(void) // unused
 {
@@ -470,90 +457,19 @@ static void ShowPyramidFloorWindow(void)
     CopyWindowToVram(sBattlePyramidFloorWindowId, COPYWIN_GFX);
 }
 
-// If you want to shorten the dates to Sat., Sun., etc., change this to 70
-#define CLOCK_WINDOW_WIDTH 70//星期与时间的距离
-
-const u8 gText_Monday[] = _("Mon");
-const u8 gText_Tuesday[] = _("Tue");
-const u8 gText_Wednesday[] = _("Wed");
-const u8 gText_Thursday[] = _("Thu");
-const u8 gText_Friday[] = _("Fri");
-const u8 gText_Saturday[] = _("Sat");
-const u8 gText_Sunday[] = _("Sun");
-
-const u8 *const gDayNameStringsTable[7] = {
-    gText_Monday,
-    gText_Tuesday,
-    gText_Wednesday,
-    gText_Thursday,
-    gText_Friday,
-    gText_Saturday,
-    gText_Sunday,
-};
-
-// 季节文本定义
-const u8 gText_Spring[] = _("Spr");
-const u8 gText_Summer[] = _("Sum");
-const u8 gText_Autumn[] = _("Aut");
-const u8 gText_Winter[] = _("Win");
-
-const u8 *const gSeasonStringsTable[4] = {
-    gText_Spring,
-    gText_Summer,
-    gText_Autumn,
-    gText_Winter
-};
-
-static void ShowTimeWindow(void)
-{
-    u8* ptr;
-    // 新增季节计算
-    u8 season = (gLocalTime.days /*/ 10*/) % 4; // 每10天一个季节，四季周期40天
-
-    // print window
-    sStartClockWindowId = AddWindow(&sWindowTemplate_StartClock);
-    PutWindowTilemap(sStartClockWindowId);
-    DrawStdWindowFrame(sStartClockWindowId, FALSE);
-
-    // 24小时制处理
-    u8 hours = gLocalTime.hours;
-
-    // 打印星期（左对齐）
-    StringExpandPlaceholders(gStringVar4, gDayNameStringsTable[(gLocalTime.days % 7)]);
-    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, 0, 1, 0xFF, NULL);
-
-    // 构造时间字符串HH:MM
-    ptr = ConvertIntToDecimalStringN(gStringVar4, hours, STR_CONV_MODE_LEADING_ZEROS, 2);
-    *ptr = 0xF0; // 冒号
-    ConvertIntToDecimalStringN(ptr + 1, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
-
-    // 计算时间居中位置并打印
-    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, GetStringCenterAlignXOffset(1, gStringVar4, CLOCK_WINDOW_WIDTH), 1, 0xFF, NULL);
-
-    // 打印季节（右对齐）
-    StringExpandPlaceholders(gStringVar4, gSeasonStringsTable[season]);
-    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, GetStringRightAlignXOffset(1, gStringVar4, CLOCK_WINDOW_WIDTH), 1, 0xFF, NULL);
-
-    CopyWindowToVram(sStartClockWindowId, COPYWIN_GFX);
-}
-
 static void RemoveExtraStartMenuWindows(void)
 {
     if (GetSafariZoneFlag())
     {
         ClearStdWindowAndFrameToTransparent(sSafariBallsWindowId, FALSE);
-        //CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
+        CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
         RemoveWindow(sSafariBallsWindowId);
     }
-    else if (InBattlePyramid())
+    if (InBattlePyramid())
     {
         ClearStdWindowAndFrameToTransparent(sBattlePyramidFloorWindowId, FALSE);
         RemoveWindow(sBattlePyramidFloorWindowId);
     }
-    
-    ClearStdWindowAndFrameToTransparent(sStartClockWindowId, FALSE);
-    // CopyWindowToVram(sStartClockWindowId, COPYWIN_GFX);
-    RemoveWindow(sStartClockWindowId);
 }
 
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
@@ -609,19 +525,15 @@ static bool32 InitStartMenuStep(void)
     case 3:
         if (GetSafariZoneFlag())
             ShowSafariBallsWindow();
-        else if (InBattlePyramid())
+        if (InBattlePyramid())
             ShowPyramidFloorWindow();
         sInitStartMenuData[0]++;
         break;
     case 4:
-        ShowTimeWindow();
-        sInitStartMenuData[0]++;
-        break;
-    case 5:
         if (PrintStartMenuActions(&sInitStartMenuData[1], 2))
             sInitStartMenuData[0]++;
         break;
-    case 6:
+    case 5:
         sStartMenuCursorPos = InitMenuNormal(GetStartMenuWindowId(), FONT_NORMAL, 0, 9, 16, sNumStartMenuActions, sStartMenuCursorPos);
         CopyWindowToVram(GetStartMenuWindowId(), COPYWIN_MAP);
         return TRUE;
@@ -748,8 +660,6 @@ static bool8 HandleStartMenuInput(void)
         return TRUE;
     }
 
-    RemoveExtraStartMenuWindows();
-    ShowTimeWindow();
     return FALSE;
 }
 
@@ -779,12 +689,6 @@ static bool8 StartMenuPokemonCallback(void)
         SetMainCallback2(CB2_PartyMenuFromStartMenu); // Display party menu
 
         return TRUE;
-    }
-
-    if (!GetSafariZoneFlag() && !InBattlePyramid() && gSaveBlock2Ptr->playTimeSeconds == 0) 
-    {
-        RemoveExtraStartMenuWindows();
-        ShowTimeWindow();
     }
 
     return FALSE;
