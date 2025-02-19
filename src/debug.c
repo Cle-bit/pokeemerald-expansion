@@ -4189,7 +4189,7 @@ static void DebugAction_PCBag_Fill_PocketItems(u8 taskId)
     for (itemId = 1; itemId < ITEMS_COUNT; itemId++)
     {
         if (ItemId_GetPocket(itemId) == POCKET_ITEMS && CheckBagHasSpace(itemId, MAX_BAG_ITEM_CAPACITY))
-            AddBagItem(itemId, MAX_BAG_ITEM_CAPACITY);
+            AddBagItem(itemId, 1);
     }
 }
 

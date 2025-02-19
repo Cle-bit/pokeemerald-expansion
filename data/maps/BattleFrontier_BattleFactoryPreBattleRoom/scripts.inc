@@ -615,7 +615,7 @@ BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleUnrestrained:
 	.string "be free-spirited and unrestrained.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_LikeToSwapMon:
-	.string "Before fucking the battle, would you\n"
+	.string "Before starting the battle, would you\n"
 	.string "like to swap a POKéMON?$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_YourSwapIsComplete:
