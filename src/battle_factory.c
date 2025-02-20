@@ -43,9 +43,9 @@ static u8 GetMoveBattleStyle(u16 move);
 
 // Number of moves needed on the team to be considered using a certain battle style
 static const u8 sRequiredMoveCounts[FACTORY_NUM_STYLES - 1] = {
-    [FACTORY_STYLE_PREPARATION - 1]   = 3,
-    [FACTORY_STYLE_SLOW_STEADY - 1]   = 3,
-    [FACTORY_STYLE_ENDURANCE - 1]     = 3,
+    [FACTORY_STYLE_PREPARATION - 1]   = 2,
+    [FACTORY_STYLE_SLOW_STEADY - 1]   = 2,
+    [FACTORY_STYLE_ENDURANCE - 1]     = 2,
     [FACTORY_STYLE_HIGH_RISK - 1]     = 2,
     [FACTORY_STYLE_WEAKENING - 1]     = 2,
     [FACTORY_STYLE_UNPREDICTABLE - 1] = 2,
@@ -56,7 +56,7 @@ static const u16 sMoves_TotalPreparation[] =
 {
     MOVE_SWORDS_DANCE, MOVE_GROWTH, MOVE_MEDITATE, MOVE_AGILITY, MOVE_DOUBLE_TEAM, MOVE_HARDEN,
     MOVE_MINIMIZE, MOVE_WITHDRAW, MOVE_DEFENSE_CURL, MOVE_BARRIER, MOVE_FOCUS_ENERGY, MOVE_AMNESIA,
-    MOVE_ACID_ARMOR, MOVE_SHARPEN, MOVE_CONVERSION, MOVE_CONVERSION_2, MOVE_BELLY_DRUM, MOVE_PSYCH_UP,
+    MOVE_ACID_ARMOR, MOVE_SHARPEN, MOVE_CONVERSION, MOVE_CONVERSION_2, MOVE_BELLY_DRUM, MOVE_PSYCH_UP, MOVE_BATON_PASS,
     MOVE_CHARGE, MOVE_SNATCH, MOVE_TAIL_GLOW, MOVE_COSMIC_POWER, MOVE_IRON_DEFENSE, MOVE_HOWL, MOVE_BULK_UP, MOVE_CALM_MIND, MOVE_DRAGON_DANCE,
     MOVE_NONE
 };
@@ -88,7 +88,7 @@ static const u16 sMoves_HighRiskHighReturn[] =
 static const u16 sMoves_Endurance[] =
 {
     MOVE_MIST, MOVE_RECOVER, MOVE_LIGHT_SCREEN, MOVE_HAZE, MOVE_REFLECT, MOVE_SOFT_BOILED, MOVE_REST, MOVE_PROTECT,
-    MOVE_DETECT, MOVE_ENDURE, MOVE_MILK_DRINK, MOVE_HEAL_BELL, MOVE_SAFEGUARD, MOVE_BATON_PASS, MOVE_MORNING_SUN,
+    MOVE_DETECT, MOVE_ENDURE, MOVE_MILK_DRINK, MOVE_HEAL_BELL, MOVE_SAFEGUARD, MOVE_MORNING_SUN,
     MOVE_SYNTHESIS, MOVE_MOONLIGHT, MOVE_SWALLOW, MOVE_WISH, MOVE_INGRAIN, MOVE_MAGIC_COAT, MOVE_RECYCLE, MOVE_REFRESH,
     MOVE_MUD_SPORT, MOVE_SLACK_OFF, MOVE_AROMATHERAPY, MOVE_WATER_SPORT,
     MOVE_NONE
@@ -105,7 +105,8 @@ static const u16 sMoves_SlowAndSteady[] =
 
 static const u16 sMoves_DependsOnTheBattlesFlow[] =
 {
-    MOVE_SANDSTORM, MOVE_RAIN_DANCE, MOVE_SUNNY_DAY, MOVE_HAIL, MOVE_WEATHER_BALL,
+    MOVE_SANDSTORM, MOVE_RAIN_DANCE, MOVE_SUNNY_DAY, MOVE_HAIL, MOVE_WEATHER_BALL, MOVE_TAILWIND, MOVE_TRICK_ROOM, MOVE_MAGIC_ROOM, MOVE_WONDER_ROOM,
+    MOVE_SPIKES, MOVE_STEALTH_ROCK, MOVE_TOXIC_SPIKES, MOVE_STICKY_WEB, 
     MOVE_NONE
 };
 
@@ -188,6 +189,7 @@ static void InitFactoryChallenge(void)
     gSaveBlock2Ptr->frontier.curChallengeBattleNum = 0;
     gSaveBlock2Ptr->frontier.challengePaused = FALSE;
     gSaveBlock2Ptr->frontier.disableRecordBattle = FALSE;
+    VarSet(VAR_FACTORY_SWAP_COUNTER, 0);
     if (!(gSaveBlock2Ptr->frontier.winStreakActiveFlags & sWinStreakFlags[battleMode][lvlMode]))
     {
         gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode] = 0;
@@ -805,15 +807,42 @@ u8 GetNumPastRentalsRank(u8 battleMode, u8 lvlMode)
 
 u32 GetAiScriptsInBattleFactory(void)
 {
-    int lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
-
-    if (lvlMode == FRONTIER_LVL_TENT)
-    {
+    u8 gameMode = VarGet(VAR_GAME_MODE);
+    if (gameMode != 1 && gameMode != 2)
         return 0;
-    }
-    else
+
+    GetOpponentBattleStyle();
+    u8 battleStyle = gSpecialVar_Result;
+
+    if (gameMode == 1)
     {
-        return AI_FLAG_SMART_TRAINER;
+        if (battleStyle == FACTORY_STYLE_HIGH_RISK)
+            return AI_FLAG_BASIC_TRAINER_RISKY;
+        else if (battleStyle == FACTORY_STYLE_ENDURANCE || battleStyle == FACTORY_STYLE_WEAKENING)
+            return AI_FLAG_BASIC_TRAINER_CONSERVATIVE;
+        else if (battleStyle == FACTORY_STYLE_SLOW_STEADY)
+            return AI_FLAG_BASIC_TRAINER_DEFEND;
+        else if (battleStyle == FACTORY_STYLE_WEATHER)
+            return AI_FLAG_BASIC_TRAINER_POWERSTAGE;
+        else if (battleStyle == FACTORY_STYLE_PREPARATION)
+            return AI_FLAG_BASIC_TRAINER_STRENGTHEN;
+        else
+            return AI_FLAG_BASIC_TRAINER;
+    }
+    else // gameMode == 2
+    {
+        if (battleStyle == FACTORY_STYLE_HIGH_RISK)
+            return AI_FLAG_SMART_TRAINER_RISKY;
+        else if (battleStyle == FACTORY_STYLE_ENDURANCE || battleStyle == FACTORY_STYLE_WEAKENING)
+            return AI_FLAG_SMART_TRAINER_CONSERVATIVE;
+        else if (battleStyle == FACTORY_STYLE_SLOW_STEADY)
+            return AI_FLAG_SMART_TRAINER_DEFEND;
+        else if (battleStyle == FACTORY_STYLE_WEATHER)
+            return AI_FLAG_SMART_TRAINER_POWERSTAGE;
+        else if (battleStyle == FACTORY_STYLE_PREPARATION)
+            return AI_FLAG_SMART_TRAINER_STRENGTHEN;
+        else
+            return AI_FLAG_SMART_TRAINER;
     }
 }
 
