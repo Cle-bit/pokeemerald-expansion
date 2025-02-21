@@ -38,7 +38,7 @@ static void GenerateInitialRentalMons(void);
 static void GetOpponentMostCommonMonType(void);
 static void GetOpponentBattleStyle(void);
 static void RestorePlayerPartyHeldItems(void);
-static u16 GetFactoryMonId(u32 RecordWinStreak, bool8 useBetterRange);
+static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange);
 static u8 GetMoveBattleStyle(u16 move);
 
 // Number of moves needed on the team to be considered using a certain battle style
@@ -173,6 +173,24 @@ static const u16 sInitialRentalMonRanges[][2] =
 
 };
 
+// 工厂测试模式专用宝可梦列表
+static const u16 factoryMonsGen9[] = {
+    52,53,66,67,72,73,74,75,97,98,107,108,109,110,124,125,126,127,150,151,152,162,163,222,223,224,229,230,
+    231,232,241,242,290,291,292,293,319,320,325,326,347,348,382,383,384,425,426,427,428,429,430,431,432,441,
+    442,443,444,488,489,544,545,546,547,588,589,590,591,604,605,606,607,616,617,630,631,632,633,646,647,660,
+    661,662,663,684,685,733,734,744,745,776,777,794,795,796,797,811,812,813,814,823,824,829,830,839,840,939,
+    972,973,974,975,976,977,978,979,980,981,982,983,984,985,986,987,988,989,990,991,1029,1030,1031,1032,1041,
+    1042,1043,1044,1045,1074,1075,1076,1115,1116,1117,1118,1123,1124,1166,1213,1214,1215,1216,1241,1242,1293,
+    1294,1295,1296,1321,1322,1323,1324,1325,1326,1351,1352,1353,1354,1382,1383,1406,1407,1408,1413,1414,1432,
+    1433,1446,1447,1448,1449,1527,1528,1534,1535,1540,1541,1542,1543,1556,1557,1558,1559,1564,1565,1566,1567,
+    1604,1605,1619,1620,1669,1670,1671,1672,1681,1682,1683,1684,1685,1686,1707,1712,1713,1777,1786,1787,1796,
+    1797,1802,1803,1804,1809,1810,1811,1812,1813,1823,1824,1825,1826,1882,1883,1884,1946,1947,1968,1969,1970,
+    1971,1972,1973,1974,1975,1976,1977,1978,1979,1992,1993,1994,1995,1996,1997,2038,2039,2040,2041,2058,2059,
+    2060,2061,2086,2087,2135,2136,2153,2154,2155,2156,2190,2191,2192,2193,2194,2195,2221,2222,2223,2224,2233,
+    2234,2235,2236,2237,2238,2239,2240,2241,2242,2243,2244,2245,2246,2247,2248,2249,2250,2251,2252,2253,2254,
+    2255,2256,2257,2258,2259,2260,2261,2262,2263,2264,2265,2266,2267,2268,2269,2270,2271,2272,2273,2505,2506
+};
+
 // code
 void CallBattleFactoryFunction(void)
 {
@@ -189,13 +207,14 @@ static void InitFactoryChallenge(void)
     gSaveBlock2Ptr->frontier.curChallengeBattleNum = 0;
     gSaveBlock2Ptr->frontier.challengePaused = FALSE;
     gSaveBlock2Ptr->frontier.disableRecordBattle = FALSE;
-    VarSet(VAR_FACTORY_SWAP_COUNTER, 0);
+
     if (!(gSaveBlock2Ptr->frontier.winStreakActiveFlags & sWinStreakFlags[battleMode][lvlMode]))
     {
         gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode] = 0;
         gSaveBlock2Ptr->frontier.factoryRentsCount[battleMode][lvlMode] = 0;
     }
 
+    VarSet(VAR_FACTORY_SWAP_COUNTER, 0);
     sPerformedRentalSwap = FALSE;
     for (i = 0; i < ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons); i++)
         gSaveBlock2Ptr->frontier.rentalMons[i].monId = 0xFFFF;
@@ -290,13 +309,13 @@ static void GenerateOpponentMons(void)
 {
     int i, j, k;
     u16 species[FRONTIER_PARTY_SIZE];
-    u16 heldItems[FRONTIER_PARTY_SIZE];
     int firstMonId = 0;
     u16 trainerId = 0;
     u32 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     u32 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
-    u32 challengeNum = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode] / FRONTIER_STAGES_PER_CHALLENGE;
-    u32 RecordWinStreak = gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[battleMode][lvlMode];
+    u32 WinStreak = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode];
+    u32 challengeNum = WinStreak / FRONTIER_STAGES_PER_CHALLENGE;
+
     gFacilityTrainers = gBattleFrontierTrainers;
 
     do
@@ -317,11 +336,11 @@ static void GenerateOpponentMons(void)
     i = 0;
     while (i != FRONTIER_PARTY_SIZE)
     {
-        u16 monId = GetFactoryMonId(RecordWinStreak, TRUE);
+        u16 monId = GetFactoryMonId(WinStreak, TRUE);
 
         // Unown (FRONTIER_MON_UNOWN) is forbidden on opponent Factory teams.
-        //if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
-            //continue;
+        if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
+            continue;
 
         // Ensure none of the opponent's Pokémon are the same as the potential rental Pokémon for the player
         for (j = 0; j < (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons); j++)
@@ -332,10 +351,6 @@ static void GenerateOpponentMons(void)
         if (j != (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons))
             continue;
 
-        // "High tier" Pokémon are only allowed for AI
-        //if (lvlMode == FRONTIER_LVL_50 && monId <= FRONTIER_MONS_HIGH_TIER)
-            //continue;
-
         // Ensure this species hasn't already been chosen for the opponent
         for (k = firstMonId; k < firstMonId + i; k++)
         {
@@ -345,18 +360,8 @@ static void GenerateOpponentMons(void)
         if (k != firstMonId + i)
             continue;
 
-        // Ensure held items don't repeat on the opponent's team
-        for (k = firstMonId; k < firstMonId + i; k++)
-        {
-            if (heldItems[k] != ITEM_NONE && heldItems[k] == gFacilityTrainerMons[monId].heldItem)
-                break;
-        }
-        if (k != firstMonId + i)
-            continue;
-
         // Successful selection
         species[i] = gFacilityTrainerMons[monId].species;
-        heldItems[i] = gFacilityTrainerMons[monId].heldItem;
         gFrontierTempParty[i] = monId;
         i++;
     }
@@ -437,67 +442,38 @@ static void GenerateInitialRentalMons(void)
     u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
     u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     u16 monId;
-    u16 currSpecies;
     u16 species[PARTY_SIZE];
-    u16 monIds[PARTY_SIZE];
-    u16 heldItems[PARTY_SIZE];
-    u32 RecordWinStreak = gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[battleMode][lvlMode];
+    u32 WinStreak = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode];
 
     gFacilityTrainers = gBattleFrontierTrainers;
     for (i = 0; i < PARTY_SIZE; i++)
     {
         species[i] = SPECIES_NONE;
-        monIds[i] = 0;
-        heldItems[i] = ITEM_NONE;
     }
 
     gFacilityTrainerMons = gBattleFrontierMons;
     firstMonId = 0;
 
-    currSpecies = SPECIES_NONE;
     i = 0;
     while (i != PARTY_SIZE)
     {
         // The more challenges the player has made, the more initial rentals are generated from a commoner set of Pokémon
-        monId = GetFactoryMonId(RecordWinStreak, FALSE);
+        monId = GetFactoryMonId(WinStreak, FALSE);
 
-        //if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
-            //continue;
+        if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
+            continue;
 
         // Cannot have two Pokémon of the same species.
         for (j = firstMonId; j < firstMonId + i; j++)
         {
-            u16 existingMonId = monIds[j];
-            if (existingMonId == monId)
-                break;
             if (species[j] == gFacilityTrainerMons[monId].species)
-            {
-                if (currSpecies == SPECIES_NONE)
-                    currSpecies = gFacilityTrainerMons[monId].species;
-                else
-                    break;
-            }
-        }
-        if (j != firstMonId + i)
-            continue;
-
-        // Cannot have two same held items.
-        for (j = firstMonId; j < firstMonId + i; j++)
-        {
-            if (heldItems[j] != ITEM_NONE && heldItems[j] == gFacilityTrainerMons[monId].heldItem)
-            {
-                if (gFacilityTrainerMons[monId].species == currSpecies)
-                    currSpecies = SPECIES_NONE;
                 break;
-            }
         }
         if (j != firstMonId + i)
             continue;
 
         gSaveBlock2Ptr->frontier.rentalMons[i].monId = monId;
         species[i] = gFacilityTrainerMons[monId].species;
-        heldItems[i] = gFacilityTrainerMons[monId].heldItem;
-        monIds[i] = monId;
         i++;
     }
 }
@@ -655,14 +631,14 @@ void FillFactoryBrainParty(void)
 
     u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
-    u32 RecordWinStreak = gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[battleMode][lvlMode];
+    u32 WinStreak = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode];
     monLevel = SetFacilityPtrsGetLevel();
     i = 0;
     otId = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
 
     while (i != FRONTIER_PARTY_SIZE)
     {
-        u16 monId = GetFactoryMonId(RecordWinStreak, TRUE);
+        u16 monId = GetFactoryMonId(WinStreak, TRUE);
 
         if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
             continue;
@@ -701,37 +677,27 @@ void FillFactoryBrainParty(void)
         i++;
     }
 }
-     
-static u16 GetFactoryMonId(u32 RecordWinStreak, bool8 useBetterRange)
+
+static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange)
 {
     u16 numMons, monId;
-    u16 betterRangeStart = 2238;
-    u16 betterRangeEnd = 2468;
-    u16 normalRangeEnd = 2237;
+    u16 betterRangeStart = 2276;
+    u16 betterRangeEnd = 2506;
+    u16 normalRangeEnd = 2275;
 
     if (useBetterRange)
     {
         u8 probability;
-        if (RecordWinStreak <= 7)
+        if (WinStreak < 21)//1-3
             probability = 0;
-        else if (RecordWinStreak <= 14)
-            probability = 5;
-        else if (RecordWinStreak <= 21)
-            probability = 10;
-        else if (RecordWinStreak <= 28)
-            probability = 15;
-        else if (RecordWinStreak <= 35)
-            probability = 20;
-        else if (RecordWinStreak <= 42)
-            probability = 30;
-        else if (RecordWinStreak <= 49)
-            probability = 40;
-        else if (RecordWinStreak <= 56)
-            probability = 50;
+        else if (WinStreak < 42)//4-6
+            probability = 33;
+        else if (WinStreak < 63)//7-9
+            probability = 66;
         else
             probability = 100;
 
-        if (Random() % 100 < probability)
+        if (Random() % 100 <= probability)
         {
             numMons = betterRangeEnd - betterRangeStart + 1;
             monId = Random() % numMons + betterRangeStart;
@@ -744,17 +710,38 @@ static u16 GetFactoryMonId(u32 RecordWinStreak, bool8 useBetterRange)
     }
     else
     {
-        if (RecordWinStreak < 7)
+        if (FlagGet(FLAG_FACTORY_TEST) == FALSE)
         {
-            numMons = betterRangeEnd - betterRangeStart + 1;
-            monId = Random() % numMons + betterRangeStart;
-        }
-        else if (RecordWinStreak < 14)
-        {
-            if (Random() % 100 < 60)
+            if (WinStreak < 7)
             {
                 numMons = betterRangeEnd - betterRangeStart + 1;
                 monId = Random() % numMons + betterRangeStart;
+            }
+            else if (WinStreak < 14)
+            {
+                if (Random() % 100 <= 66)
+                {
+                    numMons = betterRangeEnd - betterRangeStart + 1;
+                    monId = Random() % numMons + betterRangeStart;
+                }
+                else
+                {
+                    numMons = normalRangeEnd + 1;
+                    monId = Random() % numMons;
+                }
+            }
+            else if (WinStreak < 21)
+            {
+                if (Random() % 100 <= 33)
+                {
+                    numMons = betterRangeEnd - betterRangeStart + 1; 
+                    monId = Random() % numMons + betterRangeStart; 
+                }
+                else
+                {
+                    numMons = normalRangeEnd + 1;
+                    monId = Random() % numMons;
+                }
             }
             else
             {
@@ -762,23 +749,10 @@ static u16 GetFactoryMonId(u32 RecordWinStreak, bool8 useBetterRange)
                 monId = Random() % numMons;
             }
         }
-        else if (RecordWinStreak < 21)
+        else // 工厂测试模式
         {
-            if (Random() % 100 < 20)
-            {
-                numMons = betterRangeEnd - betterRangeStart + 1;
-                monId = Random() % numMons + betterRangeStart;
-            }
-            else
-            {
-                numMons = normalRangeEnd + 1;
-                monId = Random() % numMons;
-            }
-        }
-        else
-        {
-            numMons = normalRangeEnd + 1;
-            monId = Random() % numMons;
+            const u16 arrSize = sizeof(factoryMonsGen9) / sizeof(factoryMonsGen9[0]);
+            monId = factoryMonsGen9[Random() % arrSize];
         }
     }
     return monId;
