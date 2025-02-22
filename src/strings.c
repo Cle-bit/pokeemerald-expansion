@@ -1259,6 +1259,9 @@ const u8 gText_MoveCloserToLinkPartner[] = _("Move closer to your link partner(s
 const u8 gText_ABtnRegistrationCounter[] = _("A Button: Registration Counter");
 const u8 gText_ABtnTitleScreen[] = _("A Button: Title Screen");
 const u8 gText_Option[] = _("OPTION");
+const u8 gText_SmallDot[] = _("·");
+const u8 gText_LargeDot[] = _("{EMOJI_CIRCLE}");
+const u8 gText_PageNav[] = _("{L_BUTTON}{R_BUTTON} PAGE");
 const u8 gText_TextSpeed[] = _("TEXT SPEED");
 const u8 gText_BattleScene[] = _("BATTLE SCENE");
 const u8 gText_BattleStyle[] = _("BATTLE STYLE");
@@ -1266,6 +1269,14 @@ const u8 gText_Sound[] = _("SOUND");
 const u8 gText_Frame[] = _("FRAME");
 const u8 gText_OptionMenuCancel[] = _("CANCEL");
 const u8 gText_ButtonMode[] = _("BUTTON MODE");
+//Custom option menu
+const u8 gText_Difficulty[] = _("DIFFICULTY");
+const u8 gText_ExpSharing[] = _("EXP SHARE");
+const u8 gText_WildDouble[] = _("WILD DOUBLE");
+const u8 gText_BagUse[] = _("BAG USE");
+//const u8 gText_Follower[] = _("FOLLOWER");
+const u8 gText_MoveDescription[] = _("MOVE DESCRIPTION");
+
 const u8 gText_TextSpeedSlow[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SLOW");
 const u8 gText_TextSpeedMid[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MID");
 const u8 gText_TextSpeedFast[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FAST");
@@ -1280,6 +1291,21 @@ const u8 gText_FrameTypeNumber[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}");
 const u8 gText_ButtonTypeNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
 const u8 gText_ButtonTypeLR[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}LR");
 const u8 gText_ButtonTypeLEqualsA[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}L=A");
+//Custom option menu
+const u8 gText_DifficultyEasy[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}EASY");
+const u8 gText_DifficultyNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
+const u8 gText_DifficultyHard[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HARD");
+const u8 gText_ExpSharingon[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
+const u8 gText_ExpSharingOff[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
+const u8 gText_WildDoubleon[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
+const u8 gText_WildDoubleoff[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
+const u8 gText_BagUseon[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ALLOW");
+const u8 gText_BagUseoff[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}BAN");
+const u8 gText_Followeron[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SHOW");
+const u8 gText_Followeroff[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HIDE");
+const u8 gText_MoveDescriptionon[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SHOW");
+const u8 gText_MoveDescriptionoff[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}HIDE");
+
 const u8 gText_NumPlayerLink[] = _("{STR_VAR_1}P LINK");
 const u8 gText_BronzeCard[] = _("BRONZE");
 const u8 gText_CopperCard[] = _("COPPER");

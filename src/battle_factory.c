@@ -781,7 +781,7 @@ u8 GetNumPastRentalsRank(u8 battleMode, u8 lvlMode)
 
 u32 GetAiScriptsInBattleFactory(void)
 {
-    u8 gameMode = VarGet(VAR_GAME_MODE);
+    u8 gameMode = VarGet(VAR_DIFFICULTY_MODE);
     if (gameMode != 1 && gameMode != 2)
         return 0;
 

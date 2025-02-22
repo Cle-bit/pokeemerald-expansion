@@ -1,3 +1,4 @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 1.Outfit-System
 https://github.com/mudskipper13/pokeemerald/tree/outfits-rhh
 
@@ -10,8 +11,7 @@ https://github.com/HashtagMarky/pokeemerald/tree/ikigai/ow-encounters
 4.Craft-System
 https://github.com/hedara90/pokeemerald-expansion/tree/crafting
 
-
-
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 1.Seasons
 https://github.com/BelialClover/pokeemerald/tree/seasons
 
@@ -33,5 +33,10 @@ https://github.com/Kasenn/pokeemerald-expansion-kasen/tree/toggle_follower_from_
 7.Registered_items_menu
 https://github.com/iriv24/pokeemerald-expansion/tree/iriv24/tx_registered_items_menu
 
-8.Gen5_party_menu
+8.BW_party_menu
 https://github.com/Pawkkie/Team-Aquas-Asset-Repo/wiki/Feature-Branches#gen-5ish-party-menu
+
+9.Option_menu_second_page
+https://github.com/pret/pokeemerald/wiki/Multipage-Options-Menu
+https://github.com/PCG06/pokeemerald/blob/66ff4ddd43975e5a47adc966481825f6e0ee4343/src/option_menu.c#L106
+https://github.com/PCG06/pokeemerald/commit/66ff4ddd43975e5a47adc966481825f6e0ee4343#diff-778d5e3e3c2ed7c815b1551f8bdf90eab4f2c8eecc314222005cadb097e908a5
