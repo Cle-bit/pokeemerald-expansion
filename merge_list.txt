@@ -1,16 +1,13 @@
-3.Outfit-System
+1.Outfit-System
 https://github.com/mudskipper13/pokeemerald/tree/outfits-rhh
 
-4.Ev-Iv-Editor
+2.Ev-Iv-Editor
 https://github.com/pret/pokeemerald/wiki/Add-a-EV---IV-Stat-Editor-UI
 
-5.DexNav
-https://github.com/ghoulslash/pokeemerald/tree/dexnav
-
-6.Ow-Encounters
+3.Ow-Encounters
 https://github.com/HashtagMarky/pokeemerald/tree/ikigai/ow-encounters
 
-7.Craft-System
+4.Craft-System
 https://github.com/hedara90/pokeemerald-expansion/tree/crafting
 
 
@@ -21,17 +18,20 @@ https://github.com/BelialClover/pokeemerald/tree/seasons
 2.Timebox
 https://github.com/Pawkkie/pokeemerald-expansion/tree/start-menu-clock
 
-3.BW-summary-screen
+3.BW_summary_screen
 https://github.com/ravepossum/pokeemerald-expansion/tree/bw_summary_screen_expansion
 
 4.Ruins of Alph Puzzles
 https://github.com/sphericalice/pokeemerald/tree/sliding_puzzles
 
-5.Fishing-game
+5.Fishing_game
 https://github.com/Bivurnum/pokeemerald-expansion/tree/fishing-game-dev-expansion
 
-6.Follower-choose
+6.Follower_choose
 https://github.com/Kasenn/pokeemerald-expansion-kasen/tree/toggle_follower_from_party_menu
 
 7.Registered_items_menu
 https://github.com/iriv24/pokeemerald-expansion/tree/iriv24/tx_registered_items_menu
+
+8.Gen5_party_menu
+https://github.com/Pawkkie/Team-Aquas-Asset-Repo/wiki/Feature-Branches#gen-5ish-party-menu
