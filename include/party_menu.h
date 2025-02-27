@@ -102,6 +102,5 @@ void MoveDeleterForgetMove(void);
 void BufferMoveDeleterNicknameAndMove(void);
 void GetNumMovesSelectedMonHas(void);
 void MoveDeleterChooseMoveToForget(void);
-bool8 PlayerHasMove(u16 move);
 
 #endif // GUARD_PARTY_MENU_H
