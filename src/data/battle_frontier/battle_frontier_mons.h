@@ -8690,7 +8690,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_MEOWSCARADA_1] = {
         .species = SPECIES_MEOWSCARADA, //魔幻假面喵
         .moves = {MOVE_FLOWER_TRICK, MOVE_KNOCK_OFF, MOVE_PLAY_ROUGH, MOVE_PROTECT}, //千变万花，拍落，嬉闹，守住
-        .heldItem = ITEM_AIR_BALLOON,
+        .heldItem = ITEM_LIFE_ORB,
         .ev = TRAINER_PARTY_EVS(0, 252, 0, 252, 0, 4),
         .nature = NATURE_JOLLY
     },
@@ -11238,7 +11238,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_REVAVROOM_2] = {
         .species = SPECIES_REVAVROOM, //普隆隆姆
         .moves = {MOVE_GUNK_SHOT, MOVE_SHIFT_GEAR, MOVE_IRON_HEAD, MOVE_HIGH_HORSEPOWER}, //垃圾射击，换档，铁头，十万马力
-        .heldItem = ITEM_CHOICE_SCARF,
+        .heldItem = ITEM_AIR_BALLOON,
         .ev = TRAINER_PARTY_EVS(0, 252, 0, 252, 0, 4),
         .nature = NATURE_ADAMANT
     },
