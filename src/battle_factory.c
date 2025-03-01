@@ -460,6 +460,7 @@ static void GenerateInitialRentalMons(void)
         // The more challenges the player has made, the more initial rentals are generated from a commoner set of Pokémon
         monId = GetFactoryMonId(WinStreak, FALSE);
 
+        // Unown (FRONTIER_MON_UNOWN) is forbidden on opponent Factory teams.
         if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
             continue;
 
@@ -688,14 +689,19 @@ static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange)
     if (useBetterRange)
     {
         u8 probability;
-        if (WinStreak < 21)//1-3
+        if (VarGet(VAR_DIFFICULTY_MODE) == 0)
             probability = 0;
-        else if (WinStreak < 42)//4-6
-            probability = 33;
-        else if (WinStreak < 63)//7-9
-            probability = 66;
         else
-            probability = 100;
+        {
+            if (WinStreak < 25) // 1-25
+                probability = 0;
+            else if (WinStreak < 50) // 26-50
+                probability = 33;
+            else if (WinStreak < 75) // 51-75
+                probability = 66;
+            else
+                probability = 100;
+        }
 
         if (Random() % 100 <= probability)
         {

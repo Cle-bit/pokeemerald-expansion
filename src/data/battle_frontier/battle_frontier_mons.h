@@ -6578,14 +6578,14 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .moves = {MOVE_FIRE_FANG, MOVE_LAST_RESPECTS, MOVE_SHADOW_BALL, MOVE_SUNNY_DAY}, //火焰牙，扫墓，暗影球，大晴天
         .heldItem = ITEM_SPELL_TAG,
         .ev = TRAINER_PARTY_EVS(116, 76, 80, 88, 96, 52),
-        .nature = NATURE_CALM
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_HUNTAIL_1] = {
         .species = SPECIES_HUNTAIL, //猎斑鱼
         .moves = {MOVE_AQUA_TAIL, MOVE_ICE_FANG, MOVE_CRUNCH, MOVE_SHELL_SMASH}, //水流尾，冰冻牙，咬碎，破壳
         .heldItem = ITEM_WHITE_HERB,
         .ev = TRAINER_PARTY_EVS(0, 252, 252, 4, 0, 0),
-        .nature = NATURE_ADAMANT
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_HUNTAIL_2] = {
         .species = SPECIES_HUNTAIL, //猎斑鱼
@@ -6806,14 +6806,14 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     },
     [FRONTIER_MON_IRON_BOULDER_1] = {
         .species = SPECIES_IRON_BOULDER, //铁磐岩
-        .moves = {MOVE_MIGHTY_CLEAVE, MOVE_MEGAHORN, MOVE_ZEN_HEADBUTT, MOVE_SWORDS_DANCE}, //强刃攻击，超级角击，意念头锤，剑舞
+        .moves = {MOVE_MIGHTY_CLEAVE, MOVE_MEGAHORN, MOVE_ZEN_HEADBUTT, MOVE_SACRED_SWORD}, //强刃攻击，超级角击，意念头锤，圣剑
         .heldItem = ITEM_CHOICE_BAND,
         .ev = TRAINER_PARTY_EVS(0, 252, 0, 252, 0, 4),
         .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_IRON_BOULDER_2] = {
         .species = SPECIES_IRON_BOULDER, //铁磐岩
-        .moves = {MOVE_MIGHTY_CLEAVE, MOVE_MEGAHORN, MOVE_CLOSE_COMBAT, MOVE_SACRED_SWORD}, //强刃攻击，超级角击，近身战，圣剑
+        .moves = {MOVE_MIGHTY_CLEAVE, MOVE_MEGAHORN, MOVE_CLOSE_COMBAT, MOVE_SWORDS_DANCE}, //强刃攻击，超级角击，近身战，剑舞
         .heldItem = ITEM_BOOSTER_ENERGY,
         .ev = TRAINER_PARTY_EVS(0, 252, 4, 252, 0, 0),
         .nature = NATURE_JOLLY
@@ -9677,16 +9677,16 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_OKIDOGI_1] = {
         .species = SPECIES_OKIDOGI, //够赞狗
         .moves = {MOVE_BULK_UP, MOVE_DRAIN_PUNCH, MOVE_KNOCK_OFF, MOVE_POISON_JAB}, //健美，吸取拳，拍落，毒击
-        .heldItem = ITEM_ASSAULT_VEST,
+        .heldItem = ITEM_LIFE_ORB,
         .ev = TRAINER_PARTY_EVS(4, 252, 0, 252, 0, 0),
-        .nature = NATURE_ADAMANT
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_OKIDOGI_2] = {
         .species = SPECIES_OKIDOGI, //够赞狗
         .moves = {MOVE_GUNK_SHOT, MOVE_CLOSE_COMBAT, MOVE_KNOCK_OFF, MOVE_LOW_KICK}, //垃圾射击，近身战，拍落，踢倒
         .heldItem = ITEM_CHOICE_SCARF,
         .ev = TRAINER_PARTY_EVS(252, 192, 60, 0, 0, 4),
-        .nature = NATURE_JOLLY
+        .nature = NATURE_ADAMANT
     },
     [FRONTIER_MON_OMASTAR_1] = {
         .species = SPECIES_OMASTAR, //多刺菊石兽
@@ -15661,14 +15661,14 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     },
     [FRONTIER_MON_ARCHALUDON_1] = {
         .species = SPECIES_ARCHALUDON, //铝钢桥龙
-        .moves = {MOVE_BODY_PRESS, MOVE_FLASH_CANNON, MOVE_ELECTRO_SHOT, MOVE_REST},//扑击，加农光炮,电光束,睡觉
+        .moves = {MOVE_BODY_PRESS, MOVE_FLASH_CANNON, MOVE_SLEEP_TALK, MOVE_REST},//扑击，加农光炮,梦话,睡觉 
         .heldItem = ITEM_HEAVY_DUTY_BOOTS,
         .ev = TRAINER_PARTY_EVS(252, 0, 252, 0, 0, 4),
         .nature = NATURE_BOLD
     },
     [FRONTIER_MON_ARCHALUDON_2] = {
         .species = SPECIES_ARCHALUDON, //铝钢桥龙
-        .moves = {MOVE_BODY_PRESS, MOVE_FLASH_CANNON, MOVE_STEALTH_ROCK, MOVE_FOUL_PLAY}, //扑击，加农光炮,隐形岩，欺诈
+        .moves = {MOVE_BODY_PRESS, MOVE_FLASH_CANNON, MOVE_ELECTRO_SHOT, MOVE_FOUL_PLAY}, //扑击，加农光炮,电光束，欺诈
         .heldItem = ITEM_ASSAULT_VEST,
         .ev = TRAINER_PARTY_EVS(252, 0, 252, 0, 0, 4),
         .nature = NATURE_BOLD
