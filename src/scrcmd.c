@@ -1255,6 +1255,21 @@ bool8 ScrCmd_fadeinbgm(struct ScriptContext *ctx)
     return FALSE;
 }
 
+struct ObjectEvent *ScriptHideFollower(void)
+{
+    struct ObjectEvent *obj = GetFollowerObject();
+
+    if (obj == NULL || obj->invisible)
+        return NULL;
+
+    ClearObjectEventMovement(obj, &gSprites[obj->spriteId]);
+    gSprites[obj->spriteId].animCmdIndex = 0; // Reset start frame of animation
+    // Note: ScriptMovement_ returns TRUE on error
+    if (ScriptMovement_StartObjectMovementScript(obj->localId, obj->mapGroup, obj->mapNum, EnterPokeballMovement))
+        return NULL;
+    return obj;
+}
+
 bool8 ScrCmd_applymovement(struct ScriptContext *ctx)
 {
     u16 localId = VarGet(ScriptReadHalfword(ctx));

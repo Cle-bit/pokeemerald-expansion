@@ -258,7 +258,7 @@ static void ReadAllCurrentSettings(u8 taskId)
             gTasks[taskId].tExpSharing = FlagGet(I_EXP_SHARE_FLAG);
             gTasks[taskId].tWildDouble = FlagGet(B_FLAG_FORCE_DOUBLE_WILD);
             gTasks[taskId].tBagUse     = FlagGet(B_FLAG_NO_BAG_USE);
-            gTasks[taskId].tFollower   = FlagGet(B_FLAG_FOLLOWERS_ENABLED);
+            gTasks[taskId].tFollower   = FlagGet(B_FLAG_FOLLOWERS_DISABLED);
             gTasks[taskId].tMoveDescription = FlagGet(B_FLAG_MOVE_DESCRIPTION);
             break;
     }
@@ -619,7 +619,7 @@ static void SaveOptionMenuDataFromTask(u8 taskId)
             gTasks[taskId].tExpSharing == 0 ? FlagClear(I_EXP_SHARE_FLAG) : FlagSet(I_EXP_SHARE_FLAG);
             gTasks[taskId].tWildDouble == 0 ? FlagClear(B_FLAG_FORCE_DOUBLE_WILD) : FlagSet(B_FLAG_FORCE_DOUBLE_WILD);
             gTasks[taskId].tBagUse == 0 ? FlagClear(B_FLAG_NO_BAG_USE) : FlagSet(B_FLAG_NO_BAG_USE);
-            gTasks[taskId].tFollower == 0 ? FlagClear(B_FLAG_FOLLOWERS_ENABLED) : FlagSet(B_FLAG_FOLLOWERS_ENABLED);
+            gTasks[taskId].tFollower == 0 ? FlagClear(B_FLAG_FOLLOWERS_DISABLED) : FlagSet(B_FLAG_FOLLOWERS_DISABLED);
             gTasks[taskId].tMoveDescription == 0 ? FlagClear(B_FLAG_MOVE_DESCRIPTION) : FlagSet(B_FLAG_MOVE_DESCRIPTION);
             break;
     }

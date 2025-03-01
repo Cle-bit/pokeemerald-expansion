@@ -3,8 +3,8 @@
 
 #include "constants/event_object_movement.h"
 
-#if OW_POKEMON_OBJECT_EVENTS == FALSE && B_FLAG_FOLLOWERS_ENABLED == TRUE
-#error "OW_POKEMON_OBJECT_EVENTS needs to be TRUE in order for B_FLAG_FOLLOWERS_ENABLED to work."
+#if OW_POKEMON_OBJECT_EVENTS == FALSE && OW_FOLLOWERS_ENABLED == TRUE
+#error "OW_POKEMON_OBJECT_EVENTS needs to be TRUE in order for OW_FOLLOWERS_ENABLED to work."
 #endif
 
 // Palette slots for overworld NPCs.
