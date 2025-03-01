@@ -212,6 +212,10 @@ struct SaveBlock3
     u8 itemFlags[ITEM_FLAGS_COUNT];
 #endif
     u8 followerIndex;
+#if USE_DEXNAV_SEARCH_LEVELS == TRUE
+    u8 dexNavSearchLevels[NUM_SPECIES];
+#endif
+    u8 dexNavChain;
 };
 
 extern struct SaveBlock3 *gSaveBlock3Ptr;
