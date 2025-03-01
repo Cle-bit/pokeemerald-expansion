@@ -86,3 +86,4 @@ enum PokemonSummaryScreenMode_BW
 };
 
 #endif // GUARD_BW_SUMMARY_SCREEN_H
+
