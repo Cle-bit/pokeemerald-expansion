@@ -3691,21 +3691,21 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     },
     [FRONTIER_MON_DRIFBLIM_2] = {
         .species = SPECIES_DRIFBLIM, //随风球
-        .moves = {MOVE_ASTRAL_BARRAGE, MOVE_THUNDERBOLT, MOVE_STRENGTH_SAP, MOVE_CALM_MIND}, //星碎，十万伏特，吸取力量，冥想
+        .moves = {MOVE_SHADOW_BALL, MOVE_THUNDERBOLT, MOVE_STRENGTH_SAP, MOVE_CALM_MIND}, //暗影球，十万伏特，吸取力量，冥想
         .heldItem = ITEM_FLAME_ORB,
         .ev = TRAINER_PARTY_EVS(0, 0, 252, 4, 252, 0),
         .nature = NATURE_BOLD
     },
     [FRONTIER_MON_DRIFBLIM_3] = {
         .species = SPECIES_DRIFBLIM, //随风球
-        .moves = {MOVE_ASTRAL_BARRAGE, MOVE_ACROBATICS, MOVE_THUNDERBOLT, MOVE_STRENGTH_SAP}, //星碎，杂技，十万伏特，吸取力量
+        .moves = {MOVE_SHADOW_BALL, MOVE_ACROBATICS, MOVE_THUNDERBOLT, MOVE_STRENGTH_SAP}, //暗影球，杂技，十万伏特，吸取力量
         .heldItem = ITEM_SITRUS_BERRY,
         .ev = TRAINER_PARTY_EVS(0, 88, 0, 180, 240, 0),
         .nature = NATURE_RASH
     },
     [FRONTIER_MON_DRIFBLIM_4] = {
         .species = SPECIES_DRIFBLIM, //随风球
-        .moves = {MOVE_ASTRAL_BARRAGE, MOVE_WILL_O_WISP, MOVE_STRENGTH_SAP, MOVE_TAILWIND}, //星碎，磷火，吸取力量，顺风
+        .moves = {MOVE_SHADOW_BALL, MOVE_WILL_O_WISP, MOVE_STRENGTH_SAP, MOVE_TAILWIND}, //暗影球，磷火，吸取力量，顺风
         .heldItem = ITEM_GHOST_GEM,
         .ev = TRAINER_PARTY_EVS(0, 0, 0, 128, 128, 252),
         .nature = NATURE_CALM
@@ -12785,7 +12785,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_SNEASLER_4] = {
         .species = SPECIES_SNEASLER, //大狃拉
         .moves = {MOVE_CLOSE_COMBAT, MOVE_DIRE_CLAW, MOVE_ACROBATICS, MOVE_FAKE_OUT}, //近身战，克命爪，杂技，击掌奇袭
-        .heldItem = ITEM_GRASSY_SEED,
+        .heldItem = ITEM_PSYCHIC_SEED,
         .ev = TRAINER_PARTY_EVS(0, 252, 0, 252, 0, 4),
         .nature = NATURE_ADAMANT
     },
@@ -14954,7 +14954,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     },
     [FRONTIER_MON_WALKING_WAKE_2] = {
         .species = SPECIES_WALKING_WAKE, //波荡水
-        .moves = {MOVE_DRACO_METEOR, MOVE_HYDRO_PUMP, MOVE_SNARL, MOVE_HURRICANE}, //流星群，水炮，大声咆哮，暴风
+        .moves = {MOVE_HYDRO_STEAM, MOVE_HYDRO_PUMP, MOVE_FLAMETHROWER, MOVE_DRAGON_PULSE}, //水蒸气，水炮，喷射火焰，龙之波动
         .heldItem = ITEM_CHOICE_SPECS,
         .ev = TRAINER_PARTY_EVS(0, 0, 0, 252, 244, 12),
         .nature = NATURE_TIMID

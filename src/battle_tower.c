@@ -1590,19 +1590,48 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
     SetMonData(dst, MON_DATA_HELD_ITEM, &fmon->heldItem);
 
     // try to set ability. Otherwise, random of non-hidden as per vanilla
-    if (fmon->ability != ABILITY_NONE)
+    const struct SpeciesInfo *speciesInfo = &gSpeciesInfo[fmon->species];
+    bool8 foundWeather = FALSE;
+    u8 weatherAbilityIndex = 0;
+
+    // 检查是否存在天气特性
+    for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
     {
-        const struct SpeciesInfo *speciesInfo = &gSpeciesInfo[fmon->species];
-        u32 maxAbilities = ARRAY_COUNT(speciesInfo->abilities);
-        for (ability = 0; ability < maxAbilities; ++ability)
+        u16 currentAbility = speciesInfo->abilities[i];
+        if (currentAbility == ABILITY_DRIZZLE || currentAbility == ABILITY_DROUGHT ||
+            currentAbility == ABILITY_SAND_STREAM || currentAbility == ABILITY_SNOW_WARNING)
         {
-            if (speciesInfo->abilities[ability] == fmon->ability)
-                break;
+            foundWeather = TRUE;
+            weatherAbilityIndex = i;
+            break;
         }
-        if (ability >= maxAbilities)
-            ability = 0;
-        SetMonData(dst, MON_DATA_ABILITY_NUM, &ability);
     }
+
+    if (foundWeather)
+    {
+        ability = weatherAbilityIndex;
+    }
+    else
+    {
+        // 收集有效特性索引
+        u8 validAbilities[NUM_ABILITY_SLOTS];
+        u8 validCount = 0;
+        for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
+        {
+            if (speciesInfo->abilities[i] != ABILITY_NONE)
+                validAbilities[validCount++] = i;
+        }
+
+        // 随机选择特性
+        if (validCount == 0)
+            ability = 0; // 不会发生，每个宝可梦至少有一个特性
+        else
+        {
+            u8 rand = Random() % validCount;
+            ability = validAbilities[rand];
+        }
+    }
+    SetMonData(dst, MON_DATA_ABILITY_NUM, &ability);
 
     if (fmon->ev != NULL)
     {
@@ -1617,11 +1646,9 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
     if (fmon->iv)
         SetMonData(dst, MON_DATA_IVS, &(fmon->iv));
 
-    if (fmon->isShiny)
-    {
-        u32 data = TRUE;
-        SetMonData(dst, MON_DATA_IS_SHINY, &data);
-    }
+    u32 isShiny = (Random() % 100) < 30 ? TRUE : FALSE;
+    SetMonData(dst, MON_DATA_IS_SHINY, &isShiny);
+
     if (fmon->dynamaxLevel > 0)
     {
         u32 data = fmon->dynamaxLevel;
