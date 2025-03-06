@@ -279,7 +279,6 @@ BattleFrontier_BattleFactoryLobby_EventScript_FatMan::
 	switch VAR_RESULT
 	case NO, BattleFrontier_BattleFactoryLobby_EventScript_FatMan_No
 	case YES, BattleFrontier_BattleFactoryLobby_EventScript_FatMan_Yes
-	case MULTI_B_PRESSED, BattleFrontier_BattleFactoryLobby_EventScript_FatMan_No
 	end
 
 BattleFrontier_BattleFactoryLobby_EventScript_FatMan_No::

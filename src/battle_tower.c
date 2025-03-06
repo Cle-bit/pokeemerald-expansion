@@ -1563,14 +1563,52 @@ static void FillTentTrainerParty(u8 monsCount)
     FillTentTrainerParty_(gTrainerBattleOpponent_A, 0, monsCount);
 }
 
+static const u16 sPriorityAbilities[] = 
+{
+    ABILITY_COMMANDER,
+    ABILITY_PRANKSTER,
+    ABILITY_DRIZZLE,
+    ABILITY_DROUGHT,
+    ABILITY_SAND_STREAM,
+    ABILITY_SNOW_WARNING,
+    ABILITY_SAND_RUSH,
+    ABILITY_SLUSH_RUSH,
+    ABILITY_CHLOROPHYLL,
+    ABILITY_SWIFT_SWIM,
+    ABILITY_ELECTRIC_SURGE,
+    ABILITY_GRASSY_SURGE,
+    ABILITY_MISTY_SURGE,
+    ABILITY_PSYCHIC_SURGE
+};
+
+static bool8 CheckItemAbilityCombo(u16 ability, u16 heldItem)
+{
+    return (
+        (ability == ABILITY_POISON_HEAL && heldItem == ITEM_TOXIC_ORB) ||
+        (ability == ABILITY_GUTS && heldItem == ITEM_FLAME_ORB) ||
+        (ability == ABILITY_UNBURDEN && (heldItem == ITEM_GRASSY_SEED || heldItem == ITEM_MISTY_SEED || heldItem == ITEM_ELECTRIC_SEED || heldItem == ITEM_PSYCHIC_SEED)));
+}
+
+static bool8 HasPriorityAbility(u16 ability, const u16 *priorityList, u32 listSize)
+{
+    for (u32 j = 0; j < listSize; j++)
+    {
+        if (ability == priorityList[j])
+            return TRUE;
+    }
+    return FALSE;
+}
+
 void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32 otID, u32 flags, struct Pokemon *dst)
 {
     u8 ball = (fmon->ball == 0xFF) ? Random() % POKEBALL_COUNT : fmon->ball;
     u16 move;
-    u32 personality = 0, ability, friendship, j;
+    u16 heldItem = fmon->heldItem;
+    u32 personality = 0, ability=0, friendship, j;
+    bool8 abilityFound = FALSE;
 
     personality = fmon->nature;
-    
+
     CreateMon(dst, fmon->species, level, fixedIV, TRUE, personality, otID, OT_ID_PRESET);
 
     friendship = MAX_FRIENDSHIP;
@@ -1583,37 +1621,44 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
 
         SetMonMoveSlot(dst, move, j);
         if (gMovesInfo[move].effect == EFFECT_FRUSTRATION)
-            friendship = 0;  // Frustration is more powerful the lower the pokemon's friendship is.
+            friendship = 0; // Frustration is more powerful the lower the pokemon's friendship is.
     }
 
     SetMonData(dst, MON_DATA_FRIENDSHIP, &friendship);
     SetMonData(dst, MON_DATA_HELD_ITEM, &fmon->heldItem);
 
-    // try to set ability. Otherwise, random of non-hidden as per vanilla
+    // try to set ability. Otherwise, random possible abilities
+    // 第一阶段：检查道具与特性组合
     const struct SpeciesInfo *speciesInfo = &gSpeciesInfo[fmon->species];
-    bool8 foundWeather = FALSE;
-    u8 weatherAbilityIndex = 0;
-
-    // 检查是否存在天气特性
     for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
     {
         u16 currentAbility = speciesInfo->abilities[i];
-        if (currentAbility == ABILITY_DRIZZLE || currentAbility == ABILITY_DROUGHT ||
-            currentAbility == ABILITY_SAND_STREAM || currentAbility == ABILITY_SNOW_WARNING)
+        if (CheckItemAbilityCombo(currentAbility, heldItem))
         {
-            foundWeather = TRUE;
-            weatherAbilityIndex = i;
+            ability = i;
+            abilityFound = TRUE;
             break;
         }
     }
 
-    if (foundWeather)
+    // 第二阶段：如果没有找到道具组合，检查优先特性列表
+    if (!abilityFound)
     {
-        ability = weatherAbilityIndex;
+        for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
+        {
+            u16 currentAbility = speciesInfo->abilities[i];
+            if (HasPriorityAbility(currentAbility, sPriorityAbilities, ARRAY_COUNT(sPriorityAbilities)))
+            {
+                ability = i;
+                abilityFound = TRUE;
+                break;
+            }
+        }
     }
-    else
+
+    // 第三阶段：如果仍未找到，随机选择有效能力
+    if (!abilityFound)
     {
-        // 收集有效特性索引
         u8 validAbilities[NUM_ABILITY_SLOTS];
         u8 validCount = 0;
         for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
@@ -1621,16 +1666,9 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
             if (speciesInfo->abilities[i] != ABILITY_NONE)
                 validAbilities[validCount++] = i;
         }
-
-        // 随机选择特性
-        if (validCount == 0)
-            ability = 0; // 不会发生，每个宝可梦至少有一个特性
-        else
-        {
-            u8 rand = Random() % validCount;
-            ability = validAbilities[rand];
-        }
+        ability = validAbilities[Random() % validCount];
     }
+
     SetMonData(dst, MON_DATA_ABILITY_NUM, &ability);
 
     if (fmon->ev != NULL)
@@ -1646,7 +1684,7 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
     if (fmon->iv)
         SetMonData(dst, MON_DATA_IVS, &(fmon->iv));
 
-    u32 isShiny = (Random() % 100) < 30 ? TRUE : FALSE;
+    u32 isShiny = (Random() % 12 == 0) ? TRUE : FALSE; // 1/6 概率
     SetMonData(dst, MON_DATA_IS_SHINY, &isShiny);
 
     if (fmon->dynamaxLevel > 0)
@@ -1664,7 +1702,6 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
         u32 data = fmon->teraType;
         SetMonData(dst, MON_DATA_TERA_TYPE, &data);
     }
-
 
     SetMonData(dst, MON_DATA_POKEBALL, &ball);
     CalculateMonStats(dst);
