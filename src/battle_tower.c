@@ -1611,7 +1611,7 @@ static bool8 CheckItemAbilityCombo(u16 ability, u16 heldItem)
         ((heldItem >= ITEM_GRASSY_SEED && heldItem <= ITEM_PSYCHIC_SEED) ||  // 种子
          (heldItem >= ITEM_CHERI_BERRY && heldItem <= ITEM_MARANGA_BERRY) || // 树果
          (heldItem >= ITEM_NORMAL_GEM && heldItem <= ITEM_FAIRY_GEM) ||    // 宝石
-         (heldItem >= ITEM_FOCUS_SASH ) || (heldItem == ITEM_FOCUS_BAND) || //消耗类道具
+         (heldItem == ITEM_FOCUS_SASH ) || (heldItem == ITEM_FOCUS_BAND) || //消耗类道具
          (heldItem == ITEM_WEAKNESS_POLICY) ||(heldItem == ITEM_BLUNDER_POLICY) ||
          (heldItem == ITEM_THROAT_SPRAY)))
         return TRUE;
@@ -1638,7 +1638,7 @@ static bool8 HasPriorityAbility(u16 ability, const u16 *priorityList, u32 listSi
     return FALSE;
 }
 
-// 检查id
+// 检查戏法空间id
 static bool8 IsIdInTrickRoomAttack(u16 monid) {
     for (u16 i = 0; i < TrickRoomAttackSize; ++i) {
         if (TrickRoomAttack[i] == monid) {

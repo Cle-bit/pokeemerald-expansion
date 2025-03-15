@@ -442,7 +442,7 @@ const u16 TrickRoom[] = {
     FRONTIER_MON_GOTHITELLE_1, FRONTIER_MON_GOTHITELLE_2, FRONTIER_MON_GOTHITELLE_3, FRONTIER_MON_GOTHITELLE_4,
     FRONTIER_MON_CRESSELIA_1, FRONTIER_MON_CRESSELIA_2, FRONTIER_MON_CRESSELIA_3, FRONTIER_MON_CRESSELIA_4,
     FRONTIER_MON_PORYGON2_1, FRONTIER_MON_PORYGON2_2, FRONTIER_MON_PORYGON2_3, FRONTIER_MON_PORYGON2_4,
-    FRONTIER_MON_MIMIKYU_DISGUISED_1, FRONTIER_MON_MIMIKYU_DISGUISED_2, FRONTIER_MON_MIMIKYU_DISGUISED_3, FRONTIER_MON_MIMIKYU_DISGUISED_4,
+    FRONTIER_MON_MIMIKYU_DISGUISED_2, FRONTIER_MON_MIMIKYU_DISGUISED_2, FRONTIER_MON_MIMIKYU_DISGUISED_4, FRONTIER_MON_MIMIKYU_DISGUISED_4,
 };
 
 const u16 TrickRoomAttack[] = {
@@ -753,7 +753,8 @@ static void GenerateOpponentMons(void)
         i++;
     }
 
-    if (FlagGet(FLAG_TEAM_TEST) && battleMode == FRONTIER_MODE_DOUBLES)
+    if ((FlagGet(FLAG_TEAM_TEST) || (WinStreak >= 30 && WinStreak <= 70)) &&
+        battleMode == FRONTIER_MODE_DOUBLES)
     {
         u8 probTable[NUM_TEAM_TYPES] = {0};
 
@@ -1287,11 +1288,11 @@ static void GenerateInitialRentalMons(void)
                 probability = 0;
             else
             {
-                if (WinStreak < 25) // 1-25
+                if (WinStreak < 70) // 1-70
                     probability = 0;
-                else if (WinStreak < 50) // 26-50
+                else if (WinStreak < 80) // 71-80
                     probability = 33;
-                else if (WinStreak < 75) // 51-75
+                else if (WinStreak < 90) // 81-90
                     probability = 66;
                 else
                     probability = 100;

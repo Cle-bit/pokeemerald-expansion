@@ -53,6 +53,7 @@ static void ClearFrontierRecord(void);
 static void WarpToTruck(void);
 static void ResetMiniGamesRecords(void);
 static void ResetItemFlags(void);
+static void NewGameFactoryTest(void);
 
 EWRAM_DATA bool8 gDifferentSaveFile = FALSE;
 EWRAM_DATA bool8 gEnableContestDebugging = FALSE;
@@ -93,7 +94,7 @@ static void InitPlayerTrainerId(void)
 static void SetDefaultOptions(void)
 {
     gSaveBlock2Ptr->optionsTextSpeed = OPTIONS_TEXT_SPEED_FAST;
-    gSaveBlock2Ptr->optionsWindowFrameType = 0;
+    gSaveBlock2Ptr->optionsWindowFrameType = 1;
     gSaveBlock2Ptr->optionsSound = OPTIONS_SOUND_MONO;
     gSaveBlock2Ptr->optionsBattleStyle = OPTIONS_BATTLE_STYLE_SET;
     gSaveBlock2Ptr->optionsBattleSceneOff = FALSE;
@@ -128,7 +129,7 @@ static void ClearFrontierRecord(void)
 
 static void WarpToTruck(void)
 {
-    SetWarpDestination(MAP_GROUP(INSIDE_OF_TRUCK), MAP_NUM(INSIDE_OF_TRUCK), WARP_ID_NONE, -1, -1);
+    SetWarpDestination(MAP_GROUP(BATTLE_FRONTIER_MART), MAP_NUM(BATTLE_FRONTIER_MART), WARP_ID_NONE, -1, -1);
     WarpIntoMap();
 }
 
@@ -172,7 +173,7 @@ void NewGameInitData(void)
     ResetGabbyAndTy();
     ClearSecretBases();
     ClearBerryTrees();
-    SetMoney(&gSaveBlock1Ptr->money, 3000);
+    SetMoney(&gSaveBlock1Ptr->money, 5000);
     SetCoins(0);
     ResetLinkContestBoolean();
     ResetGameStats();
@@ -208,6 +209,7 @@ void NewGameInitData(void)
     ResetTrainerHillResults();
     ResetContestLinkResults();
     ResetItemFlags();
+    NewGameFactoryTest();
     gSaveBlock3Ptr->followerIndex = OW_FOLLOWER_NOT_SET;
     gSaveBlock2Ptr->autoRun = FALSE;
 }
@@ -225,4 +227,48 @@ static void ResetItemFlags(void)
 #if OW_SHOW_ITEM_DESCRIPTIONS == OW_ITEM_DESCRIPTIONS_FIRST_TIME
     memset(&gSaveBlock3Ptr->itemFlags, 0, sizeof(gSaveBlock3Ptr->itemFlags));
 #endif
+}
+
+static void NewGameFactoryTest(void)
+{
+    //Basic Options
+    VarSet(VAR_DIFFICULTY_MODE, 2);
+    FlagSet(FLAG_SANDBOX_MODE);
+    FlagSet(I_EXP_SHARE_FLAG);
+    FlagSet(B_FLAG_FOLLOWERS_ENABLED);
+    FlagSet(B_FLAG_MOVE_DESCRIPTION);
+    FlagSet(FLAG_SYS_POKEDEX_GET);
+    FlagSet(FLAG_SYS_POKENAV_GET);
+    FlagSet(FLAG_SYS_B_DASH);
+    FlagSet(FLAG_SYS_FRONTIER_PASS);
+    //Flying Spots
+    FlagSet(FLAG_VISITED_LITTLEROOT_TOWN);
+    FlagSet(FLAG_VISITED_OLDALE_TOWN);
+    FlagSet(FLAG_VISITED_DEWFORD_TOWN);
+    FlagSet(FLAG_VISITED_LAVARIDGE_TOWN);
+    FlagSet(FLAG_VISITED_FALLARBOR_TOWN);
+    FlagSet(FLAG_VISITED_VERDANTURF_TOWN);
+    FlagSet(FLAG_VISITED_PACIFIDLOG_TOWN);
+    FlagSet(FLAG_VISITED_PETALBURG_CITY);
+    FlagSet(FLAG_VISITED_SLATEPORT_CITY);
+    FlagSet(FLAG_VISITED_MAUVILLE_CITY);
+    FlagSet(FLAG_VISITED_RUSTBORO_CITY);
+    FlagSet(FLAG_VISITED_FORTREE_CITY);
+    FlagSet(FLAG_VISITED_LILYCOVE_CITY);
+    FlagSet(FLAG_VISITED_MOSSDEEP_CITY);
+    FlagSet(FLAG_VISITED_SOOTOPOLIS_CITY);
+    FlagSet(FLAG_VISITED_EVER_GRANDE_CITY);
+    FlagSet(FLAG_LANDMARK_POKEMON_LEAGUE);
+    FlagSet(FLAG_LANDMARK_BATTLE_FRONTIER);
+    //Badges
+    FlagSet(FLAG_BADGE01_GET);
+    FlagSet(FLAG_BADGE02_GET);
+    FlagSet(FLAG_BADGE03_GET);
+    FlagSet(FLAG_BADGE04_GET);
+    FlagSet(FLAG_BADGE05_GET);
+    FlagSet(FLAG_BADGE06_GET);
+    FlagSet(FLAG_BADGE07_GET);
+    FlagSet(FLAG_BADGE08_GET);
+    //Factory Ai Team
+    FlagSet(FLAG_UNUSED_0x027);
 }

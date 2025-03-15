@@ -689,7 +689,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_ARMAROUGE_2] = {
         .species = SPECIES_ARMAROUGE, //红莲铠骑
         .moves = {MOVE_EXPANDING_FORCE, MOVE_TRICK_ROOM, MOVE_AURA_SPHERE, MOVE_HEAT_WAVE}, //广域战力，戏法空间，波导弹，热风
-        .heldItem = ITEM_CHOICE_SPECS,
+        .heldItem = ITEM_WEAKNESS_POLICY,
         .ev = TRAINER_PARTY_EVS(252, 0, 0, 0, 252, 4),
         .nature = NATURE_QUIET
     },
@@ -8480,7 +8480,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_MELMETAL_1] = {
         .species = SPECIES_MELMETAL, //美录梅塔
         .moves = {MOVE_DOUBLE_IRON_BASH, MOVE_ICE_PUNCH, MOVE_EARTHQUAKE, MOVE_THUNDER_PUNCH}, //钢拳双击，冰冻拳，地震，雷电拳
-        .heldItem = ITEM_EXPERT_BELT,
+        .heldItem = ITEM_ASSAULT_VEST,
         .ev = TRAINER_PARTY_EVS(252, 252, 0, 0, 0, 4),
         .nature = NATURE_ADAMANT
     },
@@ -8508,7 +8508,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_MELMETAL_5] = {
         .species = SPECIES_MELMETAL, //美录梅塔
         .moves = {MOVE_DOUBLE_IRON_BASH, MOVE_HIGH_HORSEPOWER, MOVE_ROCK_SLIDE, MOVE_PROTECT}, //钢拳双击，十万马力，岩崩，守住
-        .heldItem = ITEM_ASSAULT_VEST,
+        .heldItem = ITEM_EXPERT_BELT,
         .ev = TRAINER_PARTY_EVS(252, 252, 0, 0, 0, 4),
         .nature = NATURE_BRAVE
     },
