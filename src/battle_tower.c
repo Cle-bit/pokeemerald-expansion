@@ -1565,6 +1565,12 @@ static void FillTentTrainerParty(u8 monsCount)
 
 static const u16 sPriorityAbilities[] = 
 {
+    ABILITY_MAGIC_BOUNCE,
+    ABILITY_CONTRARY,
+    ABILITY_TRIAGE,
+    ABILITY_PROTEAN,
+    ABILITY_PUNK_ROCK,
+    ABILITY_SPEED_BOOST,
     ABILITY_COMMANDER,
     ABILITY_PRANKSTER,
     ABILITY_DRIZZLE,
@@ -1578,15 +1584,48 @@ static const u16 sPriorityAbilities[] =
     ABILITY_ELECTRIC_SURGE,
     ABILITY_GRASSY_SURGE,
     ABILITY_MISTY_SURGE,
-    ABILITY_PSYCHIC_SURGE
+    ABILITY_PSYCHIC_SURGE,
+    ABILITY_GALVANIZE,
+    ABILITY_PIXILATE
 };
 
 static bool8 CheckItemAbilityCombo(u16 ability, u16 heldItem)
 {
-    return (
-        (ability == ABILITY_POISON_HEAL && heldItem == ITEM_TOXIC_ORB) ||
-        (ability == ABILITY_GUTS && heldItem == ITEM_FLAME_ORB) ||
-        (ability == ABILITY_UNBURDEN && (heldItem == ITEM_GRASSY_SEED || heldItem == ITEM_MISTY_SEED || heldItem == ITEM_ELECTRIC_SEED || heldItem == ITEM_PSYCHIC_SEED)));
+    // 检查Toxic Orb 的组合
+    if ((ability == ABILITY_POISON_HEAL ||
+         ability == ABILITY_TOXIC_BOOST) &&
+        heldItem == ITEM_TOXIC_ORB)
+        return TRUE;
+
+    // 检查 Flame Orb 的组合
+    if ((ability == ABILITY_GUTS ||
+         ability == ABILITY_FLARE_BOOST ||
+         ability == ABILITY_MARVEL_SCALE ||
+         ability == ABILITY_QUICK_FEET ||
+         ability == ABILITY_TANGLED_FEET) &&
+        heldItem == ITEM_FLAME_ORB)
+        return TRUE;
+
+    // 检查 Unburden 和种子、树果、宝石类道具的组合
+    if (ability == ABILITY_UNBURDEN &&
+        ((heldItem >= ITEM_GRASSY_SEED && heldItem <= ITEM_PSYCHIC_SEED) ||  // 种子
+         (heldItem >= ITEM_CHERI_BERRY && heldItem <= ITEM_MARANGA_BERRY) || // 树果
+         (heldItem >= ITEM_NORMAL_GEM && heldItem <= ITEM_FAIRY_GEM) ||    // 宝石
+         (heldItem >= ITEM_FOCUS_SASH ) || (heldItem == ITEM_FOCUS_BAND) || //消耗类道具
+         (heldItem == ITEM_WEAKNESS_POLICY) ||(heldItem == ITEM_BLUNDER_POLICY) ||
+         (heldItem == ITEM_THROAT_SPRAY)))
+        return TRUE;
+
+    // 检查收获和树果的组合
+    if ((ability == ABILITY_HARVEST ||
+         ability == ABILITY_CUD_CHEW ||
+         ability == ABILITY_CHEEK_POUCH ||
+         ability == ABILITY_GLUTTONY) &&
+        (heldItem >= ITEM_CHERI_BERRY && heldItem <= ITEM_MARANGA_BERRY))
+        return TRUE;
+
+    // 如果没有匹配的组合，返回 FALSE
+    return FALSE;
 }
 
 static bool8 HasPriorityAbility(u16 ability, const u16 *priorityList, u32 listSize)
@@ -1599,17 +1638,27 @@ static bool8 HasPriorityAbility(u16 ability, const u16 *priorityList, u32 listSi
     return FALSE;
 }
 
+// 检查id
+static bool8 IsIdInTrickRoomAttack(u16 monid) {
+    for (u16 i = 0; i < TrickRoomAttackSize; ++i) {
+        if (TrickRoomAttack[i] == monid) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32 otID, u32 flags, struct Pokemon *dst)
 {
-    u8 ball = (fmon->ball == 0xFF) ? Random() % POKEBALL_COUNT : fmon->ball;
+    u16 ball = BALL_MASTER;
     u16 move;
     u16 heldItem = fmon->heldItem;
-    u32 personality = 0, ability=0, friendship, j;
+    u32 ability=0, friendship, j;
     bool8 abilityFound = FALSE;
+    u32 nature = fmon->nature;
+    u16 factory0iv = 0;
 
-    personality = fmon->nature;
-
-    CreateMon(dst, fmon->species, level, fixedIV, TRUE, personality, otID, OT_ID_PRESET);
+    CreateMon(dst, fmon->species, level, fixedIV, TRUE, nature, otID, OT_ID_PRESET);
 
     friendship = MAX_FRIENDSHIP;
     // Give the chosen Pokémon its specified moves.
@@ -1681,10 +1730,16 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
         SetMonData(dst, MON_DATA_SPEED_EV, &(fmon->ev[5]));
     }
 
-    if (fmon->iv)
-        SetMonData(dst, MON_DATA_IVS, &(fmon->iv));
+    // 计算monId = 当前fmon指针 - 数组起始地址
+    u16 monId = fmon - gFacilityTrainerMons;
 
-    u32 isShiny = (Random() % 12 == 0) ? TRUE : FALSE; // 1/6 概率
+    // 使用monId进行检查
+    if (IsIdInTrickRoomAttack(monId))
+    {
+        SetMonData(dst, MON_DATA_SPEED_IV, &(factory0iv));
+    }
+
+    u32 isShiny = (Random() % 12 == 0) ? TRUE : FALSE; // 1/12 概率
     SetMonData(dst, MON_DATA_IS_SHINY, &isShiny);
 
     if (fmon->dynamaxLevel > 0)

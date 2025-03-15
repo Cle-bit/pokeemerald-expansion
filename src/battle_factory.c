@@ -252,7 +252,7 @@ static const u16 factoryMonsGen9[] = {
     FRONTIER_MON_CYCLIZAR_1, FRONTIER_MON_CYCLIZAR_2,
     FRONTIER_MON_ORTHWORM_1, FRONTIER_MON_ORTHWORM_2,
     FRONTIER_MON_GLIMMORA_1, FRONTIER_MON_GLIMMORA_2,
-    FRONTIER_MON_HOUNDSTONE,
+    FRONTIER_MON_HOUNDSTONE_1, FRONTIER_MON_HOUNDSTONE_2, FRONTIER_MON_HOUNDSTONE_3,
     FRONTIER_MON_FLAMIGO_1, FRONTIER_MON_FLAMIGO_2,
     FRONTIER_MON_CETITAN_1, FRONTIER_MON_CETITAN_2,
     FRONTIER_MON_VELUZA_1, FRONTIER_MON_VELUZA_2,
@@ -308,6 +308,8 @@ static const u16 factoryMonsGen9[] = {
     FRONTIER_MON_IRON_CROWN_1, FRONTIER_MON_IRON_CROWN_2,
 };
 
+u8 challengecount = 0;
+
 // code
 void CallBattleFactoryFunction(void)
 {
@@ -331,6 +333,7 @@ static void InitFactoryChallenge(void)
         gSaveBlock2Ptr->frontier.factoryRentsCount[battleMode][lvlMode] = 0;
     }
 
+    challengecount = 0;
     VarSet(VAR_FACTORY_SWAP_COUNTER, 0);
     sPerformedRentalSwap = FALSE;
     for (i = 0; i < ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons); i++)
@@ -422,6 +425,273 @@ static void SetPerformedRentalSwap(void)
     sPerformedRentalSwap = TRUE;
 }
 
+
+#define FLAG_TEAM_TEST FLAG_UNUSED_0x027
+#define VAR_FACTORY_TEAM_TEST VAR_UNUSED_0x4091
+
+const u16 TrickRoom[] = {
+    FRONTIER_MON_DUSCLOPS_1, FRONTIER_MON_DUSCLOPS_2, FRONTIER_MON_DUSCLOPS_3, FRONTIER_MON_DUSCLOPS_4,
+    FRONTIER_MON_HATTERENE_1, FRONTIER_MON_HATTERENE_2, FRONTIER_MON_HATTERENE_3, FRONTIER_MON_HATTERENE_4,
+    FRONTIER_MON_RUNERIGUS_1, FRONTIER_MON_RUNERIGUS_2, FRONTIER_MON_RUNERIGUS_3, FRONTIER_MON_RUNERIGUS_4,
+    FRONTIER_MON_COFAGRIGUS_1, FRONTIER_MON_COFAGRIGUS_2, FRONTIER_MON_COFAGRIGUS_3, FRONTIER_MON_COFAGRIGUS_4,
+    FRONTIER_MON_REUNICLUS_1, FRONTIER_MON_REUNICLUS_2, FRONTIER_MON_REUNICLUS_3, FRONTIER_MON_REUNICLUS_4,
+    FRONTIER_MON_BRONZONG_1, FRONTIER_MON_BRONZONG_2, FRONTIER_MON_BRONZONG_3, FRONTIER_MON_BRONZONG_4,
+    FRONTIER_MON_DUSKNOIR_1, FRONTIER_MON_DUSKNOIR_2, FRONTIER_MON_DUSKNOIR_3, FRONTIER_MON_DUSKNOIR_4,
+    FRONTIER_MON_ORANGURU_1, FRONTIER_MON_ORANGURU_2, FRONTIER_MON_ORANGURU_3, FRONTIER_MON_ORANGURU_4,
+    FRONTIER_MON_FARIGIRAF_1, FRONTIER_MON_FARIGIRAF_2, FRONTIER_MON_FARIGIRAF_1, FRONTIER_MON_FARIGIRAF_2,
+    FRONTIER_MON_GOTHITELLE_1, FRONTIER_MON_GOTHITELLE_2, FRONTIER_MON_GOTHITELLE_3, FRONTIER_MON_GOTHITELLE_4,
+    FRONTIER_MON_CRESSELIA_1, FRONTIER_MON_CRESSELIA_2, FRONTIER_MON_CRESSELIA_3, FRONTIER_MON_CRESSELIA_4,
+    FRONTIER_MON_PORYGON2_1, FRONTIER_MON_PORYGON2_2, FRONTIER_MON_PORYGON2_3, FRONTIER_MON_PORYGON2_4,
+    FRONTIER_MON_MIMIKYU_DISGUISED_1, FRONTIER_MON_MIMIKYU_DISGUISED_2, FRONTIER_MON_MIMIKYU_DISGUISED_3, FRONTIER_MON_MIMIKYU_DISGUISED_4,
+};
+
+const u16 TrickRoomAttack[] = {
+    FRONTIER_MON_STAKATAKA_1, FRONTIER_MON_STAKATAKA_2, FRONTIER_MON_STAKATAKA_3, FRONTIER_MON_STAKATAKA_4,
+    FRONTIER_MON_CAMERUPT_2, FRONTIER_MON_CAMERUPT_2, FRONTIER_MON_CAMERUPT_3, FRONTIER_MON_CAMERUPT_4,
+    FRONTIER_MON_TORKOAL_3, FRONTIER_MON_TORKOAL_4, FRONTIER_MON_TORKOAL_3, FRONTIER_MON_TORKOAL_4,
+    FRONTIER_MON_ESCAVALIER_3, FRONTIER_MON_ESCAVALIER_4, FRONTIER_MON_ESCAVALIER_3, FRONTIER_MON_ESCAVALIER_4,
+    FRONTIER_MON_SNORLAX_3, FRONTIER_MON_SNORLAX_3, FRONTIER_MON_SNORLAX_4, FRONTIER_MON_SNORLAX_5,
+    FRONTIER_MON_STEELIX_3, FRONTIER_MON_STEELIX_3, FRONTIER_MON_STEELIX_4, FRONTIER_MON_STEELIX_5,
+    FRONTIER_MON_ABOMASNOW_2, FRONTIER_MON_ABOMASNOW_2, FRONTIER_MON_ABOMASNOW_4, FRONTIER_MON_ABOMASNOW_4,
+    FRONTIER_MON_COPPERAJAH_2, FRONTIER_MON_COPPERAJAH_2, FRONTIER_MON_COPPERAJAH_3, FRONTIER_MON_COPPERAJAH_4,
+    FRONTIER_MON_GLASTRIER_2, FRONTIER_MON_GLASTRIER_2, FRONTIER_MON_GLASTRIER_4, FRONTIER_MON_GLASTRIER_4,
+    FRONTIER_MON_MELMETAL_2, FRONTIER_MON_MELMETAL_2, FRONTIER_MON_MELMETAL_5, FRONTIER_MON_MELMETAL_5, FRONTIER_MON_MELMETAL_6, FRONTIER_MON_MELMETAL_6,
+    FRONTIER_MON_MUDSDALE_1, FRONTIER_MON_MUDSDALE_1, FRONTIER_MON_MUDSDALE_4, FRONTIER_MON_MUDSDALE_4,
+    FRONTIER_MON_DRAMPA_3, FRONTIER_MON_DRAMPA_4, FRONTIER_MON_DRAMPA_3, FRONTIER_MON_DRAMPA_4,
+    FRONTIER_MON_ARAQUANID_1, FRONTIER_MON_ARAQUANID_1, FRONTIER_MON_ARAQUANID_4, FRONTIER_MON_ARAQUANID_4,
+    FRONTIER_MON_CRABOMINABLE_2, FRONTIER_MON_CRABOMINABLE_2, FRONTIER_MON_CRABOMINABLE_4, FRONTIER_MON_CRABOMINABLE_4,
+    FRONTIER_MON_MAROWAK_ALOLA_1, FRONTIER_MON_MAROWAK_ALOLA_2, FRONTIER_MON_MAROWAK_ALOLA_3, FRONTIER_MON_MAROWAK_ALOLA_4,
+    FRONTIER_MON_AMPHAROS_2, FRONTIER_MON_AMPHAROS_2, FRONTIER_MON_AMPHAROS_4, FRONTIER_MON_AMPHAROS_4,
+    FRONTIER_MON_CONKELDURR_1, FRONTIER_MON_CONKELDURR_2, FRONTIER_MON_CONKELDURR_3, FRONTIER_MON_CONKELDURR_4,
+    FRONTIER_MON_TING_LU_1, FRONTIER_MON_TING_LU_2, FRONTIER_MON_TING_LU_1, FRONTIER_MON_TING_LU_2,
+    FRONTIER_MON_ENAMORUS_THERIAN_1, FRONTIER_MON_ENAMORUS_THERIAN_2, FRONTIER_MON_ENAMORUS_THERIAN_1, FRONTIER_MON_ENAMORUS_THERIAN_2,
+    FRONTIER_MON_MAWILE_2, FRONTIER_MON_MAWILE_2, FRONTIER_MON_MAWILE_3, FRONTIER_MON_MAWILE_3,
+    FRONTIER_MON_URSALUNA_1, FRONTIER_MON_URSALUNA_2, FRONTIER_MON_URSALUNA_3, FRONTIER_MON_URSALUNA_4,
+    FRONTIER_MON_URSALUNA_BLOODMOON_1, FRONTIER_MON_URSALUNA_BLOODMOON_2, FRONTIER_MON_URSALUNA_BLOODMOON_1, FRONTIER_MON_URSALUNA_BLOODMOON_2,
+    FRONTIER_MON_KINGAMBIT_1, FRONTIER_MON_KINGAMBIT_1, FRONTIER_MON_KINGAMBIT_1, FRONTIER_MON_KINGAMBIT_1,
+    FRONTIER_MON_MACHAMP_3, FRONTIER_MON_MACHAMP_3, FRONTIER_MON_MACHAMP_4, FRONTIER_MON_MACHAMP_4,
+    FRONTIER_MON_JELLICENT_1, FRONTIER_MON_JELLICENT_2, FRONTIER_MON_JELLICENT_1, FRONTIER_MON_JELLICENT_2,
+    FRONTIER_MON_CELESTEELA_3, FRONTIER_MON_CELESTEELA_3, FRONTIER_MON_CELESTEELA_4, FRONTIER_MON_CELESTEELA_4,
+    FRONTIER_MON_EMBOAR_3, FRONTIER_MON_EMBOAR_3, FRONTIER_MON_EMBOAR_4, FRONTIER_MON_EMBOAR_4,
+    FRONTIER_MON_BRAVIARY_HISUI_1, FRONTIER_MON_BRAVIARY_HISUI_1, FRONTIER_MON_BRAVIARY_HISUI_2, FRONTIER_MON_BRAVIARY_HISUI_2,
+    FRONTIER_MON_SIRFETCHD_3, FRONTIER_MON_SIRFETCHD_4, FRONTIER_MON_SIRFETCHD_3, FRONTIER_MON_SIRFETCHD_4,
+    FRONTIER_MON_MALAMAR_1, FRONTIER_MON_MALAMAR_2, FRONTIER_MON_MALAMAR_3, FRONTIER_MON_MALAMAR_4,
+    FRONTIER_MON_IRON_THORNS_1, FRONTIER_MON_IRON_THORNS_1, FRONTIER_MON_IRON_THORNS_1, FRONTIER_MON_IRON_THORNS_1,
+    FRONTIER_MON_TSAREENA_3, FRONTIER_MON_TSAREENA_4, FRONTIER_MON_TSAREENA_3, FRONTIER_MON_TSAREENA_4,
+    FRONTIER_MON_ARMAROUGE_1, FRONTIER_MON_ARMAROUGE_2, FRONTIER_MON_ARMAROUGE_1, FRONTIER_MON_ARMAROUGE_2,
+    FRONTIER_MON_CERULEDGE_2, FRONTIER_MON_CERULEDGE_2, FRONTIER_MON_CERULEDGE_2, FRONTIER_MON_CERULEDGE_2,
+    FRONTIER_MON_DURALUDON_1, FRONTIER_MON_DURALUDON_2, FRONTIER_MON_DURALUDON_1, FRONTIER_MON_DURALUDON_2,
+    FRONTIER_MON_SLITHER_WING_1, FRONTIER_MON_SLITHER_WING_1, FRONTIER_MON_SLITHER_WING_1, FRONTIER_MON_SLITHER_WING_1,
+    FRONTIER_MON_CHANDELURE_2, FRONTIER_MON_CHANDELURE_2, FRONTIER_MON_CHANDELURE_4, FRONTIER_MON_CHANDELURE_4,
+    FRONTIER_MON_FALINKS_3, FRONTIER_MON_FALINKS_4, FRONTIER_MON_FALINKS_3, FRONTIER_MON_FALINKS_4,
+    FRONTIER_MON_WO_CHIEN_1, FRONTIER_MON_WO_CHIEN_1, FRONTIER_MON_WO_CHIEN_1, FRONTIER_MON_WO_CHIEN_1,
+    FRONTIER_MON_SKELEDIRGE_1, FRONTIER_MON_SKELEDIRGE_2, FRONTIER_MON_SKELEDIRGE_1, FRONTIER_MON_SKELEDIRGE_2,
+    //FRONTIER_MON_MAGEARNA_3, FRONTIER_MON_MAGEARNA_4, FRONTIER_MON_MAGEARNA_5, FRONTIER_MON_MAGEARNA_6,
+    FRONTIER_MON_BEWEAR_3, FRONTIER_MON_BEWEAR_4, FRONTIER_MON_BEWEAR_3, FRONTIER_MON_BEWEAR_4,
+    FRONTIER_MON_CLAWITZER_2, FRONTIER_MON_CLAWITZER_2, FRONTIER_MON_CLAWITZER_4, FRONTIER_MON_CLAWITZER_4,
+    FRONTIER_MON_RAMPARDOS_3, FRONTIER_MON_RAMPARDOS_4, FRONTIER_MON_RAMPARDOS_3, FRONTIER_MON_RAMPARDOS_4,
+    FRONTIER_MON_BRUTE_BONNET_1, FRONTIER_MON_BRUTE_BONNET_1, FRONTIER_MON_BRUTE_BONNET_1, FRONTIER_MON_BRUTE_BONNET_1,
+    FRONTIER_MON_CRAWDAUNT_2, FRONTIER_MON_CRAWDAUNT_2, FRONTIER_MON_CRAWDAUNT_4, FRONTIER_MON_CRAWDAUNT_4,
+    FRONTIER_MON_HARIYAMA_1, FRONTIER_MON_HARIYAMA_1, FRONTIER_MON_HARIYAMA_4, FRONTIER_MON_HARIYAMA_4,
+    FRONTIER_MON_INDEEDEE_F_2, FRONTIER_MON_INDEEDEE_F_2, FRONTIER_MON_INDEEDEE_M_2, FRONTIER_MON_INDEEDEE_M_2,
+    FRONTIER_MON_SLOWBRO_2, FRONTIER_MON_SLOWBRO_2, FRONTIER_MON_SLOWBRO_3, FRONTIER_MON_SLOWBRO_4,
+    FRONTIER_MON_AVALUGG_HISUI_1, FRONTIER_MON_AVALUGG_HISUI_2, FRONTIER_MON_AVALUGG_HISUI_3, FRONTIER_MON_AVALUGG_HISUI_4,
+    //FRONTIER_MON_CALYREX_ICE_3, FRONTIER_MON_CALYREX_ICE_3, FRONTIER_MON_CALYREX_ICE_4, FRONTIER_MON_CALYREX_ICE_4,
+    FRONTIER_MON_BUZZWOLE_1, FRONTIER_MON_BUZZWOLE_2, FRONTIER_MON_BUZZWOLE_3, FRONTIER_MON_BUZZWOLE_4,
+    FRONTIER_MON_GOODRA_HISUI_1, FRONTIER_MON_GOODRA_HISUI_2, FRONTIER_MON_GOODRA_HISUI_3, FRONTIER_MON_GOODRA_HISUI_4,
+    FRONTIER_MON_HYDRAPPLE_1, FRONTIER_MON_HYDRAPPLE_1, FRONTIER_MON_HYDRAPPLE_2, FRONTIER_MON_HYDRAPPLE_2, 
+};
+
+const u16 TrickRoomSize = ARRAY_COUNT(TrickRoom);
+const u16 TrickRoomAttackSize = ARRAY_COUNT(TrickRoomAttack);
+
+static const u16 Rain[] = {
+    FRONTIER_MON_PELIPPER_1, FRONTIER_MON_PELIPPER_2, FRONTIER_MON_PELIPPER_3, FRONTIER_MON_PELIPPER_4,
+    FRONTIER_MON_POLITOED_1, FRONTIER_MON_POLITOED_2, FRONTIER_MON_POLITOED_3, FRONTIER_MON_POLITOED_4,
+};
+
+static const u16 RainAttack[] = {
+    FRONTIER_MON_GOLDUCK_1, FRONTIER_MON_GOLDUCK_2, FRONTIER_MON_GOLDUCK_3, FRONTIER_MON_GOLDUCK_4,
+    FRONTIER_MON_POLIWRATH_1, FRONTIER_MON_POLIWRATH_2, FRONTIER_MON_POLIWRATH_3, FRONTIER_MON_POLIWRATH_4,
+    FRONTIER_MON_KABUTOPS_1, FRONTIER_MON_KABUTOPS_2, FRONTIER_MON_KABUTOPS_3, FRONTIER_MON_KABUTOPS_4,
+    FRONTIER_MON_KINGDRA_1, FRONTIER_MON_KINGDRA_2, FRONTIER_MON_KINGDRA_3, FRONTIER_MON_KINGDRA_4,
+    FRONTIER_MON_SWAMPERT_1, FRONTIER_MON_SWAMPERT_2, FRONTIER_MON_SWAMPERT_3, FRONTIER_MON_SWAMPERT_4,
+    FRONTIER_MON_LUDICOLO_1, FRONTIER_MON_LUDICOLO_2, FRONTIER_MON_LUDICOLO_3, FRONTIER_MON_LUDICOLO_4,
+    FRONTIER_MON_SEISMITOAD_1, FRONTIER_MON_SEISMITOAD_2, FRONTIER_MON_SEISMITOAD_3, FRONTIER_MON_SEISMITOAD_4,
+    FRONTIER_MON_DREDNAW_1, FRONTIER_MON_DREDNAW_2, FRONTIER_MON_DREDNAW_3, FRONTIER_MON_DREDNAW_4,
+    FRONTIER_MON_BARRASKEWDA_1, FRONTIER_MON_BARRASKEWDA_2, FRONTIER_MON_BARRASKEWDA_3, FRONTIER_MON_BARRASKEWDA_4,
+    FRONTIER_MON_BASCULEGION_F_2, FRONTIER_MON_BASCULEGION_F_2, FRONTIER_MON_BASCULEGION_F_2, FRONTIER_MON_BASCULEGION_F_2,
+    FRONTIER_MON_BASCULEGION_M_1, FRONTIER_MON_BASCULEGION_M_2, FRONTIER_MON_BASCULEGION_M_3, FRONTIER_MON_BASCULEGION_M_3,
+    FRONTIER_MON_OVERQWIL_1, FRONTIER_MON_OVERQWIL_2, FRONTIER_MON_OVERQWIL_1, FRONTIER_MON_OVERQWIL_2,
+    FRONTIER_MON_PALAFIN_ZERO_1, FRONTIER_MON_PALAFIN_ZERO_2, FRONTIER_MON_PALAFIN_ZERO_1, FRONTIER_MON_PALAFIN_ZERO_2,
+    FRONTIER_MON_FERROTHORN_1, FRONTIER_MON_FERROTHORN_2, FRONTIER_MON_FERROTHORN_3, FRONTIER_MON_FERROTHORN_4,
+    FRONTIER_MON_ZAPDOS_1, FRONTIER_MON_ZAPDOS_2, FRONTIER_MON_ZAPDOS_3, FRONTIER_MON_ZAPDOS_4,
+    FRONTIER_MON_JOLTEON_1, FRONTIER_MON_JOLTEON_2, FRONTIER_MON_JOLTEON_3, FRONTIER_MON_JOLTEON_4,
+    FRONTIER_MON_ROTOM_WASH_1, FRONTIER_MON_ROTOM_WASH_2, FRONTIER_MON_ROTOM_WASH_3, FRONTIER_MON_ROTOM_WASH_4,
+    FRONTIER_MON_STARMIE_1, FRONTIER_MON_STARMIE_2, FRONTIER_MON_STARMIE_3, FRONTIER_MON_STARMIE_4,
+    FRONTIER_MON_DRAGONITE_1, FRONTIER_MON_DRAGONITE_2, FRONTIER_MON_DRAGONITE_3, FRONTIER_MON_DRAGONITE_4,
+    FRONTIER_MON_SCIZOR_1, FRONTIER_MON_SCIZOR_2, FRONTIER_MON_SCIZOR_3, FRONTIER_MON_SCIZOR_4,
+    FRONTIER_MON_GASTRODON_WEST_1, FRONTIER_MON_GASTRODON_WEST_2, FRONTIER_MON_GASTRODON_WEST_3, FRONTIER_MON_GASTRODON_WEST_4,
+    FRONTIER_MON_TOXICROAK_1, FRONTIER_MON_TOXICROAK_2, FRONTIER_MON_TOXICROAK_3, FRONTIER_MON_TOXICROAK_4,
+    FRONTIER_MON_AZUMARILL_1, FRONTIER_MON_AZUMARILL_2, FRONTIER_MON_AZUMARILL_3, FRONTIER_MON_AZUMARILL_4,
+    FRONTIER_MON_ARCHALUDON_1,FRONTIER_MON_ARCHALUDON_2, FRONTIER_MON_ARCHALUDON_1,FRONTIER_MON_ARCHALUDON_2,
+};
+
+static const u16 Drought[] = {
+    FRONTIER_MON_NINETALES_1, FRONTIER_MON_NINETALES_2, FRONTIER_MON_NINETALES_3, FRONTIER_MON_NINETALES_4,
+    FRONTIER_MON_TORKOAL_1, FRONTIER_MON_TORKOAL_2, FRONTIER_MON_TORKOAL_3, FRONTIER_MON_TORKOAL_4,
+};
+
+static const u16 DroughtAttack[] = {
+    FRONTIER_MON_BRUTE_BONNET_2, FRONTIER_MON_BRUTE_BONNET_2, FRONTIER_MON_BRUTE_BONNET_2, FRONTIER_MON_BRUTE_BONNET_2,
+    FRONTIER_MON_WALKING_WAKE_2, FRONTIER_MON_WALKING_WAKE_2, FRONTIER_MON_WALKING_WAKE_2, FRONTIER_MON_WALKING_WAKE_2,
+    FRONTIER_MON_GOUGING_FIRE_2, FRONTIER_MON_GOUGING_FIRE_2, FRONTIER_MON_GOUGING_FIRE_2, FRONTIER_MON_GOUGING_FIRE_2,
+    FRONTIER_MON_RAGING_BOLT_2, FRONTIER_MON_RAGING_BOLT_2, FRONTIER_MON_RAGING_BOLT_2, FRONTIER_MON_RAGING_BOLT_2,
+    FRONTIER_MON_FLUTTER_MANE_2, FRONTIER_MON_FLUTTER_MANE_2, FRONTIER_MON_FLUTTER_MANE_2, FRONTIER_MON_FLUTTER_MANE_2,
+    FRONTIER_MON_SLITHER_WING_2, FRONTIER_MON_SLITHER_WING_2, FRONTIER_MON_SLITHER_WING_2, FRONTIER_MON_SLITHER_WING_2,
+    FRONTIER_MON_SANDY_SHOCKS_2, FRONTIER_MON_SANDY_SHOCKS_2, FRONTIER_MON_SANDY_SHOCKS_2, FRONTIER_MON_SANDY_SHOCKS_2,
+    FRONTIER_MON_ROARING_MOON_2, FRONTIER_MON_ROARING_MOON_2, FRONTIER_MON_ROARING_MOON_2, FRONTIER_MON_ROARING_MOON_2,
+    FRONTIER_MON_GREAT_TUSK_2, FRONTIER_MON_GREAT_TUSK_2, FRONTIER_MON_GREAT_TUSK_2, FRONTIER_MON_GREAT_TUSK_2,
+    FRONTIER_MON_SCOVILLAIN, FRONTIER_MON_SCOVILLAIN,FRONTIER_MON_SCOVILLAIN, FRONTIER_MON_SCOVILLAIN,  
+    FRONTIER_MON_EXEGGUTOR_1, FRONTIER_MON_EXEGGUTOR_2, FRONTIER_MON_EXEGGUTOR_3, FRONTIER_MON_EXEGGUTOR_4,
+    FRONTIER_MON_VICTREEBEL_1, FRONTIER_MON_VICTREEBEL_2, FRONTIER_MON_VICTREEBEL_4, FRONTIER_MON_VICTREEBEL_5,
+    FRONTIER_MON_JUMPLUFF_1, FRONTIER_MON_JUMPLUFF_2, FRONTIER_MON_JUMPLUFF_3, FRONTIER_MON_JUMPLUFF_4,
+    FRONTIER_MON_SUNFLORA_1, FRONTIER_MON_SUNFLORA_2, FRONTIER_MON_SUNFLORA_3, FRONTIER_MON_SUNFLORA_4,
+    FRONTIER_MON_SHIFTRY_1, FRONTIER_MON_SHIFTRY_2, FRONTIER_MON_SHIFTRY_3, FRONTIER_MON_SHIFTRY_4,
+    FRONTIER_MON_LEAFEON_1, FRONTIER_MON_LEAFEON_2, FRONTIER_MON_LEAFEON_3, FRONTIER_MON_LEAFEON_4,
+    FRONTIER_MON_LILLIGANT_HISUI_1, FRONTIER_MON_LILLIGANT_HISUI_2, FRONTIER_MON_LILLIGANT_HISUI_3, FRONTIER_MON_LILLIGANT_HISUI_4,
+    FRONTIER_MON_LILLIGANT_1, FRONTIER_MON_LILLIGANT_2, FRONTIER_MON_LILLIGANT_4, FRONTIER_MON_LILLIGANT_5,
+    FRONTIER_MON_HOUNDOOM_1, FRONTIER_MON_HOUNDOOM_2, FRONTIER_MON_HOUNDOOM_3, FRONTIER_MON_HOUNDOOM_5,
+    FRONTIER_MON_VENUSAUR_2, FRONTIER_MON_VENUSAUR_3, FRONTIER_MON_VENUSAUR_5,
+    FRONTIER_MON_ARCANINE_1, FRONTIER_MON_ARCANINE_2, FRONTIER_MON_ARCANINE_3, FRONTIER_MON_ARCANINE_4,
+    FRONTIER_MON_CHARIZARD_2, FRONTIER_MON_CHARIZARD_3, FRONTIER_MON_CHARIZARD_4, FRONTIER_MON_CHARIZARD_5,
+    FRONTIER_MON_DARMANITAN_STANDARD_1, FRONTIER_MON_DARMANITAN_STANDARD_2, FRONTIER_MON_DARMANITAN_STANDARD_3, FRONTIER_MON_DARMANITAN_STANDARD_4,
+    FRONTIER_MON_CHANDELURE_1, FRONTIER_MON_CHANDELURE_2, FRONTIER_MON_CHANDELURE_3, FRONTIER_MON_CHANDELURE_4,
+    FRONTIER_MON_VOLCARONA_1, FRONTIER_MON_VOLCARONA_2, FRONTIER_MON_VOLCARONA_3, FRONTIER_MON_VOLCARONA_4,
+    FRONTIER_MON_TYPHLOSION_HISUI_1, FRONTIER_MON_TYPHLOSION_HISUI_2, FRONTIER_MON_TYPHLOSION_HISUI_3, FRONTIER_MON_TYPHLOSION_HISUI_4,
+};
+
+static const u16 Sandstorm[] = {
+    FRONTIER_MON_TYRANITAR_1, FRONTIER_MON_TYRANITAR_2, FRONTIER_MON_TYRANITAR_3, FRONTIER_MON_TYRANITAR_4,
+    FRONTIER_MON_HIPPOWDON_1, FRONTIER_MON_HIPPOWDON_2, FRONTIER_MON_HIPPOWDON_3, FRONTIER_MON_HIPPOWDON_4, FRONTIER_MON_HIPPOWDON_5,
+    FRONTIER_MON_GIGALITH_1, FRONTIER_MON_GIGALITH_2, FRONTIER_MON_GIGALITH_3, FRONTIER_MON_GIGALITH_4,
+};
+
+static const u16 SandstormAttack[] = {
+    FRONTIER_MON_EXCADRILL_1, FRONTIER_MON_EXCADRILL_2, FRONTIER_MON_EXCADRILL_3, FRONTIER_MON_EXCADRILL_4,
+    FRONTIER_MON_LYCANROC_MIDDAY_1, FRONTIER_MON_LYCANROC_MIDDAY_2, FRONTIER_MON_LYCANROC_MIDDAY_3,
+    FRONTIER_MON_DRACOZOLT_1, FRONTIER_MON_DRACOZOLT_2, FRONTIER_MON_DRACOZOLT_3, FRONTIER_MON_DRACOZOLT_4,
+    FRONTIER_MON_DRACOVISH_1, FRONTIER_MON_DRACOVISH_2, FRONTIER_MON_DRACOVISH_3, FRONTIER_MON_DRACOVISH_4,
+    FRONTIER_MON_GARCHOMP_1, FRONTIER_MON_GARCHOMP_2, FRONTIER_MON_GARCHOMP_3, FRONTIER_MON_GARCHOMP_4, 
+    FRONTIER_MON_METAGROSS_1, FRONTIER_MON_METAGROSS_2, FRONTIER_MON_METAGROSS_3, FRONTIER_MON_METAGROSS_4,
+    FRONTIER_MON_ARCANINE_HISUI_1, FRONTIER_MON_ARCANINE_HISUI_2, FRONTIER_MON_ARCANINE_HISUI_3, FRONTIER_MON_ARCANINE_HISUI_4,
+    FRONTIER_MON_HOUNDSTONE_1, FRONTIER_MON_HOUNDSTONE_2, FRONTIER_MON_HOUNDSTONE_3, FRONTIER_MON_HOUNDSTONE_3,
+    FRONTIER_MON_GASTRODON_WEST_1, FRONTIER_MON_GASTRODON_WEST_2, FRONTIER_MON_GASTRODON_WEST_3, FRONTIER_MON_GASTRODON_WEST_4,
+    FRONTIER_MON_LANDORUS_INCARNATE_1, FRONTIER_MON_LANDORUS_INCARNATE_2, FRONTIER_MON_LANDORUS_INCARNATE_3,
+    FRONTIER_MON_INFERNAPE_1, FRONTIER_MON_INFERNAPE_2, FRONTIER_MON_INFERNAPE_3, FRONTIER_MON_INFERNAPE_4,
+    FRONTIER_MON_GYARADOS_1, FRONTIER_MON_GYARADOS_2, FRONTIER_MON_GYARADOS_3, FRONTIER_MON_GYARADOS_4,
+    FRONTIER_MON_FERALIGATR_1, FRONTIER_MON_FERALIGATR_2, FRONTIER_MON_FERALIGATR_3, FRONTIER_MON_FERALIGATR_4,
+    FRONTIER_MON_SCIZOR_1, FRONTIER_MON_SCIZOR_2, FRONTIER_MON_SCIZOR_3, FRONTIER_MON_SCIZOR_4,
+    FRONTIER_MON_BRELOOM_1, FRONTIER_MON_BRELOOM_2, FRONTIER_MON_BRELOOM_3, FRONTIER_MON_BRELOOM_4,
+    FRONTIER_MON_SERPERIOR_1, FRONTIER_MON_SERPERIOR_2, FRONTIER_MON_SERPERIOR_3, FRONTIER_MON_SERPERIOR_4,
+    FRONTIER_MON_MIENSHAO_1, FRONTIER_MON_MIENSHAO_2, FRONTIER_MON_MIENSHAO_3, FRONTIER_MON_MIENSHAO_4,
+    FRONTIER_MON_GENGAR_1, FRONTIER_MON_GENGAR_2, FRONTIER_MON_GENGAR_3, FRONTIER_MON_GENGAR_4,
+    FRONTIER_MON_AMOONGUSS_1, FRONTIER_MON_AMOONGUSS_2, FRONTIER_MON_AMOONGUSS_3, FRONTIER_MON_AMOONGUSS_4,
+    FRONTIER_MON_ROTOM_WASH_1, FRONTIER_MON_ROTOM_WASH_2, FRONTIER_MON_ROTOM_WASH_3, FRONTIER_MON_ROTOM_WASH_4,
+    FRONTIER_MON_SUICUNE_1, FRONTIER_MON_SUICUNE_2, FRONTIER_MON_SUICUNE_3, FRONTIER_MON_SUICUNE_4,
+    FRONTIER_MON_GLISCOR_1, FRONTIER_MON_GLISCOR_2, FRONTIER_MON_GLISCOR_3, FRONTIER_MON_GLISCOR_4,
+    FRONTIER_MON_FERROTHORN_1, FRONTIER_MON_FERROTHORN_2, FRONTIER_MON_FERROTHORN_3, FRONTIER_MON_FERROTHORN_4,
+    FRONTIER_MON_CROBAT_1, FRONTIER_MON_CROBAT_2, FRONTIER_MON_CROBAT_3, FRONTIER_MON_CROBAT_4,
+    FRONTIER_MON_ZAPDOS_1, FRONTIER_MON_ZAPDOS_2, FRONTIER_MON_ZAPDOS_3, FRONTIER_MON_ZAPDOS_4,
+};
+
+static const u16 ElectricTerrain[] = {
+    FRONTIER_MON_TAPU_KOKO_1, FRONTIER_MON_TAPU_KOKO_2, FRONTIER_MON_TAPU_KOKO_3, FRONTIER_MON_TAPU_KOKO_4,
+    FRONTIER_MON_PINCURCHIN_1, FRONTIER_MON_PINCURCHIN_2, FRONTIER_MON_PINCURCHIN_3, FRONTIER_MON_PINCURCHIN_4,
+};
+
+static const u16 ElectricTerrainAttack[] = {
+    FRONTIER_MON_IRON_LEAVES_2, FRONTIER_MON_IRON_LEAVES_2, FRONTIER_MON_IRON_LEAVES_2, FRONTIER_MON_IRON_LEAVES_2,
+    FRONTIER_MON_IRON_BUNDLE_2, FRONTIER_MON_IRON_BUNDLE_2, FRONTIER_MON_IRON_BUNDLE_2, FRONTIER_MON_IRON_BUNDLE_2,
+    FRONTIER_MON_IRON_JUGULIS_2, FRONTIER_MON_IRON_JUGULIS_2, FRONTIER_MON_IRON_JUGULIS_2, FRONTIER_MON_IRON_JUGULIS_2,
+    FRONTIER_MON_IRON_MOTH_2, FRONTIER_MON_IRON_MOTH_2, FRONTIER_MON_IRON_MOTH_2, FRONTIER_MON_IRON_MOTH_2,
+    FRONTIER_MON_IRON_THORNS_2, FRONTIER_MON_IRON_THORNS_2, FRONTIER_MON_IRON_THORNS_2, FRONTIER_MON_IRON_THORNS_2,
+    FRONTIER_MON_IRON_VALIANT_2, FRONTIER_MON_IRON_VALIANT_2, FRONTIER_MON_IRON_VALIANT_2, FRONTIER_MON_IRON_VALIANT_2,
+    FRONTIER_MON_IRON_TREADS_2, FRONTIER_MON_IRON_TREADS_2, FRONTIER_MON_IRON_TREADS_2, FRONTIER_MON_IRON_TREADS_2,
+    FRONTIER_MON_IRON_BOULDER_2, FRONTIER_MON_IRON_BOULDER_2, FRONTIER_MON_IRON_BOULDER_2, FRONTIER_MON_IRON_BOULDER_2,
+    FRONTIER_MON_IRON_CROWN_1, FRONTIER_MON_IRON_CROWN_2, FRONTIER_MON_IRON_CROWN_2, FRONTIER_MON_IRON_CROWN_2,
+    FRONTIER_MON_IRON_HANDS_1, FRONTIER_MON_IRON_HANDS_2, FRONTIER_MON_IRON_HANDS_2, FRONTIER_MON_IRON_HANDS_2,
+    FRONTIER_MON_SCEPTILE_3, FRONTIER_MON_SCEPTILE_4, FRONTIER_MON_SCEPTILE_3, FRONTIER_MON_SCEPTILE_4,
+    FRONTIER_MON_HITMONLEE_2, FRONTIER_MON_HITMONLEE_3, FRONTIER_MON_HITMONLEE_2, FRONTIER_MON_HITMONLEE_3,
+    FRONTIER_MON_DRIFBLIM_1, FRONTIER_MON_DRIFBLIM_4, FRONTIER_MON_DRIFBLIM_1, FRONTIER_MON_DRIFBLIM_4,
+    FRONTIER_MON_ACCELGOR_3, FRONTIER_MON_ACCELGOR_4, FRONTIER_MON_ACCELGOR_3, FRONTIER_MON_ACCELGOR_4,
+    FRONTIER_MON_HAWLUCHA_1, FRONTIER_MON_HAWLUCHA_2, FRONTIER_MON_HAWLUCHA_3, FRONTIER_MON_HAWLUCHA_4,
+    FRONTIER_MON_SNEASLER_3, FRONTIER_MON_SNEASLER_4, FRONTIER_MON_SNEASLER_3, FRONTIER_MON_SNEASLER_4,
+    FRONTIER_MON_MANECTRIC_1, FRONTIER_MON_MANECTRIC_3, FRONTIER_MON_MANECTRIC_4, FRONTIER_MON_MANECTRIC_5,
+    FRONTIER_MON_THUNDURUS_INCARNATE_1, FRONTIER_MON_THUNDURUS_INCARNATE_2, FRONTIER_MON_THUNDURUS_INCARNATE_3,
+    FRONTIER_MON_XURKITREE_1, FRONTIER_MON_XURKITREE_2, FRONTIER_MON_XURKITREE_1, FRONTIER_MON_XURKITREE_2,
+    FRONTIER_MON_REGIELEKI_1, FRONTIER_MON_REGIELEKI_2, FRONTIER_MON_REGIELEKI_1, FRONTIER_MON_REGIELEKI_2,
+    FRONTIER_MON_BELLIBOLT_1, FRONTIER_MON_BELLIBOLT_2, FRONTIER_MON_BELLIBOLT_1, FRONTIER_MON_BELLIBOLT_2,
+    FRONTIER_MON_RAGING_BOLT_2, FRONTIER_MON_RAGING_BOLT_2, FRONTIER_MON_RAGING_BOLT_2, FRONTIER_MON_RAGING_BOLT_2,
+    FRONTIER_MON_ZAPDOS_1, FRONTIER_MON_ZAPDOS_3, FRONTIER_MON_ZAPDOS_1, FRONTIER_MON_ZAPDOS_3,
+    FRONTIER_MON_LANTURN_2, FRONTIER_MON_LANTURN_4, FRONTIER_MON_LANTURN_2, FRONTIER_MON_LANTURN_4,
+    FRONTIER_MON_RAIKOU_2, FRONTIER_MON_RAIKOU_3, FRONTIER_MON_RAIKOU_2, FRONTIER_MON_RAIKOU_3,
+    FRONTIER_MON_MAGNEZONE_1, FRONTIER_MON_MAGNEZONE_2, FRONTIER_MON_MAGNEZONE_1, FRONTIER_MON_MAGNEZONE_2,
+    FRONTIER_MON_HELIOLISK_2, FRONTIER_MON_HELIOLISK_4, FRONTIER_MON_HELIOLISK_5, FRONTIER_MON_HELIOLISK_2,
+    FRONTIER_MON_TOXTRICITY_2, FRONTIER_MON_TOXTRICITY_3, FRONTIER_MON_TOXTRICITY_4, FRONTIER_MON_TOXTRICITY_2,
+    FRONTIER_MON_RAICHU_ALOLA_1, FRONTIER_MON_RAICHU_ALOLA_2, FRONTIER_MON_RAICHU_ALOLA_3, FRONTIER_MON_RAICHU_ALOLA_4,
+    FRONTIER_MON_GOLEM_ALOLA_3, FRONTIER_MON_GOLEM_ALOLA_3, FRONTIER_MON_GOLEM_ALOLA_4, FRONTIER_MON_GOLEM_ALOLA_4,
+};
+
+// 队伍类型枚举
+typedef enum
+{
+    RAIN_TEAM,
+    DROUGHT_TEAM,
+    SANDSTORM_TEAM,
+    ELECTRIC_TERRAIN_TEAM,
+    NUM_TEAM_TYPES
+} TeamType;
+
+// 队伍模板结构体
+typedef struct {
+    const u16 *lead;      // 领队数组
+    const u16 *attack;    // 攻击手数组
+    u8 leadCount;         // 领队数组的长度
+    u8 attackCount;       // 攻击手数组的长度
+} TeamTemplate;
+
+// 队伍模板数组
+static const TeamTemplate sTeamTemplates[NUM_TEAM_TYPES] = {
+    [RAIN_TEAM] = {
+        .lead = Rain,
+        .attack = RainAttack,
+        .leadCount = ARRAY_COUNT(Rain),
+        .attackCount = ARRAY_COUNT(RainAttack)
+    },
+    [DROUGHT_TEAM] = {
+        .lead = Drought,
+        .attack = DroughtAttack,
+        .leadCount = ARRAY_COUNT(Drought),
+        .attackCount = ARRAY_COUNT(DroughtAttack)
+    },
+    [SANDSTORM_TEAM] = {
+        .lead = Sandstorm,
+        .attack = SandstormAttack,
+        .leadCount = ARRAY_COUNT(Sandstorm),
+        .attackCount = ARRAY_COUNT(SandstormAttack)
+    },
+    [ELECTRIC_TERRAIN_TEAM] = {
+        .lead = ElectricTerrain,
+        .attack = ElectricTerrainAttack,
+        .leadCount = ARRAY_COUNT(ElectricTerrain),
+        .attackCount = ARRAY_COUNT(ElectricTerrainAttack)
+    }
+};
+
+// 默认概率表
+static const u8 sDefaultProbTable[NUM_TEAM_TYPES] = {25, 25, 25, 25};
+
 static void GenerateOpponentMons(void)
 {
     int i, j, k;
@@ -481,6 +751,81 @@ static void GenerateOpponentMons(void)
         species[i] = gFacilityTrainerMons[monId].species;
         gFrontierTempParty[i] = monId;
         i++;
+    }
+
+    if (FlagGet(FLAG_TEAM_TEST) && battleMode == FRONTIER_MODE_DOUBLES)
+    {
+        u8 probTable[NUM_TEAM_TYPES] = {0};
+
+        // 根据条件设置概率值
+        if (VarGet(VAR_FACTORY_TEAM_TEST==1))
+        {
+            probTable[RAIN_TEAM] = 100;
+            probTable[DROUGHT_TEAM] = 0;
+            probTable[SANDSTORM_TEAM] = 0;
+            probTable[ELECTRIC_TERRAIN_TEAM] = 0;
+        }
+        else if (VarGet(VAR_FACTORY_TEAM_TEST==2))
+        {
+            probTable[RAIN_TEAM] = 0;
+            probTable[DROUGHT_TEAM] = 100;
+            probTable[SANDSTORM_TEAM] = 0;
+            probTable[ELECTRIC_TERRAIN_TEAM] = 0;
+        }
+        else if (VarGet(VAR_FACTORY_TEAM_TEST==3))
+        {
+            probTable[RAIN_TEAM] = 0;
+            probTable[DROUGHT_TEAM] = 0;
+            probTable[SANDSTORM_TEAM] = 100;
+            probTable[ELECTRIC_TERRAIN_TEAM] = 0;
+        }
+        else if (VarGet(VAR_FACTORY_TEAM_TEST==4))
+        {
+            probTable[RAIN_TEAM] = 0;
+            probTable[DROUGHT_TEAM] = 0;
+            probTable[SANDSTORM_TEAM] = 0;
+            probTable[ELECTRIC_TERRAIN_TEAM] = 100;
+        }
+        else
+            memcpy(probTable, sDefaultProbTable, sizeof(probTable)); // 使用默认概率
+
+        // 概率选择队伍类型
+        u8 teamType = RAIN_TEAM;
+        {
+            u16 rand = Random() % 100, sum = 0;
+            for (u8 i = 0; i < NUM_TEAM_TYPES; i++)
+            {
+                sum += probTable[i];
+                if (rand < sum)
+                {
+                    teamType = i;
+                    break;
+                }
+            }
+        }
+
+        const TeamTemplate *tpl = &sTeamTemplates[teamType];
+
+        // 替换领队
+        if (tpl->lead && tpl->leadCount > 0)
+        {
+            u16 monId = tpl->lead[Random() % tpl->leadCount];
+            gFrontierTempParty[0] = monId;
+            species[0] = gFacilityTrainerMons[monId].species;
+        }
+
+        // 替换攻击手（保证两个不重复）
+        u16 monId1, monId2;
+        do
+        {
+            monId1 = tpl->attack[Random() % tpl->attackCount];
+            monId2 = tpl->attack[Random() % tpl->attackCount];
+        } while (gFacilityTrainerMons[monId1].species == gFacilityTrainerMons[monId2].species);
+
+        gFrontierTempParty[1] = monId1;
+        species[1] = gFacilityTrainerMons[monId1].species;
+        gFrontierTempParty[2] = monId2;
+        species[2] = gFacilityTrainerMons[monId2].species;
     }
 }
 
@@ -680,277 +1025,282 @@ static void GenerateInitialRentalMons(void)
             species[slot] = requiredSpecies;
         }
     }
-}
 
-// Determines if the upcoming opponent has a single most-common
-// type in its party. If there are two different types that are
-// tied, then the opponent is deemed to have no preferred type,
-// and NUMBER_OF_MON_TYPES is the result.
-static void GetOpponentMostCommonMonType(void)
-{
-    u8 i;
-    u8 typeCounts[NUMBER_OF_MON_TYPES];
-    u8 mostCommonTypes[2];
-
-    gFacilityTrainerMons = gBattleFrontierMons;
-
-    // Count the number of times each type occurs in the opponent's party.
-    for (i = TYPE_NORMAL; i < NUMBER_OF_MON_TYPES; i++)
-        typeCounts[i] = 0;
-    for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+    if (VarGet(VAR_FACTORY_TEAM_TEST) == 6 && battleMode == FRONTIER_MODE_DOUBLES)
     {
-        u32 species = gFacilityTrainerMons[gFrontierTempParty[i]].species;
-        typeCounts[gSpeciesInfo[species].types[0]]++;
-        if (gSpeciesInfo[species].types[0] != gSpeciesInfo[species].types[1])
-            typeCounts[gSpeciesInfo[species].types[1]]++;
-    }
-
-    // Determine which are the two most-common types.
-    // The second most-common type is only updated if
-    // its count is equal to the most-common type.
-    mostCommonTypes[0] = 0;
-    mostCommonTypes[1] = 0;
-    for (i = 1; i < NUMBER_OF_MON_TYPES; i++)
-    {
-        if (typeCounts[mostCommonTypes[0]] < typeCounts[i])
-            mostCommonTypes[0] = i;
-        else if (typeCounts[mostCommonTypes[0]] == typeCounts[i])
-            mostCommonTypes[1] = i;
-    }
-
-    if (typeCounts[mostCommonTypes[0]] != 0)
-    {
-        // The most-common type must be strictly greater than
-        // the second-most-common type, or the top two must be
-        // the same type.
-        if (typeCounts[mostCommonTypes[0]] > typeCounts[mostCommonTypes[1]])
-            gSpecialVar_Result = mostCommonTypes[0];
-        else if (mostCommonTypes[0] == mostCommonTypes[1])
-            gSpecialVar_Result = mostCommonTypes[0];
-        else
-            gSpecialVar_Result = NUMBER_OF_MON_TYPES;
-    }
-    else
-    {
-        gSpecialVar_Result = NUMBER_OF_MON_TYPES;
-    }
-}
-
-static void GetOpponentBattleStyle(void)
-{
-    u8 i, j, count;
-    u8 stylePoints[FACTORY_NUM_STYLES];
-
-    count = 0;
-    gFacilityTrainerMons = gBattleFrontierMons;
-    for (i = 0; i < FACTORY_NUM_STYLES; i++)
-        stylePoints[i] = 0;
-
-    for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
-    {
-        u16 monId = gFrontierTempParty[i];
-        for (j = 0; j < MAX_MON_MOVES; j++)
+        // Step 1: 替换位置0（TrickRoom随机抽取）
+        if (TrickRoomSize > 0)
         {
-            u8 battleStyle = GetMoveBattleStyle(gFacilityTrainerMons[monId].moves[j]);
-            stylePoints[battleStyle]++;
+            u16 trickRoomMonId = TrickRoom[Random() % TrickRoomSize];
+            gSaveBlock2Ptr->frontier.rentalMons[0].monId = trickRoomMonId;
+            species[0] = gFacilityTrainerMons[trickRoomMonId].species;
+        }
+
+        // Step 2: 替换位置1-5（需要5个不同species）
+        u16 selectedSpecies[5] = {0};
+        u8 validCount = 0;
+
+        for (int replaceIndex = 0; replaceIndex < 5; replaceIndex++)
+        {
+            u8 pos = replaceIndex + 1; // 替换位置1-5
+            bool8 success = FALSE;
+
+            // 带重试机制的循环
+            while (!success)
+            {
+                u16 attackMonId = TrickRoomAttack[Random() % TrickRoomAttackSize];
+                u16 currentSpecies = gFacilityTrainerMons[attackMonId].species;
+
+                // 检查species唯一性
+                bool8 speciesExists = FALSE;
+                for (int k = 0; k < validCount; k++)
+                {
+                    if (selectedSpecies[k] == currentSpecies)
+                    {
+                        speciesExists = TRUE;
+                        break;
+                    }
+                }
+
+                if (!speciesExists)
+                {
+                    selectedSpecies[validCount++] = currentSpecies;
+                    gSaveBlock2Ptr->frontier.rentalMons[pos].monId = attackMonId;
+                    species[pos] = currentSpecies;
+                    success = TRUE;
+                }
+            }
         }
     }
+}
 
-    gSpecialVar_Result = FACTORY_STYLE_NONE;
-    for (i = 1; i < FACTORY_NUM_STYLES; i++)
+    // Determines if the upcoming opponent has a single most-common
+    // type in its party. If there are two different types that are
+    // tied, then the opponent is deemed to have no preferred type,
+    // and NUMBER_OF_MON_TYPES is the result.
+    static void GetOpponentMostCommonMonType(void)
     {
-        if (stylePoints[i] >= sRequiredMoveCounts[i - 1])
-        {
-            gSpecialVar_Result = i;
-            count++;
-        }
-    }
+        u8 i;
+        u8 typeCounts[NUMBER_OF_MON_TYPES];
+        u8 mostCommonTypes[2];
 
-    // Has no singular style
-    if (count > 2)
-        gSpecialVar_Result = FACTORY_NUM_STYLES;
-}
-
-static u8 GetMoveBattleStyle(u16 move)
-{
-    const u16 *moves;
-    u8 i, j;
-
-    for (i = 0; i < ARRAY_COUNT(sMoveStyles); i++)
-    {
-        for (j = 0, moves = sMoveStyles[i]; moves[j] != MOVE_NONE; j++)
-        {
-            if (moves[j] == move)
-                return i + 1;
-        }
-    }
-    return FACTORY_STYLE_NONE;
-}
-
-bool8 InBattleFactory(void)
-{
-    return gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_FACTORY_PRE_BATTLE_ROOM
-        || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_FACTORY_BATTLE_ROOM;
-}
-
-static void RestorePlayerPartyHeldItems(void)
-{
-    u8 i;
-
-    if (gSaveBlock2Ptr->frontier.lvlMode != FRONTIER_LVL_TENT)
         gFacilityTrainerMons = gBattleFrontierMons;
-    else
-        gFacilityTrainerMons = gSlateportBattleTentMons;
 
-    for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
-    {
-        SetMonData(&gPlayerParty[i],
-                   MON_DATA_HELD_ITEM,
-                   &gFacilityTrainerMons[gSaveBlock2Ptr->frontier.rentalMons[i].monId].heldItem);
-    }
-}
-
-// Get the IV to use for the opponent's pokémon.
-// The IVs get higher for each subsequent challenge and for
-// the last trainer in each challenge. Noland is an exception
-// to this, as he uses the IVs that would be used by the regular
-// trainers 2 challenges ahead of the current one.
-// Due to a mistake in FillFactoryFrontierTrainerParty, the
-// challenge number used to determine the IVs for regular trainers
-// is Battle Tower's instead of Battle Factory's.
-u8 GetFactoryMonFixedIV(u8 challengeNum, bool8 isLastBattle)
-{
-    u8 ivSet = 31;
-    return ivSet;
-}
-
-void FillFactoryBrainParty(void)
-{
-    int i, j, k;
-    u16 species[FRONTIER_PARTY_SIZE];
-    u16 heldItems[FRONTIER_PARTY_SIZE];
-    int monLevel;
-    const u8 fixedIV = 31;
-    u32 otId;
-
-    u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
-    u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
-    u32 WinStreak = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode];
-    monLevel = SetFacilityPtrsGetLevel();
-    i = 0;
-    otId = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
-
-    while (i != FRONTIER_PARTY_SIZE)
-    {
-        u16 monId = GetFactoryMonId(WinStreak, TRUE);
-
-        if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
-            continue;
-        if (monLevel == FRONTIER_MAX_LEVEL_50) //&& monId > FRONTIER_MONS_HIGH_TIER)
-            continue;
-
-        for (j = 0; j < (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons); j++)
+        // Count the number of times each type occurs in the opponent's party.
+        for (i = TYPE_NORMAL; i < NUMBER_OF_MON_TYPES; i++)
+            typeCounts[i] = 0;
+        for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
         {
-            if (monId == gSaveBlock2Ptr->frontier.rentalMons[j].monId)
-                break;
+            u32 species = gFacilityTrainerMons[gFrontierTempParty[i]].species;
+            typeCounts[gSpeciesInfo[species].types[0]]++;
+            if (gSpeciesInfo[species].types[0] != gSpeciesInfo[species].types[1])
+                typeCounts[gSpeciesInfo[species].types[1]]++;
         }
-        if (j != (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons))
-            continue;
 
-        for (k = 0; k < i; k++)
+        // Determine which are the two most-common types.
+        // The second most-common type is only updated if
+        // its count is equal to the most-common type.
+        mostCommonTypes[0] = 0;
+        mostCommonTypes[1] = 0;
+        for (i = 1; i < NUMBER_OF_MON_TYPES; i++)
         {
-            if (species[k] == gFacilityTrainerMons[monId].species)
-                break;
+            if (typeCounts[mostCommonTypes[0]] < typeCounts[i])
+                mostCommonTypes[0] = i;
+            else if (typeCounts[mostCommonTypes[0]] == typeCounts[i])
+                mostCommonTypes[1] = i;
         }
-        if (k != i)
-            continue;
 
-        for (k = 0; k < i; k++)
+        if (typeCounts[mostCommonTypes[0]] != 0)
         {
-            if (heldItems[k] != ITEM_NONE && heldItems[k] == gFacilityTrainerMons[monId].heldItem)
-                break;
-        }
-        if (k != i)
-            continue;
-
-        species[i] = gFacilityTrainerMons[monId].species;
-        heldItems[i] = gFacilityTrainerMons[monId].heldItem;
-        CreateFacilityMon(&gFacilityTrainerMons[monId],
-                monLevel, fixedIV, otId, FLAG_FRONTIER_MON_FACTORY,
-                &gEnemyParty[i]);
-        i++;
-    }
-}
-
-static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange)
-{
-    u16 numMons, monId;
-    u16 betterRangeStart = 2221;
-    u16 betterRangeEnd = 2516;
-    u16 normalRangeEnd = 2228;
-
-    if (useBetterRange)
-    {
-        u8 probability;
-        if (VarGet(VAR_DIFFICULTY_MODE) == 0)
-            probability = 0;
-        else
-        {
-            if (WinStreak < 25) // 1-25
-                probability = 0;
-            else if (WinStreak < 50) // 26-50
-                probability = 33;
-            else if (WinStreak < 75) // 51-75
-                probability = 66;
+            // The most-common type must be strictly greater than
+            // the second-most-common type, or the top two must be
+            // the same type.
+            if (typeCounts[mostCommonTypes[0]] > typeCounts[mostCommonTypes[1]])
+                gSpecialVar_Result = mostCommonTypes[0];
+            else if (mostCommonTypes[0] == mostCommonTypes[1])
+                gSpecialVar_Result = mostCommonTypes[0];
             else
-                probability = 100;
-        }
-
-        if (Random() % 100 < probability)
-        {
-            numMons = betterRangeEnd - betterRangeStart + 1;
-            monId = Random() % numMons + betterRangeStart;
+                gSpecialVar_Result = NUMBER_OF_MON_TYPES;
         }
         else
         {
-            numMons = normalRangeEnd + 1;
-            monId = Random() % numMons;
+            gSpecialVar_Result = NUMBER_OF_MON_TYPES;
         }
     }
-    else
+
+    static void GetOpponentBattleStyle(void)
     {
-        if (FlagGet(FLAG_FACTORY_TEST) == FALSE)
+        u8 i, j, count;
+        u8 stylePoints[FACTORY_NUM_STYLES];
+
+        count = 0;
+        gFacilityTrainerMons = gBattleFrontierMons;
+        for (i = 0; i < FACTORY_NUM_STYLES; i++)
+            stylePoints[i] = 0;
+
+        for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
         {
-            if (WinStreak < 7)
+            u16 monId = gFrontierTempParty[i];
+            for (j = 0; j < MAX_MON_MOVES; j++)
+            {
+                u8 battleStyle = GetMoveBattleStyle(gFacilityTrainerMons[monId].moves[j]);
+                stylePoints[battleStyle]++;
+            }
+        }
+
+        gSpecialVar_Result = FACTORY_STYLE_NONE;
+        for (i = 1; i < FACTORY_NUM_STYLES; i++)
+        {
+            if (stylePoints[i] >= sRequiredMoveCounts[i - 1])
+            {
+                gSpecialVar_Result = i;
+                count++;
+            }
+        }
+
+        // Has no singular style
+        if (count > 2)
+            gSpecialVar_Result = FACTORY_NUM_STYLES;
+    }
+
+    static u8 GetMoveBattleStyle(u16 move)
+    {
+        const u16 *moves;
+        u8 i, j;
+
+        for (i = 0; i < ARRAY_COUNT(sMoveStyles); i++)
+        {
+            for (j = 0, moves = sMoveStyles[i]; moves[j] != MOVE_NONE; j++)
+            {
+                if (moves[j] == move)
+                    return i + 1;
+            }
+        }
+        return FACTORY_STYLE_NONE;
+    }
+
+    bool8 InBattleFactory(void)
+    {
+        return gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_FACTORY_PRE_BATTLE_ROOM || gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_FACTORY_BATTLE_ROOM;
+    }
+
+    static void RestorePlayerPartyHeldItems(void)
+    {
+        u8 i;
+
+        if (gSaveBlock2Ptr->frontier.lvlMode != FRONTIER_LVL_TENT)
+            gFacilityTrainerMons = gBattleFrontierMons;
+        else
+            gFacilityTrainerMons = gSlateportBattleTentMons;
+
+        for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+        {
+            SetMonData(&gPlayerParty[i],
+                       MON_DATA_HELD_ITEM,
+                       &gFacilityTrainerMons[gSaveBlock2Ptr->frontier.rentalMons[i].monId].heldItem);
+        }
+    }
+
+    // Get the IV to use for the opponent's pokémon.
+    // The IVs get higher for each subsequent challenge and for
+    // the last trainer in each challenge. Noland is an exception
+    // to this, as he uses the IVs that would be used by the regular
+    // trainers 2 challenges ahead of the current one.
+    // Due to a mistake in FillFactoryFrontierTrainerParty, the
+    // challenge number used to determine the IVs for regular trainers
+    // is Battle Tower's instead of Battle Factory's.
+    u8 GetFactoryMonFixedIV(u8 challengeNum, bool8 isLastBattle)
+    {
+        u8 ivSet = 31;
+        return ivSet;
+    }
+
+    void FillFactoryBrainParty(void)
+    {
+        int i, j, k;
+        u16 species[FRONTIER_PARTY_SIZE];
+        u16 heldItems[FRONTIER_PARTY_SIZE];
+        int monLevel;
+        const u8 fixedIV = 31;
+        u32 otId;
+
+        u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
+        u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
+        u32 WinStreak = gSaveBlock2Ptr->frontier.factoryWinStreaks[battleMode][lvlMode];
+        monLevel = SetFacilityPtrsGetLevel();
+        i = 0;
+        otId = T1_READ_32(gSaveBlock2Ptr->playerTrainerId);
+
+        while (i != FRONTIER_PARTY_SIZE)
+        {
+            u16 monId = GetFactoryMonId(WinStreak, TRUE);
+
+            if (gFacilityTrainerMons[monId].species == SPECIES_UNOWN)
+                continue;
+            if (monLevel == FRONTIER_MAX_LEVEL_50) //&& monId > FRONTIER_MONS_HIGH_TIER)
+                continue;
+
+            for (j = 0; j < (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons); j++)
+            {
+                if (monId == gSaveBlock2Ptr->frontier.rentalMons[j].monId)
+                    break;
+            }
+            if (j != (int)ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons))
+                continue;
+
+            for (k = 0; k < i; k++)
+            {
+                if (species[k] == gFacilityTrainerMons[monId].species)
+                    break;
+            }
+            if (k != i)
+                continue;
+
+            for (k = 0; k < i; k++)
+            {
+                if (heldItems[k] != ITEM_NONE && heldItems[k] == gFacilityTrainerMons[monId].heldItem)
+                    break;
+            }
+            if (k != i)
+                continue;
+
+            species[i] = gFacilityTrainerMons[monId].species;
+            heldItems[i] = gFacilityTrainerMons[monId].heldItem;
+            CreateFacilityMon(&gFacilityTrainerMons[monId],
+                              monLevel, fixedIV, otId, FLAG_FRONTIER_MON_FACTORY,
+                              &gEnemyParty[i]);
+            i++;
+        }
+    }
+
+    static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange)
+    {
+        u16 numMons, monId;
+        u16 betterRangeStart = 2196;
+        u16 betterRangeEnd = 2523;
+        u16 normalRangeEnd = 2230;
+
+        if (useBetterRange)
+        {
+            u8 probability;
+            if (VarGet(VAR_DIFFICULTY_MODE) == 0)
+                probability = 0;
+            else
+            {
+                if (WinStreak < 25) // 1-25
+                    probability = 0;
+                else if (WinStreak < 50) // 26-50
+                    probability = 33;
+                else if (WinStreak < 75) // 51-75
+                    probability = 66;
+                else
+                    probability = 100;
+            }
+
+            if (Random() % 100 < probability)
             {
                 numMons = betterRangeEnd - betterRangeStart + 1;
                 monId = Random() % numMons + betterRangeStart;
-            }
-            else if (WinStreak < 14)
-            {
-                if (Random() % 100 < 66)
-                {
-                    numMons = betterRangeEnd - betterRangeStart + 1;
-                    monId = Random() % numMons + betterRangeStart;
-                }
-                else
-                {
-                    numMons = normalRangeEnd + 1;
-                    monId = Random() % numMons;
-                }
-            }
-            else if (WinStreak < 21)
-            {
-                if (Random() % 100 < 33)
-                {
-                    numMons = betterRangeEnd - betterRangeStart + 1; 
-                    monId = Random() % numMons + betterRangeStart; 
-                }
-                else
-                {
-                    numMons = normalRangeEnd + 1;
-                    monId = Random() % numMons;
-                }
             }
             else
             {
@@ -958,81 +1308,122 @@ static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange)
                 monId = Random() % numMons;
             }
         }
-        else // 工厂测试模式
+        else
         {
-            const u16 arrSize = sizeof(factoryMonsGen9) / sizeof(factoryMonsGen9[0]);
-            monId = factoryMonsGen9[Random() % arrSize];
+            if (FlagGet(FLAG_FACTORY_TEST) == FALSE)
+            {
+                if (WinStreak < 7)
+                {
+                    numMons = betterRangeEnd - betterRangeStart + 1;
+                    monId = Random() % numMons + betterRangeStart;
+                }
+                else if (WinStreak < 14)
+                {
+                    if (Random() % 100 < 66)
+                    {
+                        numMons = betterRangeEnd - betterRangeStart + 1;
+                        monId = Random() % numMons + betterRangeStart;
+                    }
+                    else
+                    {
+                        numMons = normalRangeEnd + 1;
+                        monId = Random() % numMons;
+                    }
+                }
+                else if (WinStreak < 21)
+                {
+                    if (Random() % 100 < 33)
+                    {
+                        numMons = betterRangeEnd - betterRangeStart + 1;
+                        monId = Random() % numMons + betterRangeStart;
+                    }
+                    else
+                    {
+                        numMons = normalRangeEnd + 1;
+                        monId = Random() % numMons;
+                    }
+                }
+                else
+                {
+                    numMons = normalRangeEnd + 1;
+                    monId = Random() % numMons;
+                }
+            }
+            else // 工厂测试模式
+            {
+                const u16 arrSize = sizeof(factoryMonsGen9) / sizeof(factoryMonsGen9[0]);
+                monId = factoryMonsGen9[Random() % arrSize];
+            }
+        }
+        return monId;
+    }
+
+    u8 GetNumPastRentalsRank(u8 battleMode, u8 lvlMode)
+    {
+        u8 ret;
+        u8 rents = gSaveBlock2Ptr->frontier.factoryRentsCount[battleMode][lvlMode];
+
+        if (rents < 15)
+            ret = 0;
+        else if (rents < 22)
+            ret = 1;
+        else if (rents < 29)
+            ret = 2;
+        else if (rents < 36)
+            ret = 3;
+        else if (rents < 43)
+            ret = 4;
+        else
+            ret = 5;
+
+        return ret;
+    }
+
+    u32 GetAiScriptsInBattleFactory(void)
+    {
+        u8 gameMode = VarGet(VAR_DIFFICULTY_MODE);
+        if (gameMode != 1 && gameMode != 2)
+            return 0;
+
+        GetOpponentBattleStyle();
+        u8 battleStyle = gSpecialVar_Result;
+
+        if (gameMode == 1)
+        {
+            if (battleStyle == FACTORY_STYLE_HIGH_RISK)
+                return AI_FLAG_BASIC_TRAINER_RISKY;
+            else if (battleStyle == FACTORY_STYLE_ENDURANCE || battleStyle == FACTORY_STYLE_WEAKENING)
+                return AI_FLAG_BASIC_TRAINER_CONSERVATIVE;
+            else if (battleStyle == FACTORY_STYLE_SLOW_STEADY)
+                return AI_FLAG_BASIC_TRAINER_DEFEND;
+            else if (battleStyle == FACTORY_STYLE_WEATHER)
+                return AI_FLAG_BASIC_TRAINER_POWERSTAGE;
+            else if (battleStyle == FACTORY_STYLE_PREPARATION)
+                return AI_FLAG_BASIC_TRAINER_STRENGTHEN;
+            else
+                return AI_FLAG_BASIC_TRAINER;
+        }
+        else // gameMode == 2
+        {
+            if (battleStyle == FACTORY_STYLE_HIGH_RISK)
+                return AI_FLAG_SMART_TRAINER_RISKY;
+            else if (battleStyle == FACTORY_STYLE_ENDURANCE || battleStyle == FACTORY_STYLE_WEAKENING)
+                return AI_FLAG_SMART_TRAINER_CONSERVATIVE;
+            else if (battleStyle == FACTORY_STYLE_SLOW_STEADY)
+                return AI_FLAG_SMART_TRAINER_DEFEND;
+            else if (battleStyle == FACTORY_STYLE_WEATHER)
+                return AI_FLAG_SMART_TRAINER_POWERSTAGE;
+            else if (battleStyle == FACTORY_STYLE_PREPARATION)
+                return AI_FLAG_SMART_TRAINER_STRENGTHEN;
+            else
+                return AI_FLAG_SMART_TRAINER;
         }
     }
-    return monId;
-}
 
-u8 GetNumPastRentalsRank(u8 battleMode, u8 lvlMode)
-{
-    u8 ret;
-    u8 rents = gSaveBlock2Ptr->frontier.factoryRentsCount[battleMode][lvlMode];
-
-    if (rents < 15)
-        ret = 0;
-    else if (rents < 22)
-        ret = 1;
-    else if (rents < 29)
-        ret = 2;
-    else if (rents < 36)
-        ret = 3;
-    else if (rents < 43)
-        ret = 4;
-    else
-        ret = 5;
-
-    return ret;
-}
-
-u32 GetAiScriptsInBattleFactory(void)
-{
-    u8 gameMode = VarGet(VAR_DIFFICULTY_MODE);
-    if (gameMode != 1 && gameMode != 2)
-        return 0;
-
-    GetOpponentBattleStyle();
-    u8 battleStyle = gSpecialVar_Result;
-
-    if (gameMode == 1)
+    void SetMonMoveAvoidReturn(struct Pokemon * mon, u16 moveArg, u8 moveSlot)
     {
-        if (battleStyle == FACTORY_STYLE_HIGH_RISK)
-            return AI_FLAG_BASIC_TRAINER_RISKY;
-        else if (battleStyle == FACTORY_STYLE_ENDURANCE || battleStyle == FACTORY_STYLE_WEAKENING)
-            return AI_FLAG_BASIC_TRAINER_CONSERVATIVE;
-        else if (battleStyle == FACTORY_STYLE_SLOW_STEADY)
-            return AI_FLAG_BASIC_TRAINER_DEFEND;
-        else if (battleStyle == FACTORY_STYLE_WEATHER)
-            return AI_FLAG_BASIC_TRAINER_POWERSTAGE;
-        else if (battleStyle == FACTORY_STYLE_PREPARATION)
-            return AI_FLAG_BASIC_TRAINER_STRENGTHEN;
-        else
-            return AI_FLAG_BASIC_TRAINER;
+        u16 move = moveArg;
+        if (moveArg == MOVE_RETURN)
+            move = MOVE_FRUSTRATION;
+        SetMonMoveSlot(mon, move, moveSlot);
     }
-    else // gameMode == 2
-    {
-        if (battleStyle == FACTORY_STYLE_HIGH_RISK)
-            return AI_FLAG_SMART_TRAINER_RISKY;
-        else if (battleStyle == FACTORY_STYLE_ENDURANCE || battleStyle == FACTORY_STYLE_WEAKENING)
-            return AI_FLAG_SMART_TRAINER_CONSERVATIVE;
-        else if (battleStyle == FACTORY_STYLE_SLOW_STEADY)
-            return AI_FLAG_SMART_TRAINER_DEFEND;
-        else if (battleStyle == FACTORY_STYLE_WEATHER)
-            return AI_FLAG_SMART_TRAINER_POWERSTAGE;
-        else if (battleStyle == FACTORY_STYLE_PREPARATION)
-            return AI_FLAG_SMART_TRAINER_STRENGTHEN;
-        else
-            return AI_FLAG_SMART_TRAINER;
-    }
-}
-
-void SetMonMoveAvoidReturn(struct Pokemon *mon, u16 moveArg, u8 moveSlot)
-{
-    u16 move = moveArg;
-    if (moveArg == MOVE_RETURN)
-        move = MOVE_FRUSTRATION;
-    SetMonMoveSlot(mon, move, moveSlot);
-}
