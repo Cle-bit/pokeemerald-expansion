@@ -1565,23 +1565,104 @@ static void FillTentTrainerParty(u8 monsCount)
     FillTentTrainerParty_(TRAINER_BATTLE_PARAM.opponentA, 0, monsCount);
 }
 
+static const u16 sPriorityAbilities[] = 
+{
+    ABILITY_MAGIC_BOUNCE,
+    ABILITY_CONTRARY,
+    ABILITY_TRIAGE,
+    ABILITY_PROTEAN,
+    ABILITY_PUNK_ROCK,
+    ABILITY_SPEED_BOOST,
+    ABILITY_COMMANDER,
+    ABILITY_PRANKSTER,
+    ABILITY_DRIZZLE,
+    ABILITY_DROUGHT,
+    ABILITY_SAND_STREAM,
+    ABILITY_SNOW_WARNING,
+    ABILITY_SAND_RUSH,
+    ABILITY_SLUSH_RUSH,
+    ABILITY_CHLOROPHYLL,
+    ABILITY_SWIFT_SWIM,
+    ABILITY_ELECTRIC_SURGE,
+    ABILITY_GRASSY_SURGE,
+    ABILITY_MISTY_SURGE,
+    ABILITY_PSYCHIC_SURGE,
+    ABILITY_GALVANIZE,
+    ABILITY_PIXILATE
+};
+
+static bool8 CheckItemAbilityCombo(u16 ability, u16 heldItem)
+{
+    // 检查Toxic Orb 的组合
+    if ((ability == ABILITY_POISON_HEAL ||
+         ability == ABILITY_GUTS ||
+         ability == ABILITY_TOXIC_BOOST ||
+         ability == ABILITY_MARVEL_SCALE ||
+         ability == ABILITY_QUICK_FEET) &&
+        heldItem == ITEM_TOXIC_ORB)
+        return TRUE;
+
+    // 检查 Flame Orb 的组合
+    if ((ability == ABILITY_GUTS ||
+         ability == ABILITY_FLARE_BOOST ||
+         ability == ABILITY_MARVEL_SCALE ||
+         ability == ABILITY_QUICK_FEET) &&
+        heldItem == ITEM_FLAME_ORB)
+        return TRUE;
+
+    // 检查 Unburden 和种子、树果、宝石类道具的组合
+    if (ability == ABILITY_UNBURDEN &&
+        ((heldItem >= ITEM_ELECTRIC_SEED && heldItem <= ITEM_GRASSY_SEED) ||  // 种子
+         (heldItem >= ITEM_CHERI_BERRY && heldItem <= ITEM_MARANGA_BERRY) || // 树果
+         (heldItem >= ITEM_NORMAL_GEM && heldItem <= ITEM_FAIRY_GEM) ||    // 宝石
+         (heldItem == ITEM_FOCUS_SASH ) || (heldItem == ITEM_FOCUS_BAND) || //消耗类道具
+         (heldItem == ITEM_WEAKNESS_POLICY) ||(heldItem == ITEM_BLUNDER_POLICY) ||
+         (heldItem == ITEM_THROAT_SPRAY)))
+        return TRUE;
+
+    // 检查收获和树果的组合
+    if ((ability == ABILITY_HARVEST ||
+         ability == ABILITY_CUD_CHEW ||
+         ability == ABILITY_CHEEK_POUCH ||
+         ability == ABILITY_GLUTTONY) &&
+        (heldItem >= ITEM_CHERI_BERRY && heldItem <= ITEM_MARANGA_BERRY))
+        return TRUE;
+
+    // 如果没有匹配的组合，返回 FALSE
+    return FALSE;
+}
+
+static bool8 HasPriorityAbility(u16 ability, const u16 *priorityList, u32 listSize)
+{
+    for (u32 j = 0; j < listSize; j++)
+    {
+        if (ability == priorityList[j])
+            return TRUE;
+    }
+    return FALSE;
+}
+
+// 检查戏法空间id
+static bool8 IsIdInTrickRoomAttack(u16 monid) {
+    for (u16 i = 0; i < TrickRoomAttackSize; ++i) {
+        if (TrickRoomAttack[i] == monid) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32 otID, u32 flags, struct Pokemon *dst)
 {
-    u8 ball = (fmon->ball == 0xFF) ? Random() % POKEBALL_COUNT : fmon->ball;
+    u16 ball = BALL_MASTER;
     u16 move;
-    u32 personality = 0, ability, friendship, j;
+    u16 heldItem = fmon->heldItem;
+    u32 ability=0, friendship, j;
+    bool8 abilityFound = FALSE;
+    u32 nature = fmon->nature;
+    u16 factory0iv = 0;
 
-    if (fmon->gender == TRAINER_MON_MALE)
-    {
-        personality = GeneratePersonalityForGender(MON_MALE, fmon->species);
-    }
-    else if (fmon->gender == TRAINER_MON_FEMALE)
-    {
-        personality = GeneratePersonalityForGender(MON_FEMALE, fmon->species);
-    }
-
-    ModifyPersonalityForNature(&personality, fmon->nature);
-    CreateMon(dst, fmon->species, level, fixedIV, TRUE, personality, otID, OT_ID_PRESET);
+    CreateMon(dst, fmon->species, level, fixedIV, TRUE, nature, otID, OT_ID_PRESET);
 
     friendship = MAX_FRIENDSHIP;
     // Give the chosen Pokémon its specified moves.
@@ -1599,21 +1680,50 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
     SetMonData(dst, MON_DATA_FRIENDSHIP, &friendship);
     SetMonData(dst, MON_DATA_HELD_ITEM, &fmon->heldItem);
 
-    // try to set ability. Otherwise, random of non-hidden as per vanilla
-    if (fmon->ability != ABILITY_NONE)
+    // try to set ability. Otherwise, random possible abilities
+    // 第一阶段：检查道具与特性组合
+    const struct SpeciesInfo *speciesInfo = &gSpeciesInfo[fmon->species];
+    for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
     {
-        const struct SpeciesInfo *speciesInfo = &gSpeciesInfo[fmon->species];
-        u32 maxAbilities = ARRAY_COUNT(speciesInfo->abilities);
-        for (ability = 0; ability < maxAbilities; ++ability)
+        u16 currentAbility = speciesInfo->abilities[i];
+        if (CheckItemAbilityCombo(currentAbility, heldItem))
         {
-            if (speciesInfo->abilities[ability] == fmon->ability)
-                break;
+            ability = i;
+            abilityFound = TRUE;
+            break;
         }
-        if (ability >= maxAbilities)
-            ability = 0;
-        SetMonData(dst, MON_DATA_ABILITY_NUM, &ability);
     }
 
+    // 第二阶段：如果没有找到道具组合，检查优先特性列表
+    if (!abilityFound)
+    {
+        for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
+        {
+            u16 currentAbility = speciesInfo->abilities[i];
+            if (HasPriorityAbility(currentAbility, sPriorityAbilities, ARRAY_COUNT(sPriorityAbilities)))
+            {
+                ability = i;
+                abilityFound = TRUE;
+                break;
+            }
+        }
+    }
+
+    // 第三阶段：如果仍未找到，随机选择有效能力
+    if (!abilityFound)
+    {
+        u8 validAbilities[NUM_ABILITY_SLOTS];
+        u8 validCount = 0;
+        for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
+        {
+            if (speciesInfo->abilities[i] != ABILITY_NONE)
+                validAbilities[validCount++] = i;
+        }
+        ability = validAbilities[Random() % validCount];
+    }
+
+    SetMonData(dst, MON_DATA_ABILITY_NUM, &ability);
+    
     if (fmon->ev != NULL)
     {
         SetMonData(dst, MON_DATA_HP_EV, &(fmon->ev[0]));
@@ -1624,14 +1734,18 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
         SetMonData(dst, MON_DATA_SPEED_EV, &(fmon->ev[5]));
     }
 
-    if (fmon->iv)
-        SetMonData(dst, MON_DATA_IVS, &(fmon->iv));
+    // 计算monId = 当前fmon指针 - 数组起始地址
+    u16 monId = fmon - gFacilityTrainerMons;
 
-    if (fmon->isShiny)
+    // 使用monId进行检查
+    if (IsIdInTrickRoomAttack(monId))
     {
-        u32 data = TRUE;
-        SetMonData(dst, MON_DATA_IS_SHINY, &data);
+        SetMonData(dst, MON_DATA_SPEED_IV, &(factory0iv));
     }
+
+    u32 isShiny = (Random() % 12 == 0) ? TRUE : FALSE; // 1/12 概率
+    SetMonData(dst, MON_DATA_IS_SHINY, &isShiny);
+
     if (fmon->dynamaxLevel > 0)
     {
         u32 data = fmon->dynamaxLevel;
@@ -1647,7 +1761,6 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
         u32 data = fmon->teraType;
         SetMonData(dst, MON_DATA_TERA_TYPE, &data);
     }
-
 
     SetMonData(dst, MON_DATA_POKEBALL, &ball);
     CalculateMonStats(dst);
@@ -1717,7 +1830,7 @@ static void FillTrainerParty(u16 trainerId, u8 firstMonId, u8 monCount)
 
         // "High tier" Pokémon are only allowed on open level mode
         // 20 is not a possible value for level here
-        if ((level == FRONTIER_MAX_LEVEL_50 || level == 20) && monId > FRONTIER_MONS_HIGH_TIER)
+        if ((level == FRONTIER_MAX_LEVEL_50 || level == 20)) //&& monId > FRONTIER_MONS_HIGH_TIER)
             continue;
 
         // Ensure this Pokémon species isn't a duplicate.
@@ -1780,7 +1893,7 @@ u16 GetRandomFrontierMonFromSet(u16 trainerId)
         // "High tier" Pokémon are only allowed on open level mode
         // 20 is not a possible value for level here
         monId = monSet[Random() % numMons];
-    } while((level == FRONTIER_MAX_LEVEL_50 || level == 20) && monId > FRONTIER_MONS_HIGH_TIER);
+    } while((level == FRONTIER_MAX_LEVEL_50 || level == 20)); //&& monId > FRONTIER_MONS_HIGH_TIER);
 
     return monId;
 }

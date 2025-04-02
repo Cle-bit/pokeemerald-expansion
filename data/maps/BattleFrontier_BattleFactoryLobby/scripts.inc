@@ -273,7 +273,22 @@ BattleFrontier_BattleFactoryLobby_EventScript_Picnicker::
 	end
 
 BattleFrontier_BattleFactoryLobby_EventScript_FatMan::
-	msgbox BattleFrontier_BattleFactoryLobby_Text_CantFigureOutStaffHints, MSGBOX_NPC
+	lock
+	faceplayer
+	msgbox BattleFrontier_BattleFactoryLobby_Text_FatMan, MSGBOX_YESNO
+	switch VAR_RESULT
+	case NO, BattleFrontier_BattleFactoryLobby_EventScript_FatMan_No
+	case YES, BattleFrontier_BattleFactoryLobby_EventScript_FatMan_Yes
+	end
+
+BattleFrontier_BattleFactoryLobby_EventScript_FatMan_No::
+	clearflag FLAG_FACTORY_TEST
+	release
+	end
+
+BattleFrontier_BattleFactoryLobby_EventScript_FatMan_Yes::
+	setflag FLAG_FACTORY_TEST
+	release
 	end
 
 BattleFrontier_BattleFactoryLobby_EventScript_RulesBoard::
@@ -495,11 +510,9 @@ BattleFrontier_BattleFactoryLobby_Text_NeedToCheckOpponentsMons:
 	.string "POKéMON during battle to see if\l"
 	.string "they're any good.$"
 
-BattleFrontier_BattleFactoryLobby_Text_CantFigureOutStaffHints:
-	.string "You know how the staff here give you\n"
-	.string "a few hints about your next opponent?\p"
-	.string "Well, I'm a full-grown man, but I have\n"
-	.string "trouble figuring out their hints.$"
+BattleFrontier_BattleFactoryLobby_Text_FatMan:
+	.string "Would you like to experience all Gen9\n"
+	.string "POKéMON?.$"
 
 @ Unused
 BattleFrontier_BattleFactoryLobby_Text_RentalMonsAreVaried:
