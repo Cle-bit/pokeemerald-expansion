@@ -232,6 +232,7 @@ static void ResetItemFlags(void)
 static void NewGameFactoryTest(void)
 {
     //Basic Options
+    VarSet(VAR_CURRENT_SEASON, 1);
     VarSet(VAR_DIFFICULTY_MODE, 2);
     FlagSet(FLAG_SANDBOX_MODE);
     FlagSet(I_EXP_SHARE_FLAG);
@@ -241,6 +242,10 @@ static void NewGameFactoryTest(void)
     FlagSet(FLAG_SYS_POKENAV_GET);
     FlagSet(FLAG_SYS_B_DASH);
     FlagSet(FLAG_SYS_FRONTIER_PASS);
+
+    //PokeDex National
+    EnableNationalPokedex();
+
     //Flying Spots
     FlagSet(FLAG_VISITED_LITTLEROOT_TOWN);
     FlagSet(FLAG_VISITED_OLDALE_TOWN);
@@ -260,6 +265,7 @@ static void NewGameFactoryTest(void)
     FlagSet(FLAG_VISITED_EVER_GRANDE_CITY);
     FlagSet(FLAG_LANDMARK_POKEMON_LEAGUE);
     FlagSet(FLAG_LANDMARK_BATTLE_FRONTIER);
+
     //Badges
     FlagSet(FLAG_BADGE01_GET);
     FlagSet(FLAG_BADGE02_GET);
@@ -269,6 +275,16 @@ static void NewGameFactoryTest(void)
     FlagSet(FLAG_BADGE06_GET);
     FlagSet(FLAG_BADGE07_GET);
     FlagSet(FLAG_BADGE08_GET);
+
     //Factory Ai Team
     FlagSet(FLAG_UNUSED_0x027);
+
+    //Key items
+    u16 itemId;
+
+    for (itemId = 1; itemId < ITEMS_COUNT; itemId++)
+    {
+        if (ItemId_GetPocket(itemId) == POCKET_KEY_ITEMS && CheckBagHasSpace(itemId, 1))
+            AddBagItem(itemId, 1);
+    }
 }

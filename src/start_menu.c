@@ -482,13 +482,13 @@ const u8 gText_Saturday[] = _("Sat");
 const u8 gText_Sunday[] = _("Sun");
 
 const u8 *const gDayNameStringsTable[7] = {
+    gText_Sunday,
     gText_Monday,
     gText_Tuesday,
     gText_Wednesday,
     gText_Thursday,
     gText_Friday,
     gText_Saturday,
-    gText_Sunday,
 };
 
 // 季节文本定义

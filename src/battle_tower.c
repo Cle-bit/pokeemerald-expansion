@@ -1593,7 +1593,10 @@ static bool8 CheckItemAbilityCombo(u16 ability, u16 heldItem)
 {
     // 检查Toxic Orb 的组合
     if ((ability == ABILITY_POISON_HEAL ||
-         ability == ABILITY_TOXIC_BOOST) &&
+         ability == ABILITY_GUTS ||
+         ability == ABILITY_TOXIC_BOOST ||
+         ability == ABILITY_MARVEL_SCALE ||
+         ability == ABILITY_QUICK_FEET) &&
         heldItem == ITEM_TOXIC_ORB)
         return TRUE;
 
@@ -1601,14 +1604,13 @@ static bool8 CheckItemAbilityCombo(u16 ability, u16 heldItem)
     if ((ability == ABILITY_GUTS ||
          ability == ABILITY_FLARE_BOOST ||
          ability == ABILITY_MARVEL_SCALE ||
-         ability == ABILITY_QUICK_FEET ||
-         ability == ABILITY_TANGLED_FEET) &&
+         ability == ABILITY_QUICK_FEET) &&
         heldItem == ITEM_FLAME_ORB)
         return TRUE;
 
     // 检查 Unburden 和种子、树果、宝石类道具的组合
     if (ability == ABILITY_UNBURDEN &&
-        ((heldItem >= ITEM_GRASSY_SEED && heldItem <= ITEM_PSYCHIC_SEED) ||  // 种子
+        ((heldItem >= ITEM_ELECTRIC_SEED && heldItem <= ITEM_GRASSY_SEED) ||  // 种子
          (heldItem >= ITEM_CHERI_BERRY && heldItem <= ITEM_MARANGA_BERRY) || // 树果
          (heldItem >= ITEM_NORMAL_GEM && heldItem <= ITEM_FAIRY_GEM) ||    // 宝石
          (heldItem == ITEM_FOCUS_SASH ) || (heldItem == ITEM_FOCUS_BAND) || //消耗类道具
@@ -1719,7 +1721,7 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
     }
 
     SetMonData(dst, MON_DATA_ABILITY_NUM, &ability);
-
+    
     if (fmon->ev != NULL)
     {
         SetMonData(dst, MON_DATA_HP_EV, &(fmon->ev[0]));
