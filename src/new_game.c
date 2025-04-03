@@ -131,7 +131,7 @@ static void ClearFrontierRecord(void)
 
 static void WarpToTruck(void)
 {
-    SetWarpDestination(MAP_GROUP(BATTLE_FRONTIER_MART), MAP_NUM(BATTLE_FRONTIER_MART), WARP_ID_NONE, -1, -1);
+    SetWarpDestination(MAP_GROUP(BATTLE_FRONTIER_MART), MAP_NUM(BATTLE_FRONTIER_MART), WARP_ID_NONE, -1, -3);
     WarpIntoMap();
 }
 
@@ -213,8 +213,6 @@ void NewGameInitData(void)
     ResetItemFlags();
     ResetDexNav();
     NewGameFactoryTest();
-    gSaveBlock3Ptr->followerIndex = OW_FOLLOWER_NOT_SET;
-    gSaveBlock2Ptr->autoRun = FALSE;
 }
 
 static void ResetMiniGamesRecords(void)
@@ -238,6 +236,7 @@ static void ResetDexNav(void)
     memset(gSaveBlock3Ptr->dexNavSearchLevels, 0, sizeof(gSaveBlock3Ptr->dexNavSearchLevels));
 #endif
     gSaveBlock3Ptr->dexNavChain = 0;
+}
 
 static void NewGameFactoryTest(void)
 {
@@ -247,8 +246,9 @@ static void NewGameFactoryTest(void)
     FlagSet(B_FLAG_NO_BAG_USE);
     FlagSet(I_EXP_SHARE_FLAG);
 
+    FlagSet(OW_FLAG_POKE_RIDER);
     FlagSet(FLAG_SYS_B_DASH);
-    FlagGet(DN_FLAG_DEXNAV_GET);
+    FlagSet(DN_FLAG_DEXNAV_GET);
     FlagSet(FLAG_SYS_POKEDEX_GET);
     FlagSet(FLAG_SYS_POKENAV_GET);
     FlagSet(FLAG_SYS_FRONTIER_PASS);

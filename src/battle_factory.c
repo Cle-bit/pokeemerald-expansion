@@ -928,7 +928,7 @@ static void GenerateOpponentMons(void)
 
     //队伍替换部分
     if (VarGet(VAR_DIFFICULTY_MODE) == 2 &&
-        ((WinStreak >= 20 && WinStreak <= 59) || FlagGet(FLAG_FACTORY_TEST)) &&
+        ((WinStreak >= 20 && WinStreak <= 59) || FlagGet(FLAG_TEAM_TEST)) &&
         battleMode == FRONTIER_MODE_DOUBLES)
     {
         u8 probTable[NUM_TEAM_TYPES] = {0};
@@ -995,7 +995,9 @@ static void GenerateOpponentMons(void)
             }
         }
 
-        if (FlagGet(FLAG_TEAM_TEST) && VarGet(VAR_FACTORY_TEAM_TEST) > 0)
+        if (FlagGet(FLAG_TEAM_TEST) && 
+            VarGet(VAR_FACTORY_TEAM_TEST) >= 1 &&
+            VarGet(VAR_FACTORY_TEAM_TEST) <= 7)
             teamType = VarGet(VAR_FACTORY_TEAM_TEST) - 1;
 
         // 敌方队伍替换（替换3只，第2和3只不同）
@@ -1203,7 +1205,7 @@ static void GenerateInitialRentalMons(void)
 
     //我方队伍替换部分
     if (VarGet(VAR_DIFFICULTY_MODE) == 2 &&
-        (WinStreak >= 60 || !FlagGet(FLAG_FACTORY_TEST)) &&
+        WinStreak >= 60 &&
         battleMode == FRONTIER_MODE_DOUBLES)
     {
         u8 probTable[NUM_TEAM_TYPES] = {0};
@@ -1248,7 +1250,9 @@ static void GenerateInitialRentalMons(void)
             }
         }
  
-        if (FlagGet(FLAG_TEAM_TEST) && VarGet(VAR_FACTORY_TEAM_TEST) > 0)
+        if (!FlagGet(FLAG_TEAM_TEST) && 
+            VarGet(VAR_FACTORY_TEAM_TEST) >= 1 &&
+            VarGet(VAR_FACTORY_TEAM_TEST) <= 7)
             teamType = VarGet(VAR_FACTORY_TEAM_TEST) - 1;
 
         u16 species[PARTY_SIZE] = {0};
