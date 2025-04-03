@@ -1255,6 +1255,7 @@ static void GenerateInitialRentalMons(void)
             VarGet(VAR_FACTORY_TEAM_TEST) <= 7)
             teamType = VarGet(VAR_FACTORY_TEAM_TEST) - 1;
 
+        // 我方队伍替换（替换6只，6只均不同）
         u16 species[PARTY_SIZE] = {0};
         ReplaceTeamMembers(teamType, FALSE, gSaveBlock2Ptr->frontier.rentalMons, species);
     }

@@ -241,17 +241,18 @@ static void ResetDexNav(void)
 static void NewGameFactoryTest(void)
 {
     //Basic Options
-    VarSet(VAR_DIFFICULTY_MODE, 2);
-    FlagSet(B_FLAG_SLEEP_CLAUSE);
-    FlagSet(B_FLAG_NO_BAG_USE);
-    FlagSet(I_EXP_SHARE_FLAG);
-
-    FlagSet(OW_FLAG_POKE_RIDER);
     FlagSet(FLAG_SYS_B_DASH);
+    FlagSet(OW_FLAG_POKE_RIDER);
     FlagSet(DN_FLAG_DEXNAV_GET);
     FlagSet(FLAG_SYS_POKEDEX_GET);
     FlagSet(FLAG_SYS_POKENAV_GET);
     FlagSet(FLAG_SYS_FRONTIER_PASS);
+
+    //Battle Options
+    VarSet(VAR_DIFFICULTY_MODE, 2);
+    FlagSet(B_FLAG_SLEEP_CLAUSE);
+    FlagSet(B_FLAG_NO_BAG_USE);
+    FlagSet(I_EXP_SHARE_FLAG);
 
     //PokeDex National
     EnableNationalPokedex();
@@ -285,9 +286,6 @@ static void NewGameFactoryTest(void)
     FlagSet(FLAG_BADGE06_GET);
     FlagSet(FLAG_BADGE07_GET);
     FlagSet(FLAG_BADGE08_GET);
-
-    //Factory Ai Team
-    FlagSet(FLAG_UNUSED_0x027);
 
     //Key items
     u16 itemId;
