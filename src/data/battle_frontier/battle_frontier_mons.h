@@ -4608,17 +4608,17 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     },
     [FRONTIER_MON_FEZANDIPITI_1] = {
         .species = SPECIES_FEZANDIPITI, //吉雉鸡
-        .moves = {MOVE_GUNK_SHOT, MOVE_PLAY_ROUGH, MOVE_QUICK_ATTACK, MOVE_DUAL_WINGBEAT}, //垃圾射击，嬉闹，电光一闪，双翼
-        .heldItem = ITEM_LIFE_ORB,
+        .moves = {MOVE_GUNK_SHOT, MOVE_PLAY_ROUGH, MOVE_U_TURN, MOVE_DUAL_WINGBEAT}, //垃圾射击，嬉闹，急速折返，双翼
+        .heldItem = ITEM_CHOICE_SCARF,
         .ev = TRAINER_PARTY_EVS(0, 252, 4, 252, 0, 0),
         .nature = NATURE_ADAMANT
     },
     [FRONTIER_MON_FEZANDIPITI_2] = {
         .species = SPECIES_FEZANDIPITI, //吉雉鸡
-        .moves = {MOVE_GUNK_SHOT, MOVE_PLAY_ROUGH, MOVE_ROOST, MOVE_CHARM}, //垃圾射击，嬉闹，羽栖，撒娇
+        .moves = {MOVE_GUNK_SHOT, MOVE_PLAY_ROUGH, MOVE_DOUBLE_KICK, MOVE_QUICK_ATTACK}, //垃圾射击，嬉闹，二连踢，电光一闪
         .heldItem = ITEM_BLACK_SLUDGE,
-        .ev = TRAINER_PARTY_EVS(248, 0, 136, 0, 0, 124),
-        .nature = NATURE_CAREFUL
+        .ev = TRAINER_PARTY_EVS(4, 252, 0, 252, 0, 0),
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_FLAMIGO_1] = {
         .species = SPECIES_FLAMIGO, //缠红鹤
