@@ -87,6 +87,12 @@
 	special CallBattleFactoryFunction
 	.endm
 
+	@ Modify Factory Win Streaks
+	.macro factory_modifyfactorywinstreaks
+	setvar VAR_0x8004, BATTLE_FACTORY_FUNC_MODIFY_WIN_STREAKS
+	special CallBattleFactoryFunction
+	.endm
+
 	@ Return the FACTORY_STYLE_* dependent on what types of moves the opponents team has, or FACTORY_NUM_STYLES if multiple styles tie for the same amount of moves
 	.macro factory_getopponentstyle
 	setvar VAR_0x8004, BATTLE_FACTORY_FUNC_GET_OPPONENT_STYLE

@@ -36,6 +36,7 @@ static void SetOpponentGfxVar(void);
 static void GenerateOpponentMons(void);
 static void GenerateInitialRentalMons(void);
 static void GetOpponentMostCommonMonType(void);
+static void ModifyFactoryWinStreaks(void);
 static void GetOpponentBattleStyle(void);
 static void RestorePlayerPartyHeldItems(void);
 static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange);
@@ -141,6 +142,7 @@ static void (* const sBattleFactoryFunctions[])(void) =
     [BATTLE_FACTORY_FUNC_GET_OPPONENT_MON_TYPE]  = GetOpponentMostCommonMonType,
     [BATTLE_FACTORY_FUNC_GET_OPPONENT_STYLE]     = GetOpponentBattleStyle,
     [BATTLE_FACTORY_FUNC_RESET_HELD_ITEMS]       = RestorePlayerPartyHeldItems,
+    [BATTLE_FACTORY_FUNC_MODIFY_WIN_STREAKS]     = ModifyFactoryWinStreaks,
 };
 
 static const u32 sWinStreakFlags[][2] =
@@ -303,8 +305,6 @@ static const u16 factoryMonsGen9[] = {
     FRONTIER_MON_IRON_CROWN_1, FRONTIER_MON_IRON_CROWN_2,FRONTIER_MON_IRON_CROWN_3,
 };
 
-u8 challengecount = 0;
-
 // code
 void CallBattleFactoryFunction(void)
 {
@@ -328,7 +328,6 @@ static void InitFactoryChallenge(void)
         gSaveBlock2Ptr->frontier.factoryRentsCount[battleMode][lvlMode] = 0;
     }
 
-    challengecount = 0;
     VarSet(VAR_FACTORY_SWAP_COUNTER, 0);
     sPerformedRentalSwap = FALSE;
     for (i = 0; i < ARRAY_COUNT(gSaveBlock2Ptr->frontier.rentalMons); i++)
@@ -647,7 +646,7 @@ static const u16 PsychicTerrainAttack[] = {
     FRONTIER_MON_CHANDELURE_1, FRONTIER_MON_CHANDELURE_2, FRONTIER_MON_CHANDELURE_3, FRONTIER_MON_CHANDELURE_4,
     FRONTIER_MON_AEGISLASH_SHIELD_1, FRONTIER_MON_AEGISLASH_SHIELD_2, FRONTIER_MON_AEGISLASH_SHIELD_3, FRONTIER_MON_AEGISLASH_SHIELD_4,
     FRONTIER_MON_POLTEAGEIST_PHONY_1, FRONTIER_MON_POLTEAGEIST_PHONY_2, FRONTIER_MON_POLTEAGEIST_PHONY_3, FRONTIER_MON_POLTEAGEIST_PHONY_4,
-    FRONTIER_MON_CORSOLA_1, FRONTIER_MON_CORSOLA_2, FRONTIER_MON_CORSOLA_3, FRONTIER_MON_CORSOLA_4,
+    FRONTIER_MON_CORSOLA_GALAR_1, FRONTIER_MON_CORSOLA_GALAR_2, FRONTIER_MON_CORSOLA_GALAR_3, FRONTIER_MON_CORSOLA_GALAR_3,
     FRONTIER_MON_DRAGAPULT_1, FRONTIER_MON_DRAGAPULT_2, FRONTIER_MON_DRAGAPULT_3, FRONTIER_MON_DRAGAPULT_4,
     FRONTIER_MON_SPECTRIER_1, FRONTIER_MON_SPECTRIER_2, FRONTIER_MON_SPECTRIER_3, FRONTIER_MON_SPECTRIER_4,
     FRONTIER_MON_CERULEDGE_1, FRONTIER_MON_CERULEDGE_2, FRONTIER_MON_CERULEDGE_1, FRONTIER_MON_CERULEDGE_2,
@@ -674,10 +673,10 @@ const u16 TrickRoom[] = {
     FRONTIER_MON_CRESSELIA_1, FRONTIER_MON_CRESSELIA_2, FRONTIER_MON_CRESSELIA_3, FRONTIER_MON_CRESSELIA_4,
     FRONTIER_MON_PORYGON2_1, FRONTIER_MON_PORYGON2_2, FRONTIER_MON_PORYGON2_3, FRONTIER_MON_PORYGON2_4,
     FRONTIER_MON_MIMIKYU_DISGUISED_2, FRONTIER_MON_MIMIKYU_DISGUISED_2, FRONTIER_MON_MIMIKYU_DISGUISED_4, FRONTIER_MON_MIMIKYU_DISGUISED_4,
+    FRONTIER_MON_STAKATAKA_1, FRONTIER_MON_STAKATAKA_2, FRONTIER_MON_STAKATAKA_3, FRONTIER_MON_STAKATAKA_4,
 };
 
 const u16 TrickRoomAttack[] = {
-    FRONTIER_MON_STAKATAKA_1, FRONTIER_MON_STAKATAKA_2, FRONTIER_MON_STAKATAKA_3, FRONTIER_MON_STAKATAKA_4,
     FRONTIER_MON_CAMERUPT_2, FRONTIER_MON_CAMERUPT_2, FRONTIER_MON_CAMERUPT_3, FRONTIER_MON_CAMERUPT_4,
     FRONTIER_MON_TORKOAL_3, FRONTIER_MON_TORKOAL_4, FRONTIER_MON_TORKOAL_3, FRONTIER_MON_TORKOAL_4,
     FRONTIER_MON_ESCAVALIER_3, FRONTIER_MON_ESCAVALIER_4, FRONTIER_MON_ESCAVALIER_3, FRONTIER_MON_ESCAVALIER_4,
@@ -812,14 +811,23 @@ void ReplaceTeamMembers(TeamType teamType, bool8 isEnemy, void* party, u16* spec
     const TeamTemplate* tpl = &sTeamTemplates[teamType];
 
     // 替换领队（位置0）
-    if (tpl->lead && tpl->leadCount > 0) {
-        u16 monId = tpl->lead[Random() % tpl->leadCount];
-        if (isEnemy) {
+    if (tpl->lead && tpl->leadCount > 0)
+    {
+        u16 monId;
+        do
+        {
+            monId = tpl->lead[Random() % tpl->leadCount];
+        } while (!isEnemy && monId > FRONTIER_MON_PECHARUNT_1);
+
+        if (isEnemy)
+        {
             // 敌方：party 是 u16 数组
-            ((u16*)party)[0] = monId;
-        } else {
+            ((u16 *)party)[0] = monId;
+        }
+        else
+        {
             // 我方：party 是 RentalMon 数组，直接操作 monId 字段
-            ((struct RentalMon*)party)[0].monId = monId;
+            ((struct RentalMon *)party)[0].monId = monId;
         }
         species[0] = gFacilityTrainerMons[monId].species;
     }
@@ -834,13 +842,20 @@ void ReplaceTeamMembers(TeamType teamType, bool8 isEnemy, void* party, u16* spec
         while (!success) {
             if (tpl->attackCount == 0) break;
 
-            u16 monId = tpl->attack[Random() % tpl->attackCount];
+            u16 monId;
+            do
+            {
+                monId = tpl->attack[Random() % tpl->attackCount];
+            } while (!isEnemy && monId > FRONTIER_MON_PECHARUNT_1);
+
             u16 currentSpecies = gFacilityTrainerMons[monId].species;
 
             // 检查物种是否重复
             bool8 exists = FALSE;
-            for (u8 j = 0; j < selectedCount; j++) {
-                if (selectedSpecies[j] == currentSpecies) {
+            for (u8 j = 0; j < selectedCount; j++)
+            {
+                if (selectedSpecies[j] == currentSpecies)
+                {
                     exists = TRUE;
                     break;
                 }
@@ -912,6 +927,17 @@ static void GenerateOpponentMons(void)
         for (k = firstMonId; k < firstMonId + i; k++)
         {
             if (species[k] == gFacilityTrainerMons[monId].species)
+                break;
+        }
+        if (k != firstMonId + i)
+            continue;
+
+        // 新增全国图鉴查重逻辑
+        u16 currentNatDex = gSpeciesInfo[gFacilityTrainerMons[monId].species].natDexNum;
+        for (k = firstMonId; k < firstMonId + i; k++)
+        {
+            u16 existingNatDex = gSpeciesInfo[species[k]].natDexNum;
+            if (existingNatDex == currentNatDex)
                 break;
         }
         if (k != firstMonId + i)
@@ -1108,7 +1134,7 @@ static const DondozoOption DONDOZO_OPTIONS[] =
 
 static void GenerateInitialRentalMons(void)
 {
-    int i, j;
+    int i, j, k;
     u8 firstMonId;
     u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
     u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
@@ -1142,6 +1168,17 @@ static void GenerateInitialRentalMons(void)
                 break;
         }
         if (j != firstMonId + i)
+            continue;
+
+        // 新增全国图鉴查重逻辑
+        u16 currentNatDex = gSpeciesInfo[gFacilityTrainerMons[monId].species].natDexNum;
+        for (k = firstMonId; k < firstMonId + i; k++)
+        {
+            u16 existingNatDex = gSpeciesInfo[species[k]].natDexNum;
+            if (existingNatDex == currentNatDex)
+                break;
+        }
+        if (k != firstMonId + i)
             continue;
 
         gSaveBlock2Ptr->frontier.rentalMons[i].monId = monId;
@@ -1224,12 +1261,12 @@ static void GenerateInitialRentalMons(void)
         else if (WinStreak >= 80)
         {
             /* 阶梯比例：一阶50% | 二阶40% | 三阶10% */
-            probTable[RAIN_TEAM] = 10;             // 二阶
+            probTable[RAIN_TEAM] = 30;             // 二阶
             probTable[DROUGHT_TEAM] = 10;          // 二阶
-            probTable[SANDSTORM_TEAM] = 5;         // 三阶
-            probTable[SNOW_TEAM] = 5;              // 三阶
+            probTable[SANDSTORM_TEAM] = 0;         // 三阶
+            probTable[SNOW_TEAM] = 0;              // 三阶
             probTable[ELECTRIC_TERRAIN_TEAM] = 10; // 二阶
-            probTable[PSYCHIC_TERRAIN_TEAM] = 10;  // 二阶
+            probTable[PSYCHIC_TERRAIN_TEAM] = 0;  // 二阶
             probTable[TRICK_ROOM_TEAM] = 50;       // 一阶
         }
         else
@@ -1546,7 +1583,7 @@ u8 GetNumPastRentalsRank(u8 battleMode, u8 lvlMode)
         return ret;
     }
 
-    u32 GetAiScriptsInBattleFactory(void)
+u32 GetAiScriptsInBattleFactory(void)
     {
         u8 gameMode = VarGet(VAR_DIFFICULTY_MODE);
         if (gameMode != 1 && gameMode != 2)
@@ -1558,30 +1595,26 @@ u8 GetNumPastRentalsRank(u8 battleMode, u8 lvlMode)
         if (gameMode == 1)
         {
             if (battleStyle == FACTORY_STYLE_HIGH_RISK)
-                return AI_FLAG_BASIC_TRAINER_RISKY;
+                return (Random() % 2) ? AI_FLAG_BASIC_TRAINER_RISKY1 : AI_FLAG_BASIC_TRAINER_RISKY2;
             else if (battleStyle == FACTORY_STYLE_ENDURANCE || battleStyle == FACTORY_STYLE_WEAKENING)
                 return AI_FLAG_BASIC_TRAINER_CONSERVATIVE;
             else if (battleStyle == FACTORY_STYLE_SLOW_STEADY)
                 return AI_FLAG_BASIC_TRAINER_DEFEND;
             else if (battleStyle == FACTORY_STYLE_WEATHER)
                 return AI_FLAG_BASIC_TRAINER_POWERSTAGE;
-            else if (battleStyle == FACTORY_STYLE_PREPARATION)
-                return AI_FLAG_BASIC_TRAINER_STRENGTHEN;
             else
                 return AI_FLAG_BASIC_TRAINER;
         }
         else // gameMode == 2
         {
             if (battleStyle == FACTORY_STYLE_HIGH_RISK)
-                return AI_FLAG_SMART_TRAINER_RISKY;
+                return (Random() % 2) ? AI_FLAG_SMART_TRAINER_RISKY1 : AI_FLAG_SMART_TRAINER_RISKY2;
             else if (battleStyle == FACTORY_STYLE_ENDURANCE || battleStyle == FACTORY_STYLE_WEAKENING)
                 return AI_FLAG_SMART_TRAINER_CONSERVATIVE;
             else if (battleStyle == FACTORY_STYLE_SLOW_STEADY)
                 return AI_FLAG_SMART_TRAINER_DEFEND;
             else if (battleStyle == FACTORY_STYLE_WEATHER)
                 return AI_FLAG_SMART_TRAINER_POWERSTAGE;
-            else if (battleStyle == FACTORY_STYLE_PREPARATION)
-                return AI_FLAG_SMART_TRAINER_STRENGTHEN;
             else
                 return AI_FLAG_SMART_TRAINER;
         }
@@ -1593,4 +1626,32 @@ u8 GetNumPastRentalsRank(u8 battleMode, u8 lvlMode)
         if (moveArg == MOVE_RETURN)
             move = MOVE_FRUSTRATION;
         SetMonMoveSlot(mon, move, moveSlot);
+    }
+
+    void ModifyFactoryWinStreaks(void)
+    {
+        u16 delta = 0;
+
+        // 根据输入参数确定增量值
+        switch (gSpecialVar_Result)
+        {
+        case 0:
+            delta = 1;
+            break;
+        case 1:
+            delta = 10;
+            break;
+        case 2:
+            delta = 50;
+            break;
+        default:
+            return; // 无效参数直接返回
+        }
+
+        // 在不超过最大值的范围内增加连胜数
+        if (gSaveBlock2Ptr->frontier.factoryWinStreaks[FRONTIER_MODE_DOUBLES][FRONTIER_LVL_OPEN] < MAX_STREAK)
+        {
+            gSaveBlock2Ptr->frontier.factoryWinStreaks[FRONTIER_MODE_DOUBLES][FRONTIER_LVL_OPEN] += delta;
+            gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[FRONTIER_MODE_DOUBLES][FRONTIER_LVL_OPEN] = gSaveBlock2Ptr->frontier.factoryWinStreaks[FRONTIER_MODE_DOUBLES][FRONTIER_LVL_OPEN];
+        }
     }

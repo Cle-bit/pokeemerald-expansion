@@ -520,111 +520,111 @@ BattleFrontier_BattleFactoryPreBattleRoom_Text_InvestigatedUpcomingOpponent:
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInNormalType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the NORMAL type.$"
+	.string "in the handling of the {COLOR RED}NORMAL{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInFireType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the FIRE type.$"
+	.string "in the handling of the {COLOR RED}FIRE{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInWaterType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the WATER type.$"
+	.string "in the handling of the {COLOR RED}WATER{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInElectricType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the ELECTRIC type.$"
+	.string "in the handling of the {COLOR RED}ELECTRIC{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInGrassType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the GRASS type.$"
+	.string "in the handling of the {COLOR RED}GRASS{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInIceType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the ICE type.$"
+	.string "in the handling of the {COLOR RED}ICE{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInFightingType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the FIGHTING type.$"
+	.string "in the handling of the {COLOR RED}FIGHTING{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInPoisonType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the POISON type.$"
+	.string "in the handling of the {COLOR RED}POISON{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInGroundType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the GROUND type.$"
+	.string "in the handling of the {COLOR RED}GROUND{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInFlyingType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the FLYING type.$"
+	.string "in the handling of the {COLOR RED}FLYING{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInPsychicType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the PSYCHIC type.$"
+	.string "in the handling of the {COLOR RED}PSYCHIC{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInBugType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the BUG type.$"
+	.string "in the handling of the {COLOR RED}BUG{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInRockType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the ROCK type.$"
+	.string "in the handling of the {COLOR RED}ROCK{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInGhostType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the GHOST type.$"
+	.string "in the handling of the {COLOR RED}GHOST{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInDragonType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the DRAGON type.$"
+	.string "in the handling of the {COLOR RED}DRAGON{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInDarkType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the DARK type.$"
+	.string "in the handling of the {COLOR RED}DARK{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInFairyType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the FAIRY type.$"
+	.string "in the handling of the {COLOR RED}FAIRY{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerSkilledInSteelType:
 	.string "The TRAINER is apparently skilled\n"
-	.string "in the handling of the STEEL type.$"
+	.string "in the handling of the {COLOR RED}STEEL{COLOR DARK_GRAY} type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_TrainerHasNoClearFavorite:
-	.string "The TRAINER appears to have no clear\n"
+	.string "The TRAINER appears to have {COLOR GREEN}NO{COLOR DARK_GRAY} clear\n"
 	.string "favorites when it comes to type.$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleSlowAndSteady:
 	.string "The favorite battle style appears to\n"
-	.string "be slow and steady.$"
+	.string "{COLOR BLUE}be slow and steady.{COLOR DARK_GRAY}$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleEndurance:
 	.string "The favorite battle style appears to\n"
-	.string "be one of endurance.$"
+	.string "{COLOR BLUE}be one of endurance.{COLOR DARK_GRAY}$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleHighRisk:
 	.string "The favorite battle style appears to\n"
-	.string "be high risk, high return.$"
+	.string "{COLOR RED}be high risk, high return.{COLOR DARK_GRAY}$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleDependsOnFlow:
 	.string "The favorite battle style appears to\n"
-	.string "depend on the battle's flow.$"
+	.string "{COLOR GREEN}depend on the battle's flow.{COLOR DARK_GRAY}$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleTotalPreparation:
 	.string "The favorite battle style appears to\n"
-	.string "be one based on total preparation.$"
+	.string "{COLOR GREEN}be one based on total preparation.{COLOR DARK_GRAY}$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleWeakenFoe:
 	.string "The favorite battle style appears\n"
-	.string "to be weakening the foe to start.$"
+	.string "{COLOR BLUE}to be weakening the foe to start.{COLOR DARK_GRAY}$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleFlexible:
 	.string "The favorite battle style appears to\n"
-	.string "be flexibly adaptable to the situation.$"
+	.string "{COLOR GREEN}be flexibly adaptable to the situation.{COLOR DARK_GRAY}$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleImpossibleToPredict:
 	.string "The favorite battle style appears to\n"
-	.string "be impossible to predict.$"
+	.string "{COLOR RED}be impossible to predict.{COLOR DARK_GRAY}$"
 
 BattleFrontier_BattleFactoryPreBattleRoom_Text_StyleUnrestrained:
 	.string "The favorite battle style appears to\n"

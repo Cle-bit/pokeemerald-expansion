@@ -707,6 +707,13 @@ static const struct MenuAction MultichoiceList_GoOnRestRetire[] =
     {gText_Retire},
 };
 
+static const struct MenuAction MultichoiceList_ModifyWinStreaks[] =
+{
+    {gText_WinStreakAdd1},
+    {gText_WinStreakAdd10},
+    {gText_WinStreakAdd50},
+};
+
 static const struct MenuAction MultichoiceList_GoOnRecordRetire[] =
 {
     {gText_GoOn},
@@ -906,6 +913,7 @@ static const struct MultichoiceListStruct sMultichoiceLists[] =
     [MULTI_FALLARBOR_TENT_RULES]       = MULTICHOICE(MultichoiceList_FallarborTentRules),
     [MULTI_TAG_MATCH_TYPE]             = MULTICHOICE(MultichoiceList_TagMatchType),
     [MULTI_BERRY_PLOT]                 = MULTICHOICE(MultichoiceList_BerryPlot),
+    [MULTI_MODIFY_WIN_STREAKS]         = MULTICHOICE(MultichoiceList_ModifyWinStreaks),
 };
 
 const u8 *const gStdStrings[] =
