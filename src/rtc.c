@@ -4,6 +4,7 @@
 #include "strings.h"
 #include "text.h"
 #include "fake_rtc.h"
+#include "event_data.h"
 
 // iwram bss
 static u16 sErrorStatus;
@@ -328,13 +329,17 @@ bool8 IsBetweenHours(s32 hours, s32 begin, s32 end)
 u8 GetTimeOfDay(void)
 {
     RtcCalcLocalTime();
-    if (IsBetweenHours(gLocalTime.hours, MORNING_HOUR_BEGIN, MORNING_HOUR_END))
+    u8 season = VarGet(VAR_CURRENT_SEASON);
+    const TimeOfDayConfig *config = &sSeasonTimeConfigs[season];
+
+    if (IsBetweenHours(gLocalTime.hours, config->morning_begin, config->morning_end))
         return TIME_MORNING;
-    else if (IsBetweenHours(gLocalTime.hours, EVENING_HOUR_BEGIN, EVENING_HOUR_END))
+    else if (IsBetweenHours(gLocalTime.hours, config->evening_begin, config->evening_end))
         return TIME_EVENING;
-    else if (IsBetweenHours(gLocalTime.hours, NIGHT_HOUR_BEGIN, NIGHT_HOUR_END))
+    else if (IsBetweenHours(gLocalTime.hours, config->night_begin, config->night_end))
         return TIME_NIGHT;
-    return TIME_DAY;
+    else
+        return TIME_DAY;
 }
 
 void RtcInitLocalTimeOffset(s32 hour, s32 minute)

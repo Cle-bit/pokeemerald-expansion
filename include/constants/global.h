@@ -176,6 +176,12 @@
 #define CONNECTION_DIVE     5
 #define CONNECTION_EMERGE   6
 
+//Time of Day
+#define TIME_MORNING           0
+#define TIME_DAY               1
+#define TIME_EVENING           2
+#define TIME_NIGHT             3
+
 #if TESTING
 #include "config/test.h"
 #endif

@@ -143,7 +143,12 @@ Debug_EventScript_Script_1::
 	end
 
 Debug_EventScript_Script_2::
-	release
+	gettime
+	switch VAR_0x8003
+	case TIME_MORNING, EventScript_DNS_TEST_Morning
+	case TIME_DAY, EventScript_DNS_TEST_Day
+	case TIME_EVENING, EventScript_DNS_TEST_Dawn
+	case TIME_NIGHT, EventScript_DNS_TEST_Night
 	end
 
 Debug_EventScript_Script_3::
@@ -168,6 +173,22 @@ Debug_EventScript_Script_7::
 
 Debug_EventScript_Script_8::
 	release
+	end
+
+EventScript_DNS_TEST_Morning::
+	msgbox gText_DNS_TEST_Morning, MSGBOX_SIGN
+	end
+
+EventScript_DNS_TEST_Day::
+	msgbox gText_DNS_TEST_Day, MSGBOX_SIGN
+	end
+
+EventScript_DNS_TEST_Dawn::
+	msgbox gText_DNS_TEST_Dawn, MSGBOX_SIGN
+	end
+
+EventScript_DNS_TEST_Night::
+	msgbox gText_DNS_TEST_Night, MSGBOX_SIGN
 	end
 
 Debug_CheckSaveBlock::
@@ -586,3 +607,15 @@ Debug_EventScript_FontTest::
 @Debug_EventScript_InflictStatus1_Close:
 @	releaseall
 @	end
+
+gText_DNS_TEST_Morning::
+	.string "A great {COLOR GREEN}MORNING{COLOR DARK_GRAY}, {PLAYER}!$"
+
+gText_DNS_TEST_Day::
+	.string "A great {COLOR GREEN}DAY{COLOR DARK_GRAY}, {PLAYER}!$"
+
+gText_DNS_TEST_Dawn::
+	.string "A great {COLOR GREEN}DAWN{COLOR DARK_GRAY}, {PLAYER}!$"
+
+gText_DNS_TEST_Night::
+	.string "A great {COLOR GREEN}NIGHT{COLOR DARK_GRAY}, {PLAYER}!$"

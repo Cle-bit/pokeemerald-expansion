@@ -17,76 +17,64 @@
 
 #define RTC_ERR_FLAG_MASK      0x0FF0
 
-//Morning and evening don't exist in Gen 3
-#if OW_TIMES_OF_DAY == GEN_3
-    #define MORNING_HOUR_BEGIN 0
-    #define MORNING_HOUR_END   0
+typedef struct {
+    u8 morning_begin;
+    u8 morning_end;
+    u8 day_begin;
+    u8 day_end;
+    u8 evening_begin;
+    u8 evening_end;
+    u8 night_begin;
+    u8 night_end;
+} TimeOfDayConfig;
 
-    #define DAY_HOUR_BEGIN     12
-    #define DAY_HOUR_END       HOURS_PER_DAY
-
-    #define EVENING_HOUR_BEGIN 0
-    #define EVENING_HOUR_END   0
-
-    #define NIGHT_HOUR_BEGIN   0
-    #define NIGHT_HOUR_END     12
-//Evening doesn't exist in Gen 4
-#elif OW_TIMES_OF_DAY == GEN_4
-    #define MORNING_HOUR_BEGIN 4
-    #define MORNING_HOUR_END   10
-
-    #define DAY_HOUR_BEGIN     10
-    #define DAY_HOUR_END       20
-
-    #define EVENING_HOUR_BEGIN 0
-    #define EVENING_HOUR_END   0
-
-    #define NIGHT_HOUR_BEGIN   20
-    #define NIGHT_HOUR_END     4
-//Gen 5 currently not included as the seasons change the times of day
-#elif OW_TIMES_OF_DAY <= GEN_6
-    #define MORNING_HOUR_BEGIN 4
-    #define MORNING_HOUR_END   11
-
-    #define DAY_HOUR_BEGIN     11
-    #define DAY_HOUR_END       18
-
-    #define EVENING_HOUR_BEGIN 18
-    #define EVENING_HOUR_END   21
-
-    #define NIGHT_HOUR_BEGIN   21
-    #define NIGHT_HOUR_END     4
-//These are the Sun/Ultra Sun times
-#elif OW_TIMES_OF_DAY == GEN_7
-    #define MORNING_HOUR_BEGIN 6
-    #define MORNING_HOUR_END   10
-
-    #define DAY_HOUR_BEGIN     10
-    #define DAY_HOUR_END       17
-
-    #define EVENING_HOUR_BEGIN 17
-    #define EVENING_HOUR_END   18
-
-    #define NIGHT_HOUR_BEGIN   18
-    #define NIGHT_HOUR_END     6
-#elif OW_TIMES_OF_DAY >= GEN_8
-    #define MORNING_HOUR_BEGIN 6
-    #define MORNING_HOUR_END   10
-
-    #define DAY_HOUR_BEGIN     10
-    #define DAY_HOUR_END       19
-
-    #define EVENING_HOUR_BEGIN 19
-    #define EVENING_HOUR_END   20
-
-    #define NIGHT_HOUR_BEGIN   20
-    #define NIGHT_HOUR_END     6
-#endif
-
-#define TIME_MORNING           0
-#define TIME_DAY               1
-#define TIME_EVENING           2
-#define TIME_NIGHT             3
+// 定义不同季节的时间段配置
+static const TimeOfDayConfig sSeasonTimeConfigs[] = {
+    // 春
+    {
+        .morning_begin = 0,
+        .morning_end   = 6,
+        .day_begin     = 6,
+        .day_end       = 12,
+        .evening_begin = 12,
+        .evening_end   = 18,
+        .night_begin   = 18,
+        .night_end     = 24
+    },
+    // 夏
+    {
+        .morning_begin = 6,
+        .morning_end   = 12,
+        .day_begin     = 12,
+        .day_end       = 18,
+        .evening_begin = 18,
+        .evening_end   = 24,
+        .night_begin   = 0,
+        .night_end     = 6
+    },
+    // 秋
+    {
+        .morning_begin = 12,
+        .morning_end   = 18,
+        .day_begin     = 18,
+        .day_end       = 24,
+        .evening_begin = 0,
+        .evening_end   = 6,
+        .night_begin   = 6,
+        .night_end     = 12
+    },
+    // 冬
+    {
+        .morning_begin = 18,
+        .morning_end   = 24,
+        .day_begin     = 0,
+        .day_end       = 6,
+        .evening_begin = 6,
+        .evening_end   = 12,
+        .night_begin   = 12,
+        .night_end     = 18
+    }
+};
 
 extern struct Time gLocalTime;
 
