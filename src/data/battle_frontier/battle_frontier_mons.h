@@ -3029,21 +3029,21 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .moves = {MOVE_ICICLE_CRASH, MOVE_FLARE_BLITZ, MOVE_ROCK_SLIDE, MOVE_SUPERPOWER}, //冰柱坠击，闪焰冲锋，岩崩，蛮力
         .heldItem = ITEM_CHOICE_BAND,
         .ev = TRAINER_PARTY_EVS(0, 252, 0, 252, 0, 4),
-        .nature = NATURE_ADAMANT
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_DARMANITAN_GALAR_STANDARD_2] = {
         .species = SPECIES_DARMANITAN_GALAR_STANDARD, //伽勒尔达摩狒狒
         .moves = {MOVE_ICICLE_CRASH, MOVE_FLARE_BLITZ, MOVE_ROCK_SLIDE, MOVE_U_TURN}, //冰柱坠击，闪焰冲锋，岩崩，急速折返
         .heldItem = ITEM_CHOICE_SCARF,
-        .ev = TRAINER_PARTY_EVS(0, 252, 0, 252, 0, 4),
+        .ev = TRAINER_PARTY_EVS(0, 252, 4, 252, 0, 0),
         .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_DARMANITAN_GALAR_STANDARD_3] = {
         .species = SPECIES_DARMANITAN_GALAR_STANDARD, //伽勒尔达摩狒狒
         .moves = {MOVE_ICICLE_CRASH, MOVE_FIRE_PUNCH, MOVE_REVERSAL, MOVE_ENDURE}, //冰柱坠击，火焰拳，绝处逢生，挺住
         .heldItem = ITEM_SALAC_BERRY,
-        .ev = TRAINER_PARTY_EVS(0, 252, 0, 252, 0, 4),
-        .nature = NATURE_ADAMANT
+        .ev = TRAINER_PARTY_EVS(4, 252, 0, 252, 0, 0),
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_DARMANITAN_GALAR_STANDARD_4] = {
         .species = SPECIES_DARMANITAN_GALAR_STANDARD, //伽勒尔达摩狒狒
@@ -3063,15 +3063,15 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .species = SPECIES_DARMANITAN_STANDARD, //达摩狒狒
         .moves = {MOVE_FIRE_PUNCH, MOVE_EARTHQUAKE, MOVE_YAWN, MOVE_BELLY_DRUM}, //火焰拳，地震，哈欠，腹鼓
         .heldItem = ITEM_SITRUS_BERRY,
-        .ev = TRAINER_PARTY_EVS(0, 252, 4, 252, 0, 0),
+        .ev = TRAINER_PARTY_EVS(0, 252, 0, 252, 0, 4),
         .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_DARMANITAN_STANDARD_3] = {
         .species = SPECIES_DARMANITAN_STANDARD, //达摩狒狒
         .moves = {MOVE_FIRE_BLAST, MOVE_PSYCHIC, MOVE_FOCUS_BLAST, MOVE_HIDDEN_POWER}, //大字爆炎，精神强念，真气弹，觉醒力量
         .heldItem = ITEM_CHOICE_SPECS,
-        .ev = TRAINER_PARTY_EVS(252, 0, 4, 0, 252, 0),
-        .nature = NATURE_MODEST
+        .ev = TRAINER_PARTY_EVS(0, 0, 4, 252, 252, 0),
+        .nature = NATURE_TIMID
     },
     [FRONTIER_MON_DARMANITAN_STANDARD_4] = {
         .species = SPECIES_DARMANITAN_STANDARD, //达摩狒狒
@@ -3085,14 +3085,14 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .moves = {MOVE_LEAF_BLADE, MOVE_POLTERGEIST, MOVE_SUCKER_PUNCH, MOVE_SWORDS_DANCE}, //叶刃，灵骚，突袭，剑舞
         .heldItem = ITEM_HEAVY_DUTY_BOOTS,
         .ev = TRAINER_PARTY_EVS(0, 252, 0, 252, 0, 4),
-        .nature = NATURE_ADAMANT
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_DECIDUEYE_2] = {
         .species = SPECIES_DECIDUEYE, //狙射树枭
         .moves = {MOVE_LEAF_STORM, MOVE_SHADOW_BALL, MOVE_HURRICANE, MOVE_NASTY_PLOT}, //飞叶风暴，暗影球，暴风，诡计
         .heldItem = ITEM_SALAC_BERRY,
         .ev = TRAINER_PARTY_EVS(0, 0, 0, 252, 252, 4),
-        .nature = NATURE_MODEST
+        .nature = NATURE_TIMID
     },
     [FRONTIER_MON_DECIDUEYE_3] = {
         .species = SPECIES_DECIDUEYE, //狙射树枭
@@ -3120,14 +3120,14 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .moves = {MOVE_LEAF_STORM, MOVE_AURA_SPHERE, MOVE_HURRICANE, MOVE_U_TURN}, //飞叶风暴，波导弹，暴风，急速折返
         .heldItem = ITEM_CHOICE_SPECS,
         .ev = TRAINER_PARTY_EVS(0, 0, 0, 252, 252, 4),
-        .nature = NATURE_MODEST
+        .nature = NATURE_TIMID
     },
     [FRONTIER_MON_DECIDUEYE_HISUI_3] = {
         .species = SPECIES_DECIDUEYE_HISUI, //洗翠狙射树枭
         .moves = {MOVE_LEAF_BLADE, MOVE_TRIPLE_ARROWS, MOVE_SUCKER_PUNCH, MOVE_SWORDS_DANCE}, //叶刃，三连箭，突袭，剑舞
         .heldItem = ITEM_LIFE_ORB,
         .ev = TRAINER_PARTY_EVS(0, 252, 4, 252, 0, 0),
-        .nature = NATURE_ADAMANT
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_DECIDUEYE_HISUI_4] = {
         .species = SPECIES_DECIDUEYE_HISUI, //洗翠狙射树枭
@@ -5115,7 +5115,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .moves = {MOVE_SALT_CURE, MOVE_PROTECT, MOVE_IRON_DEFENSE, MOVE_CURSE}, //盐腌，守住，铁壁，诅咒
         .heldItem = ITEM_EXPERT_BELT,
         .ev = TRAINER_PARTY_EVS(252, 4, 252, 0, 0, 0),
-        .nature = NATURE_IMPISH
+        .nature = NATURE_CAREFUL
     },
     [FRONTIER_MON_GASTRODON_WEST_1] = {
         .species = SPECIES_GASTRODON_WEST, //海兔兽-西海
@@ -7019,26 +7019,26 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .moves = {MOVE_SNIPE_SHOT, MOVE_DRAGON_PULSE, MOVE_ICE_BEAM, MOVE_HIDDEN_POWER}, //狙击，龙之波动，冰冻光束，觉醒力量
         .heldItem = ITEM_SCOPE_LENS,
         .ev = TRAINER_PARTY_EVS(4, 0, 0, 252, 252, 0),
-        .nature = NATURE_TIMID
+        .nature = NATURE_MODEST
     },
     [FRONTIER_MON_KINGDRA_2] = {
         .species = SPECIES_KINGDRA, //刺龙王
         .moves = {MOVE_HYDRO_PUMP, MOVE_DRACO_METEOR, MOVE_ICE_BEAM, MOVE_FLIP_TURN}, //水炮，流星群，冰冻光束，快速折返
         .heldItem = ITEM_CHOICE_SPECS,
-        .ev = TRAINER_PARTY_EVS(4, 0, 0, 252, 252, 0),
-        .nature = NATURE_TIMID
+        .ev = TRAINER_PARTY_EVS(0, 0, 4, 252, 252, 0),
+        .nature = NATURE_MODEST
     },
     [FRONTIER_MON_KINGDRA_3] = {
         .species = SPECIES_KINGDRA, //刺龙王
-        .moves = {MOVE_HYDRO_PUMP, MOVE_DRAGON_PULSE, MOVE_HURRICANE, MOVE_RAIN_DANCE}, //水炮，龙之波动，暴风，求雨
+        .moves = {MOVE_HYDRO_PUMP, MOVE_DRAGON_PULSE, MOVE_HURRICANE, MOVE_ICE_BEAM}, //水炮，龙之波动，暴风，冰冻光束
         .heldItem = ITEM_CHOICE_SPECS,
-        .ev = TRAINER_PARTY_EVS(4, 0, 0, 252, 252, 0),
+        .ev = TRAINER_PARTY_EVS(0, 0, 0, 252, 252, 4),
         .nature = NATURE_MODEST
     },
     [FRONTIER_MON_KINGDRA_4] = {
         .species = SPECIES_KINGDRA, //刺龙王
         .moves = {MOVE_HYDRO_PUMP, MOVE_DRACO_METEOR, MOVE_MUDDY_WATER, MOVE_PROTECT}, //水炮，流星群，浊流，守住
-        .heldItem = ITEM_WATERIUM_Z,
+        .heldItem = ITEM_LIFE_ORB,
         .ev = TRAINER_PARTY_EVS(0, 0, 0, 252, 252, 4),
         .nature = NATURE_MODEST
     },
@@ -10873,21 +10873,21 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     },
     [FRONTIER_MON_REUNICLUS_2] = {
         .species = SPECIES_REUNICLUS, //人造细胞卵
-        .moves = {MOVE_TRICK_ROOM, MOVE_TOXIC, MOVE_RECOVER, MOVE_PROTECT}, //戏法空间，剧毒，自我再生，守住
+        .moves = {MOVE_TRICK_ROOM, MOVE_PSYSHOCK, MOVE_RECOVER, MOVE_PROTECT}, //戏法空间，精神冲击，自我再生，守住
         .heldItem = ITEM_LEFTOVERS,
         .ev = TRAINER_PARTY_EVS(252, 0, 252, 0, 0, 4),
         .nature = NATURE_RELAXED
     },
     [FRONTIER_MON_REUNICLUS_3] = {
         .species = SPECIES_REUNICLUS, //人造细胞卵
-        .moves = {MOVE_TRICK_ROOM, MOVE_RECOVER, MOVE_REFLECT, MOVE_LIGHT_SCREEN}, //戏法空间，自我再生，反射壁，光墙
+        .moves = {MOVE_TRICK_ROOM, MOVE_PSYSHOCK, MOVE_REFLECT, MOVE_LIGHT_SCREEN}, //戏法空间，精神冲击，反射壁，光墙
         .heldItem = ITEM_LIGHT_CLAY,
         .ev = TRAINER_PARTY_EVS(252, 0, 4, 0, 0, 252),
         .nature = NATURE_SASSY
     },
     [FRONTIER_MON_REUNICLUS_4] = {
         .species = SPECIES_REUNICLUS, //人造细胞卵
-        .moves = {MOVE_TRICK_ROOM, MOVE_HELPING_HAND, MOVE_RECOVER, MOVE_PROTECT}, //戏法空间，帮助，自我再生，守住
+        .moves = {MOVE_TRICK_ROOM, MOVE_PSYSHOCK, MOVE_RECOVER, MOVE_PROTECT}, //戏法空间，精神冲击，自我再生，守住
         .heldItem = ITEM_WIKI_BERRY,
         .ev = TRAINER_PARTY_EVS(252, 0, 4, 0, 0, 252),
         .nature = NATURE_SASSY
@@ -11913,7 +11913,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .moves = {MOVE_HYPER_VOICE, MOVE_HEAT_WAVE, MOVE_SHADOW_BALL, MOVE_PARTING_SHOT}, //巨声，热风，暗影球，抛下狠话
         .heldItem = ITEM_CHOICE_SPECS,
         .ev = TRAINER_PARTY_EVS(4, 0, 0, 252, 252, 0),
-        .nature = NATURE_MODEST
+        .nature = NATURE_TIMID
     },
     [FRONTIER_MON_SILVALLY_NORMAL_2] = {
         .species = SPECIES_SILVALLY_ELECTRIC, //银伴战兽
@@ -11926,7 +11926,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .species = SPECIES_SILVALLY_STEEL, //银伴战兽STEEL
         .moves = {MOVE_MULTI_ATTACK, MOVE_FLAMETHROWER, MOVE_U_TURN, MOVE_DEFOG}, //多属性攻击，喷射火焰，急速折返，清除浓雾
         .heldItem = ITEM_STEEL_MEMORY,
-        .ev = TRAINER_PARTY_EVS(252, 0, 4, 0, 0, 252),
+        .ev = TRAINER_PARTY_EVS(0, 0, 4, 252, 0, 252),
         .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_SIMIPOUR_1] = {
@@ -14538,14 +14538,14 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .moves = {MOVE_SLUDGE_WAVE, MOVE_STRANGE_STEAM, MOVE_PAIN_SPLIT, MOVE_WILL_O_WISP}, //污泥波，神奇蒸汽，分担痛楚，磷火
         .heldItem = ITEM_ROCKY_HELMET,
         .ev = TRAINER_PARTY_EVS(252, 0, 252, 0, 0, 4),
-        .nature = NATURE_BOLD
+        .nature = NATURE_CALM
     },
     [FRONTIER_MON_WEEZING_2] = {
         .species = SPECIES_WEEZING, //双弹瓦斯
         .moves = {MOVE_EXPLOSION, MOVE_WILL_O_WISP, MOVE_DESTINY_BOND, MOVE_TOXIC_SPIKES}, //大爆炸，磷火，同命，毒菱
         .heldItem = ITEM_RED_CARD,
         .ev = TRAINER_PARTY_EVS(252, 4, 0, 0, 0, 252),
-        .nature = NATURE_CAREFUL
+        .nature = NATURE_CALM
     },
     [FRONTIER_MON_WEEZING_3] = {
         .species = SPECIES_WEEZING, //双弹瓦斯
@@ -14565,29 +14565,29 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .species = SPECIES_WEEZING_GALAR, //伽勒尔双弹瓦斯
         .moves = {MOVE_MISTY_EXPLOSION, MOVE_SLUDGE_WAVE, MOVE_STRANGE_STEAM, MOVE_FLAMETHROWER}, //薄雾炸裂，污泥波，神奇蒸汽，喷射火焰
         .heldItem = ITEM_CHOICE_SPECS,
-        .ev = TRAINER_PARTY_EVS(252, 0, 0, 0, 252, 4),
-        .nature = NATURE_MODEST
+        .ev = TRAINER_PARTY_EVS(0, 0, 0, 252, 252, 4),
+        .nature = NATURE_TIMID
     },
     [FRONTIER_MON_WEEZING_GALAR_2] = {
         .species = SPECIES_WEEZING_GALAR, //伽勒尔双弹瓦斯
         .moves = {MOVE_SLUDGE_BOMB, MOVE_STRANGE_STEAM, MOVE_WILL_O_WISP, MOVE_DEFOG}, //污泥炸弹，神奇蒸汽，磷火，清除浓雾
         .heldItem = ITEM_BLACK_SLUDGE,
         .ev = TRAINER_PARTY_EVS(252, 0, 252, 0, 0, 4),
-        .nature = NATURE_BOLD
+        .nature = NATURE_CALM
     },
     [FRONTIER_MON_WEEZING_GALAR_3] = {
         .species = SPECIES_WEEZING_GALAR, //伽勒尔双弹瓦斯
         .moves = {MOVE_DAZZLING_GLEAM, MOVE_SLUDGE_BOMB, MOVE_TOXIC_SPIKES, MOVE_PROTECT}, //魔法闪耀，污泥炸弹，毒菱，守住
         .heldItem = ITEM_SITRUS_BERRY,
         .ev = TRAINER_PARTY_EVS(252, 0, 16, 44, 112, 84),
-        .nature = NATURE_BOLD
+        .nature = NATURE_CALM
     },
     [FRONTIER_MON_WEEZING_GALAR_4] = {
         .species = SPECIES_WEEZING_GALAR, //伽勒尔双弹瓦斯
         .moves = {MOVE_DAZZLING_GLEAM, MOVE_SLUDGE_BOMB, MOVE_TOXIC_SPIKES, MOVE_WILL_O_WISP}, //魔法闪耀，污泥炸弹，毒菱，磷火
         .heldItem = ITEM_SITRUS_BERRY,
         .ev = TRAINER_PARTY_EVS(252, 0, 16, 44, 112, 84),
-        .nature = NATURE_BOLD
+        .nature = NATURE_CALM
     },
     [FRONTIER_MON_WHIMSICOTT_1] = {
         .species = SPECIES_WHIMSICOTT, //风妖精
@@ -16930,7 +16930,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_KYOGRE_2] = {
         .species = SPECIES_KYOGRE, //盖欧卡
         .moves = {MOVE_LIQUIDATION, MOVE_EARTHQUAKE, MOVE_THUNDER, MOVE_ICE_BEAM}, //水流裂破，地震，打雷，冰冻光束
-        .heldItem = ITEM_BLUE_ORB,
+        .heldItem = ITEM_CHOICE_SCARF,
         .ev = TRAINER_PARTY_EVS(32, 252, 64, 160, 0, 0),
         .nature = NATURE_TIMID
     },
@@ -16944,7 +16944,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_KYOGRE_4] = {
         .species = SPECIES_KYOGRE, //盖欧卡
         .moves = {MOVE_WATER_SPOUT, MOVE_SCALD, MOVE_ICE_BEAM, MOVE_THUNDER}, //喷水，热水，冰冻光束，打雷
-        .heldItem = ITEM_BLUE_ORB,
+        .heldItem = ITEM_CHOICE_SPECS,
         .ev = TRAINER_PARTY_EVS(4, 0, 0, 252, 252, 0),
         .nature = NATURE_TIMID
     },

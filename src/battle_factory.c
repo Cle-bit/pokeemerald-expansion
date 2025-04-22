@@ -839,8 +839,6 @@ const u16 TrickRoomAttack[] = {
     FRONTIER_MON_HYDRAPPLE_1, FRONTIER_MON_HYDRAPPLE_1, FRONTIER_MON_HYDRAPPLE_2, FRONTIER_MON_HYDRAPPLE_2, 
 };
 
-u8 teamType1 = 0;
-u8 teamType2 = 0;
 const u16 TrickRoomSize = ARRAY_COUNT(TrickRoom);
 const u16 TrickRoomAttackSize = ARRAY_COUNT(TrickRoomAttack);
 
@@ -1112,26 +1110,11 @@ static void GenerateOpponentMons(void)
     // 敌方队伍替换部分
     if (VarGet(VAR_DIFFICULTY_MODE) == 2 &&
         battleMode == FRONTIER_MODE_DOUBLES &&
-        (WinStreak >= 33 &&
-         ((WinStreak < 66) ||                       // 33-65: 100%
-          (WinStreak < 77 && (Random() % 7 < 4)) || // 66-76: 4/7
-          (WinStreak < 88 && (Random() % 7 < 3)) || // 77-87: 3/7
-          (Random() % 7 < 2))))                       // 88+: 2/7
+        (WinStreak >= 33 && WinStreak < 66))
     {
         u8 probTable[NUM_TEAM_TYPES] = {0};
 
         if (WinStreak >= 33 && WinStreak < 44)
-        {
-            /* 阶梯比例：一阶0% | 二阶30% | 三阶70% */
-            probTable[RAIN_TEAM] = 10;            // 二阶
-            probTable[DROUGHT_TEAM] = 10;         // 二阶
-            probTable[SANDSTORM_TEAM] = 35;       // 三阶
-            probTable[SNOW_TEAM] = 35;            // 三阶
-            probTable[ELECTRIC_TERRAIN_TEAM] = 5; // 二阶
-            probTable[PSYCHIC_TERRAIN_TEAM] = 5;  // 二阶
-            probTable[TRICK_ROOM_TEAM] = 0;       // 一阶
-        }
-        else if (WinStreak >= 44 && WinStreak < 55)
         {
             /* 阶梯比例：一阶10% | 二阶50% | 三阶40% */
             probTable[RAIN_TEAM] = 15;             // 二阶
@@ -1142,7 +1125,7 @@ static void GenerateOpponentMons(void)
             probTable[PSYCHIC_TERRAIN_TEAM] = 10;  // 二阶
             probTable[TRICK_ROOM_TEAM] = 10;       // 一阶
         }
-        else if (WinStreak >= 55 && WinStreak < 66)
+        else if (WinStreak >= 44 && WinStreak < 55)
         {
             /* 阶梯比例：一阶20% | 二阶60% | 三阶20% */
             probTable[RAIN_TEAM] = 15;             // 二阶
@@ -1153,7 +1136,7 @@ static void GenerateOpponentMons(void)
             probTable[PSYCHIC_TERRAIN_TEAM] = 15;  // 二阶
             probTable[TRICK_ROOM_TEAM] = 20;       // 一阶
         }
-        else if (WinStreak >= 66)
+        else if (WinStreak >= 55 && WinStreak < 66)
         {
             /* 阶梯比例：一阶30% | 二阶60% | 三阶10% */
             probTable[RAIN_TEAM] = 20;             // 二阶
@@ -1168,7 +1151,7 @@ static void GenerateOpponentMons(void)
             memcpy(probTable, sDefaultProbTable, sizeof(probTable)); // 使用默认概率
 
         // 概率选择队伍类型
-        teamType1 = 0;
+        u8 teamType = 0;
         {
             u16 rand = Random() % 100, sum = 0;
             for (u8 i = 0; i < NUM_TEAM_TYPES; i++)
@@ -1176,7 +1159,7 @@ static void GenerateOpponentMons(void)
                 sum += probTable[i];
                 if (rand < sum)
                 {
-                    teamType1 = i;
+                    teamType = i;
                     break;
                 }
             }
@@ -1186,11 +1169,11 @@ static void GenerateOpponentMons(void)
         if (FlagGet(FLAG_TEAM_TEST) &&
             VarGet(VAR_FACTORY_TEAM_TEST) >= 1 &&
             VarGet(VAR_FACTORY_TEAM_TEST) <= 7)
-            teamType1 = VarGet(VAR_FACTORY_TEAM_TEST) - 1;
+            teamType = VarGet(VAR_FACTORY_TEAM_TEST) - 1;
 
         // 敌方队伍替换（替换3只，第2和3只不同）
         u16 species[FRONTIER_PARTY_SIZE] = {0};
-        ReplaceTeamMembers(teamType1, TRUE, gFrontierTempParty, species);
+        ReplaceTeamMembers(teamType, TRUE, gFrontierTempParty, species);
     }
 }
 
@@ -1402,9 +1385,8 @@ static void GenerateInitialRentalMons(void)
         else
             memcpy(probTable, sDefaultProbTable, sizeof(probTable)); // 使用默认概率
 
-        // 概率选择队伍类型（受teamType1约束）
-        teamType2 = 0;
-        do
+        // 概率选择我方队伍类型
+        u8 teamType = 0;
         {
             u16 rand = Random() % 100, sum = 0;
             for (u8 i = 0; i < NUM_TEAM_TYPES; i++)
@@ -1412,24 +1394,21 @@ static void GenerateInitialRentalMons(void)
                 sum += probTable[i];
                 if (rand < sum)
                 {
-                    teamType2 = i;
+                    teamType = i;
                     break;
                 }
             }
-        } while (
-            (teamType1 <= 3 && teamType2 <= 3) || // 原范围0-3则新范围必须4-6
-            (teamType1 >= 4 && teamType2 >= 4)    // 原范围4-6则新范围必须0-3
-        );
+        }
 
         // 测试部分-强制选择队伍类型
         if (!FlagGet(FLAG_TEAM_TEST) && 
             VarGet(VAR_FACTORY_TEAM_TEST) >= 1 &&
             VarGet(VAR_FACTORY_TEAM_TEST) <= 7)
-            teamType2 = VarGet(VAR_FACTORY_TEAM_TEST) - 1;
+            teamType = VarGet(VAR_FACTORY_TEAM_TEST) - 1;
 
         // 我方队伍替换（替换6只，6只均不同）
         u16 species[PARTY_SIZE] = {0};
-        ReplaceTeamMembers(teamType2, FALSE, gSaveBlock2Ptr->frontier.rentalMons, species);
+        ReplaceTeamMembers(teamType, FALSE, gSaveBlock2Ptr->frontier.rentalMons, species);
     }
 }
 
