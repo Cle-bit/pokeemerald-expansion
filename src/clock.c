@@ -80,22 +80,34 @@ static void UpdatePerMinute(struct Time *localTime)
     }
 }
 
+#define DEBUG_SEASON_DURATION
+
 static void UpdateSeason(struct Time *localTime)
 {
     u16 currentDays = localTime->days;
     u16 currentSeason = VarGet(VAR_CURRENT_SEASON);
     u16 seasonEndDay = VarGet(VAR_SEASON_END_DAY);
 
+#ifdef DEBUG_SEASON_DURATION
+    // 调试模式：季节持续 1/2/3 天
+    #define MIN_DURATION 1
+    #define MAX_DURATION 3
+#else
+    // 正式模式：季节持续 6/7/8 天
+    #define MIN_DURATION 6
+    #define MAX_DURATION 8
+#endif
+
     if (seasonEndDay == 0) // 初始化处理
     {
-        u16 duration = 6 + (Random() % 3); // 随机6-8天
+        u16 duration = MIN_DURATION + (Random() % (MAX_DURATION - MIN_DURATION + 1));
         seasonEndDay = duration;
         VarSet(VAR_SEASON_END_DAY, seasonEndDay);
     }
 
     if (currentDays >= seasonEndDay)
     {
-        u8 duration = 6 + (Random() % 3);
+        u16 duration = MIN_DURATION + (Random() % (MAX_DURATION - MIN_DURATION + 1));
         currentSeason = (currentSeason + 1) % 4;
         VarSet(VAR_CURRENT_SEASON, currentSeason);
         VarSet(VAR_SEASON_END_DAY, currentDays + duration);
