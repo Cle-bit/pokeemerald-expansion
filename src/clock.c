@@ -12,9 +12,11 @@
 #include "overworld.h"
 #include "wallclock.h"
 #include "constants/form_change_types.h"
+#include "random.h"
 
 static void UpdatePerDay(struct Time *localTime);
 static void UpdatePerMinute(struct Time *localTime);
+static void UpdateSeason(struct Time *localTime);
 static void FormChangeTimeUpdate();
 
 void InitTimeBasedEvents(void)
@@ -32,6 +34,7 @@ void DoTimeBasedEvents(void)
         RtcCalcLocalTime();
         UpdatePerDay(&gLocalTime);
         UpdatePerMinute(&gLocalTime);
+        UpdateSeason(&gLocalTime);
     }
 }
 
@@ -74,6 +77,28 @@ static void UpdatePerMinute(struct Time *localTime)
             gSaveBlock2Ptr->lastBerryTreeUpdate = *localTime;
             FormChangeTimeUpdate();
         }
+    }
+}
+
+static void UpdateSeason(struct Time *localTime)
+{
+    u16 currentDays = localTime->days;
+    u16 currentSeason = VarGet(VAR_CURRENT_SEASON);
+    u16 seasonEndDay = VarGet(VAR_SEASON_END_DAY);
+
+    if (seasonEndDay == 0) // 初始化处理
+    {
+        u16 duration = 6 + (Random() % 3); // 随机6-8天
+        seasonEndDay = duration;
+        VarSet(VAR_SEASON_END_DAY, seasonEndDay);
+    }
+
+    if (currentDays >= seasonEndDay)
+    {
+        u8 duration = 6 + (Random() % 3);
+        currentSeason = (currentSeason + 1) % 4;
+        VarSet(VAR_CURRENT_SEASON, currentSeason);
+        VarSet(VAR_SEASON_END_DAY, currentDays + duration);
     }
 }
 
