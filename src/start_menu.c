@@ -50,6 +50,8 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "rtc.h"
+#include "constants/flags.h"
+
 
 // Menu actions
 enum
@@ -161,7 +163,7 @@ static const struct WindowTemplate sWindowTemplate_StartClock = {
     .tilemapLeft = 1, 
     .tilemapTop = 1, 
     .width = 9, // If you want to shorten the dates to Sat., Sun., etc., change this to 9
-    .height = 2, 
+    .height = 4, 
     .paletteNum = 15,
     .baseBlock = 0x30
 };
@@ -291,6 +293,7 @@ static void RemoveSaveInfoWindow(void);
 static void HideStartMenuWindow(void);
 static void HideStartMenuDebug(void);
 static void ShowTimeWindow(void);
+static void UpdateClockDisplay(void);
 
 void SetDexPokemonPokenavFlags(void) // unused
 {
@@ -475,13 +478,18 @@ static void ShowPyramidFloorWindow(void)
 
 #define CLOCK_WINDOW_WIDTH 70//星期与时间的距离
 
-const u8 gText_Monday[] = _("{COLOR BLUE}Mon{COLOR DARK_GRAY}");
-const u8 gText_Tuesday[] = _("{COLOR BLUE}Tue{COLOR DARK_GRAY}");
-const u8 gText_Wednesday[] = _("{COLOR BLUE}Wed{COLOR DARK_GRAY}");
-const u8 gText_Thursday[] = _("{COLOR BLUE}Thu{COLOR DARK_GRAY}");
-const u8 gText_Friday[] = _("{COLOR BLUE}Fri{COLOR DARK_GRAY}");
-const u8 gText_Saturday[] = _("{COLOR BLUE}Sat{COLOR DARK_GRAY}");
-const u8 gText_Sunday[] = _("{COLOR BLUE}Sun{COLOR DARK_GRAY}");
+
+const u8 gText_CurrentTime1[] = _("{STR_VAR_1}:{STR_VAR_2}");
+const u8 gText_CurrentTime2[] = _("{STR_VAR_1} {STR_VAR_2}");
+
+//星期文本定义
+const u8 gText_Monday[] = _("{COLOR BLUE}Mon.{COLOR DARK_GRAY}");
+const u8 gText_Tuesday[] = _("{COLOR BLUE}Tue.{COLOR DARK_GRAY}");
+const u8 gText_Wednesday[] = _("{COLOR BLUE}Wed.{COLOR DARK_GRAY}");
+const u8 gText_Thursday[] = _("{COLOR BLUE}Thu.{COLOR DARK_GRAY}");
+const u8 gText_Friday[] = _("{COLOR BLUE}Fri.{COLOR DARK_GRAY}");
+const u8 gText_Saturday[] = _("{COLOR BLUE}Sat.{COLOR DARK_GRAY}");
+const u8 gText_Sunday[] = _("{COLOR BLUE}Sun.{COLOR DARK_GRAY}");
 
 const u8 *const gDayNameStringsTable[7] = {
     gText_Sunday,
@@ -494,10 +502,10 @@ const u8 *const gDayNameStringsTable[7] = {
 };
 
 // 季节文本定义
-const u8 gText_Spring[] = _("{COLOR GREEN}Spr{COLOR DARK_GRAY}");
-const u8 gText_Summer[] = _("{COLOR GREEN}Sum{COLOR DARK_GRAY}");
-const u8 gText_Autumn[] = _("{COLOR GREEN}Aut{COLOR DARK_GRAY}");
-const u8 gText_Winter[] = _("{COLOR GREEN}Win{COLOR DARK_GRAY}");
+const u8 gText_Spring[] = _("{COLOR GREEN}Spr.{COLOR DARK_GRAY}");
+const u8 gText_Summer[] = _("{COLOR GREEN}Sum.{COLOR DARK_GRAY}");
+const u8 gText_Autumn[] = _("{COLOR GREEN}Aut.{COLOR DARK_GRAY}");
+const u8 gText_Winter[] = _("{COLOR GREEN}Win.{COLOR DARK_GRAY}");
 
 const u8 *const gSeasonStringsTable[4] = {
     gText_Spring,
@@ -506,37 +514,112 @@ const u8 *const gSeasonStringsTable[4] = {
     gText_Winter
 };
 
+// 天气文本定义
+const u8 gText_WeatherNone[] = _("Sunny");
+const u8 gText_SunnyClouds[] = _("Sunny");        // 1
+const u8 gText_Sunny[] = _("Sunny");               // 2
+const u8 gText_Rain[] = _("Rain");                 // 3
+const u8 gText_Snow[] = _("Snow");                 // 4
+const u8 gText_RainThunderstorm[] = _("Lighting"); // 5
+const u8 gText_FogHorizontal[] = _("Fog");         // 6
+const u8 gText_VolcanicAsh[] = _("Ash");           // 7
+const u8 gText_Sandstorm[] = _("Sandstorm");       // 8
+const u8 gText_FogDiagonal[] = _("Fog");           // 9
+const u8 gText_Underwater[] = _("UnderWater");     // 10
+const u8 gText_Shade[] = _("Shade");               // 11
+const u8 gText_Drought[] = _("Drought");           // 12
+const u8 gText_Downpour[] = _("Downpour");         // 13
+
+// 天气字符串表
+const u8 *const gWeatherStringsTable[14] = {
+    gText_WeatherNone,      // 0
+    gText_SunnyClouds,      // 1
+    gText_Sunny,            // 2
+    gText_Rain,             // 3
+    gText_Snow,             // 4
+    gText_RainThunderstorm, // 5
+    gText_FogHorizontal,    // 6
+    gText_VolcanicAsh,      // 7
+    gText_Sandstorm,        // 8
+    gText_FogDiagonal,      // 9
+    gText_Underwater,       // 10
+    gText_Shade,            // 11
+    gText_Drought,          // 12
+    gText_Downpour          // 13
+};
+
 static void ShowTimeWindow(void)
 {
-    u8* ptr;
-
-    // 季节
     u8 season = VarGet(VAR_CURRENT_SEASON);
+    u8 weather = GetCurrentWeather();
 
-    // print window
+    RtcCalcLocalTime();
+
+    // 创建窗口
     sStartClockWindowId = AddWindow(&sWindowTemplate_StartClock);
     PutWindowTilemap(sStartClockWindowId);
     DrawStdWindowFrame(sStartClockWindowId, FALSE);
+    FlagSet(FLAG_TEMP_5);
 
-    // 24小时制处理
-    u8 hours = gLocalTime.hours;
+    // ---------------------------第一行---------------------------
+    // 星期显示（左对齐，Y=1）
+    StringExpandPlaceholders(gStringVar1, gDayNameStringsTable[(gLocalTime.days % 7)]);
+    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar1, 0, 1, 0xFF, NULL);
 
-    // 打印星期（左对齐）
-    StringExpandPlaceholders(gStringVar4, gDayNameStringsTable[(gLocalTime.days % 7)]);
-    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, 0, 1, 0xFF, NULL);
+    // 时间字符串 HH:MM右对齐，Y=1）
+    ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2);
+    ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
 
-    // 构造时间字符串HH:MM
-    ptr = ConvertIntToDecimalStringN(gStringVar4, hours, STR_CONV_MODE_LEADING_ZEROS, 2);
-    *ptr = 0xF0; // 冒号
-    ConvertIntToDecimalStringN(ptr + 1, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
+    if (gLocalTime.minutes % 3)
+    {
+        StringExpandPlaceholders(gStringVar3, gText_CurrentTime1);
+    }
+    else
+    {
+        StringExpandPlaceholders(gStringVar3, gText_CurrentTime2);
+    }
 
-    // 计算时间居中位置并打印
-    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, GetStringCenterAlignXOffset(1, gStringVar4, CLOCK_WINDOW_WIDTH), 1, 0xFF, NULL);
+    // 计算右对齐坐标
+    u16 timeX = GetStringRightAlignXOffset(1, gStringVar3, CLOCK_WINDOW_WIDTH);
+    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar3, timeX, 1, 0xFF, NULL);
 
-    // 打印季节（右对齐）
-    StringExpandPlaceholders(gStringVar4, gSeasonStringsTable[season]);
-    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, GetStringRightAlignXOffset(1, gStringVar4, CLOCK_WINDOW_WIDTH), 1, 0xFF, NULL);
 
+    // ---------------------------第二行---------------------------
+    // 季节显示（左对齐，Y=16）
+    StringExpandPlaceholders(gStringVar3, gSeasonStringsTable[season]);
+    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar3, 0, 16, 0xFF, NULL);
+
+    // 天气显示（右对齐，Y=16）
+    u16 weatherX = GetStringRightAlignXOffset(1, gStringVar4, CLOCK_WINDOW_WIDTH);
+    StringExpandPlaceholders(gStringVar4, gWeatherStringsTable[weather]);
+    AddTextPrinterParameterized(sStartClockWindowId, 1, gStringVar4, weatherX, 16, 0xFF, NULL);
+
+    CopyWindowToVram(sStartClockWindowId, COPYWIN_GFX);
+}
+
+static void UpdateClockDisplay(void)
+{
+    // 检查时间窗口是否存在
+    if (!FlagGet(FLAG_TEMP_5))
+        return;
+
+    // 实时更新时间数据
+    RtcCalcLocalTime();
+
+    // 时间字符串 HH:MM（右对齐，Y=1）
+    ConvertIntToDecimalStringN(gStringVar1, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2);
+    ConvertIntToDecimalStringN(gStringVar2, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
+
+    if (gLocalTime.minutes % 3)
+    {
+        StringExpandPlaceholders(gStringVar3, gText_CurrentTime1);
+    }
+    else
+    {
+        StringExpandPlaceholders(gStringVar3, gText_CurrentTime2);
+    }
+
+    // 刷新窗口到显存
     CopyWindowToVram(sStartClockWindowId, COPYWIN_GFX);
 }
 
@@ -545,7 +628,7 @@ static void RemoveExtraStartMenuWindows(void)
     if (GetSafariZoneFlag())
     {
         ClearStdWindowAndFrameToTransparent(sSafariBallsWindowId, FALSE);
-        //CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
+        CopyWindowToVram(sSafariBallsWindowId, COPYWIN_GFX);
         RemoveWindow(sSafariBallsWindowId);
     }
     else if (InBattlePyramid())
@@ -555,8 +638,9 @@ static void RemoveExtraStartMenuWindows(void)
     }
     
     ClearStdWindowAndFrameToTransparent(sStartClockWindowId, FALSE);
-    // CopyWindowToVram(sStartClockWindowId, COPYWIN_GFX);
+    CopyWindowToVram(sStartClockWindowId, COPYWIN_GFX);
     RemoveWindow(sStartClockWindowId);
+    FlagClear(FLAG_TEMP_5);
 }
 
 static bool32 PrintStartMenuActions(s8 *pIndex, u32 count)
@@ -709,6 +793,9 @@ void ShowStartMenu(void)
 
 static bool8 HandleStartMenuInput(void)
 {
+
+    UpdateClockDisplay();
+
     if (JOY_NEW(DPAD_UP))
     {
         PlaySE(SE_SELECT);
