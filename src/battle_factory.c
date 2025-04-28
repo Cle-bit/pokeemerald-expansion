@@ -1647,7 +1647,7 @@ static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange)
     }
     else
     {
-        if (!FlagGet(FLAG_FACTORY_TEST))
+        if (!FlagGet(FLAG_GEN9_TEST))
         {
             u32 randVal = Random();
             const u16 arrSize = sizeof(factoryMonsGen9) / sizeof(factoryMonsGen9[0]);
