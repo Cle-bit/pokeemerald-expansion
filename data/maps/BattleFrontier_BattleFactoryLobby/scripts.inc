@@ -282,12 +282,12 @@ BattleFrontier_BattleFactoryLobby_EventScript_FatMan::
 	end
 
 BattleFrontier_BattleFactoryLobby_EventScript_FatMan_No::
-	clearflag FLAG_FACTORY_TEST
+	clearflag FLAG_GEN9_TEST
 	release
 	end
 
 BattleFrontier_BattleFactoryLobby_EventScript_FatMan_Yes::
-	setflag FLAG_FACTORY_TEST
+	setflag FLAG_GEN9_TEST
 	release
 	end
 

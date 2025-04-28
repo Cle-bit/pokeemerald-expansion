@@ -240,22 +240,22 @@ static void ResetDexNav(void)
 
 static void NewGameFactoryTest(void)
 {
-    //Basic Options
-    FlagSet(FLAG_SYS_B_DASH);
-    FlagSet(OW_FLAG_POKE_RIDER);
-    FlagSet(DN_FLAG_DEXNAV_GET);
-    FlagSet(FLAG_SYS_POKEDEX_GET);
-    FlagSet(FLAG_SYS_POKENAV_GET);
+    //Start Options   
     FlagSet(FLAG_SYS_FRONTIER_PASS);
+    FlagSet(FLAG_SYS_POKEDEX_GET);    
+    EnableNationalPokedex();
+    FlagSet(DN_FLAG_DEXNAV_GET);
+    FlagSet(FLAG_SYS_POKENAV_GET);
+
+    //Overworld Options
+    FlagSet(FLAG_SYS_B_DASH); 
+    FlagSet(OW_FLAG_NO_ENCOUNTER);
+    FlagSet(OW_FLAG_NO_TRAINER_SEE);
+    FlagSet(OW_FLAG_POKE_RIDER);
 
     //Battle Options
     VarSet(VAR_DIFFICULTY_MODE, 2);
     FlagSet(B_FLAG_SLEEP_CLAUSE);
-    FlagSet(B_FLAG_NO_BAG_USE);
-    FlagSet(I_EXP_SHARE_FLAG);
-
-    //PokeDex National
-    EnableNationalPokedex();
 
     //Flying Spots
     FlagSet(FLAG_VISITED_LITTLEROOT_TOWN);
@@ -289,10 +289,10 @@ static void NewGameFactoryTest(void)
 
     //Key items
     u16 itemId;
-
     for (itemId = 1; itemId < ITEMS_COUNT; itemId++)
     {
         if (ItemId_GetPocket(itemId) == POCKET_KEY_ITEMS && CheckBagHasSpace(itemId, 1))
             AddBagItem(itemId, 1);
     }
+
 }

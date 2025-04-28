@@ -94,7 +94,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_AEGISLASH_SHIELD_2] = {
         .species = SPECIES_AEGISLASH_SHIELD, //坚盾剑怪
         .moves = {MOVE_SHADOW_CLAW, MOVE_GYRO_BALL, MOVE_SHADOW_SNEAK, MOVE_KINGS_SHIELD}, //暗影爪，陀螺球，影子偷袭，王者盾牌
-        .heldItem = ITEM_LUM_BERRY,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(0, 252, 4, 0, 0, 252),
         .nature = NATURE_BRAVE
     },
@@ -395,7 +395,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_APPLETUN_3] = {
         .species = SPECIES_APPLETUN, //丰蜜龙
         .moves = {MOVE_SEED_BOMB, MOVE_BODY_PRESS, MOVE_GYRO_BALL, MOVE_CURSE}, //种子炸弹，扑击，陀螺球，诅咒
-        .heldItem = ITEM_LEFTOVERS,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(252, 64, 56, 0, 0, 136),
         .nature = NATURE_BRAVE
     },
@@ -892,7 +892,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_AVALUGG_HISUI_3] = {
         .species = SPECIES_AVALUGG_HISUI, //洗翠冰岩怪
         .moves = {MOVE_MOUNTAIN_GALE, MOVE_BODY_PRESS, MOVE_GYRO_BALL, MOVE_MIRROR_COAT}, //冰山风，扑击，陀螺球，镜面反射
-        .heldItem = ITEM_LEFTOVERS,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(4, 252, 252, 0, 0, 0),
         .nature = NATURE_SASSY
     },
@@ -1669,7 +1669,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_BRONZONG_1] = {
         .species = SPECIES_BRONZONG, //青铜钟
         .moves = {MOVE_GYRO_BALL, MOVE_TOXIC, MOVE_TRICK_ROOM, MOVE_PROTECT}, //陀螺球，剧毒，戏法空间，守住
-        .heldItem = ITEM_LEFTOVERS,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(252, 0, 4, 0, 0, 252),
         .nature = NATURE_SASSY
     },
@@ -1998,7 +1998,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_CELESTEELA_3] = {
         .species = SPECIES_CELESTEELA, //铁火辉夜
         .moves = {MOVE_GYRO_BALL, MOVE_SMACK_DOWN, MOVE_LEECH_SEED, MOVE_PROTECT}, //陀螺球，击落，寄生种子，守住
-        .heldItem = ITEM_MACHO_BRACE,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(248, 0, 104, 0, 0, 156),
         .nature = NATURE_RELAXED
     },
@@ -4595,7 +4595,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_FERROTHORN_3] = {
         .species = SPECIES_FERROTHORN, //坚果哑铃
         .moves = {MOVE_GYRO_BALL, MOVE_PAYBACK, MOVE_CURSE, MOVE_REST}, //陀螺球，以牙还牙，诅咒，睡觉
-        .heldItem = ITEM_CHESTO_BERRY,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(252, 0, 4, 0, 0, 252),
         .nature = NATURE_SASSY
     },
@@ -4819,7 +4819,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_FORRETRESS_3] = {
         .species = SPECIES_FORRETRESS, //佛烈托斯
         .moves = {MOVE_GYRO_BALL, MOVE_DRILL_RUN, MOVE_EXPLOSION, MOVE_POWER_TRICK}, //陀螺球，直冲钻，大爆炸，力量戏法
-        .heldItem = ITEM_CUSTAP_BERRY,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(252, 0, 252, 0, 0, 4),
         .nature = NATURE_RELAXED
     },
@@ -5533,7 +5533,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_GOLURK_3] = {
         .species = SPECIES_GOLURK, //泥偶巨人
         .moves = {MOVE_DRAIN_PUNCH, MOVE_SHADOW_PUNCH, MOVE_GYRO_BALL, MOVE_CURSE}, //吸取拳，暗影拳，陀螺球，诅咒
-        .heldItem = ITEM_LEFTOVERS,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(252, 0, 4, 0, 0, 252),
         .nature = NATURE_SASSY
     },
@@ -5785,7 +5785,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_GREEDENT_2] = {
         .species = SPECIES_GREEDENT, //藏饱栗鼠
         .moves = {MOVE_RETURN, MOVE_PAYBACK, MOVE_GYRO_BALL, MOVE_BELLY_DRUM}, //报恩，以牙还牙，陀螺球，腹鼓
-        .heldItem = ITEM_FIGY_BERRY,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(252, 252, 4, 0, 0, 0),
         .nature = NATURE_BRAVE
     },
@@ -9838,7 +9838,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_PERRSERKER_2] = {
         .species = SPECIES_PERRSERKER, //喵头目
         .moves = {MOVE_GYRO_BALL, MOVE_PLAY_ROUGH, MOVE_CRUNCH, MOVE_CURSE}, //陀螺球，嬉闹，咬碎，诅咒
-        .heldItem = ITEM_LIFE_ORB,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(8, 252, 0, 0, 0, 248),
         .nature = NATURE_BRAVE
     },
@@ -12499,7 +12499,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_STAKATAKA_2] = {
         .species = SPECIES_STAKATAKA, //垒磊石
         .moves = {MOVE_ROCK_SLIDE, MOVE_GYRO_BALL, MOVE_STEALTH_ROCK, MOVE_TRICK_ROOM}, //岩崩，陀螺球，隐形岩，戏法空间
-        .heldItem = ITEM_SHUCA_BERRY,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(252, 252, 0, 0, 0, 4),
         .nature = NATURE_SASSY
     },
@@ -12513,7 +12513,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_STAKATAKA_4] = {
         .species = SPECIES_STAKATAKA, //垒磊石
         .moves = {MOVE_ROCK_SLIDE, MOVE_GYRO_BALL, MOVE_TRICK_ROOM, MOVE_PROTECT}, //岩崩，陀螺球，戏法空间，守住
-        .heldItem = ITEM_FOCUS_SASH,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(252, 0, 4, 0, 0, 252),
         .nature = NATURE_SASSY
     },
@@ -14795,7 +14795,7 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     [FRONTIER_MON_WORMADAM_TRASH_1] = {
         .species = SPECIES_WORMADAM_TRASH, //结草贵妇TRASH
         .moves = {MOVE_GYRO_BALL, MOVE_TOXIC, MOVE_STEALTH_ROCK, MOVE_PROTECT}, //陀螺球，剧毒，隐形岩，守住
-        .heldItem = ITEM_LEFTOVERS,
+        .heldItem = ITEM_IRON_BALL,
         .ev = TRAINER_PARTY_EVS(252, 0, 4, 0, 0, 252),
         .nature = NATURE_SASSY
     },
@@ -16589,14 +16589,14 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
         .moves = {MOVE_THUNDERBOLT, MOVE_VOLT_SWITCH, MOVE_SIGNAL_BEAM, MOVE_RISING_VOLTAGE}, //十万伏特，伏特替换，信号光束，电力上升
         .heldItem = ITEM_MAGNET,
         .ev = TRAINER_PARTY_EVS(4, 0, 0, 252, 252, 0),
-        .nature = NATURE_TIMID
+        .nature = NATURE_MODEST
     },
     [FRONTIER_MON_REGIELEKI_2] = {
         .species = SPECIES_REGIELEKI, //雷吉艾勒奇
         .moves = {MOVE_RISING_VOLTAGE, MOVE_VOLT_SWITCH, MOVE_ELECTRO_BALL, MOVE_RISING_VOLTAGE}, //电力上升，伏特替换，电球，电力上升
         .heldItem = ITEM_ELECTRIUM_Z,
         .ev = TRAINER_PARTY_EVS(4, 0, 0, 252, 252, 0),
-        .nature = NATURE_TIMID
+        .nature = NATURE_MODEST
     },
     [FRONTIER_MON_HOOPA_UNBOUND_1] = {
         .species = SPECIES_HOOPA_UNBOUND, //胡帕-解放形态
