@@ -109,6 +109,9 @@
 #define VAR_CURRENT_SEASON VAR_UNUSED_0x404E
 #define VAR_SEASON_END_DAY VAR_UNUSED_0x4052
 
+//Weather
+#define VAR_CURRENT_WEATHER VAR_UNUSED_0x4056
+
 // Overworld flags
 // To use the following features in scripting, replace the 0s with the flag ID you're assigning it to.
 // Eg: Replace with FLAG_UNUSED_0x264 so you can use that flag to toggle the feature.

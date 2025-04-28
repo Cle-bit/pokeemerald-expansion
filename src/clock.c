@@ -13,11 +13,16 @@
 #include "wallclock.h"
 #include "constants/form_change_types.h"
 #include "random.h"
+#include "constants/weather.h"
 
 static void UpdatePerDay(struct Time *localTime);
+static void UpdatePerHour(struct Time *localTime);
 static void UpdatePerMinute(struct Time *localTime);
 static void UpdateSeason(struct Time *localTime);
+static void UpdateWeatherPerHour(u16 hours);
 static void FormChangeTimeUpdate();
+
+#define VAR_HOURS VAR_UNUSED_0x4055
 
 void InitTimeBasedEvents(void)
 {
@@ -25,6 +30,7 @@ void InitTimeBasedEvents(void)
     RtcCalcLocalTime();
     gSaveBlock2Ptr->lastBerryTreeUpdate = gLocalTime;
     VarSet(VAR_DAYS, gLocalTime.days);
+    VarSet(VAR_HOURS, gLocalTime.hours);
 }
 
 void DoTimeBasedEvents(void)
@@ -33,6 +39,7 @@ void DoTimeBasedEvents(void)
     {
         RtcCalcLocalTime();
         UpdatePerDay(&gLocalTime);
+        UpdatePerHour(&gLocalTime); 
         UpdatePerMinute(&gLocalTime);
         UpdateSeason(&gLocalTime);
     }
@@ -59,6 +66,19 @@ static void UpdatePerDay(struct Time *localTime)
         SetRandomLotteryNumber(daysSince);
         UpdateDaysPassedSinceFormChange(daysSince);
         *days = localTime->days;
+    }
+}
+
+static void UpdatePerHour(struct Time *localTime)
+{
+    u16 hours = VarGet(VAR_HOURS);
+    u16 hoursSince;
+
+    if (hours != localTime->hours)
+    {
+        hoursSince = (localTime->hours - hours + 24) % 24;
+        UpdateWeatherPerHour(hoursSince);
+        VarSet(VAR_HOURS, localTime->hours);
     }
 }
 
@@ -111,6 +131,31 @@ static void UpdateSeason(struct Time *localTime)
         currentSeason = (currentSeason + 1) % 4;
         VarSet(VAR_CURRENT_SEASON, currentSeason);
         VarSet(VAR_SEASON_END_DAY, currentDays + duration);
+    }
+}
+
+static void UpdateWeatherPerHour(u16 hours)
+{
+    if (hours >= 1)
+    {
+        static const u8 sValidWeathers[] = 
+        {
+            WEATHER_SUNNY_CLOUDS,
+            WEATHER_SUNNY,
+            WEATHER_RAIN,
+            WEATHER_SNOW,
+            WEATHER_RAIN_THUNDERSTORM,
+            //WEATHER_FOG_HORIZONTAL,
+            WEATHER_SANDSTORM,
+            //WEATHER_FOG_DIAGONAL,
+            WEATHER_SHADE,
+            WEATHER_DROUGHT,
+            WEATHER_DOWNPOUR
+        };
+
+        // 生成随机索引并设置天气
+        u8 index = Random() % (sizeof(sValidWeathers) / sizeof(sValidWeathers[0]));
+        VarSet(VAR_CURRENT_WEATHER, sValidWeathers[index]);
     }
 }
 

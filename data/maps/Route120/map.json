@@ -620,28 +620,28 @@
       "x": 7,
       "y": 15,
       "elevation": 0,
-      "weather": "COORD_EVENT_WEATHER_RAIN"
+      "weather": "COORD_EVENT_WEATHER_UPDATE_WEATHER"
     },
     {
       "type": "weather",
       "x": 7,
       "y": 16,
       "elevation": 0,
-      "weather": "COORD_EVENT_WEATHER_RAIN"
+      "weather": "COORD_EVENT_WEATHER_UPDATE_WEATHER"
     },
     {
       "type": "weather",
       "x": 22,
       "y": 61,
       "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_RAIN"
+      "weather": "COORD_EVENT_WEATHER_UPDATE_WEATHER"
     },
     {
       "type": "weather",
       "x": 12,
       "y": 64,
       "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_RAIN"
+      "weather": "COORD_EVENT_WEATHER_UPDATE_WEATHER"
     },
     {
       "type": "weather",

@@ -2,6 +2,7 @@
 #include "constants/weather.h"
 #include "coord_event_weather.h"
 #include "field_weather.h"
+#include "event_data.h"
 
 struct CoordEventWeather
 {
@@ -22,6 +23,7 @@ static void CoordEventWeather_Shade(void);
 static void CoordEventWeather_Drought(void);
 static void CoordEventWeather_Route119Cycle(void);
 static void CoordEventWeather_Route123Cycle(void);
+static void CoordEventWeather_UpdateWeather(void);
 
 static const struct CoordEventWeather sCoordEventWeatherFuncs[] =
 {
@@ -38,6 +40,7 @@ static const struct CoordEventWeather sCoordEventWeatherFuncs[] =
     { COORD_EVENT_WEATHER_DROUGHT,           CoordEventWeather_Drought },
     { COORD_EVENT_WEATHER_ROUTE119_CYCLE,    CoordEventWeather_Route119Cycle },
     { COORD_EVENT_WEATHER_ROUTE123_CYCLE,    CoordEventWeather_Route123Cycle },
+    { COORD_EVENT_WEATHER_UPDATE_WEATHER,    CoordEventWeather_UpdateWeather },
 };
 
 static void CoordEventWeather_Clouds(void)
@@ -103,6 +106,11 @@ static void CoordEventWeather_Route119Cycle(void)
 static void CoordEventWeather_Route123Cycle(void)
 {
     SetWeather(WEATHER_ROUTE123_CYCLE);
+}
+
+static void CoordEventWeather_UpdateWeather(void)
+{
+    SetWeather(VarGet(VAR_CURRENT_WEATHER));
 }
 
 void DoCoordEventWeather(u8 coordEventWeather)
