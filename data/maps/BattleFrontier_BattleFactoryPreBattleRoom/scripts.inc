@@ -35,8 +35,10 @@ BattleFrontier_BattleFactoryPreBattleRoom_EventScript_EnterRoom::
 	setorcopyvar VAR_0x8005, VAR_RESULT
 	factory_getopponentstyle
 	setorcopyvar VAR_0x8006, VAR_RESULT
+	special ShowTeamPreviewInfoWindow
 	call BattleFrontier_BattleFactoryPreBattleRoom_EventScript_CommentOnOpponentType
 	call BattleFrontier_BattleFactoryPreBattleRoom_EventScript_CommentOnOpponentStyle
+	special RemoveTeamPreviewInfoWindow
 	msgbox BattleFrontier_BattleFactoryPreBattleRoom_Text_HoldMonsChooseFromSelection, MSGBOX_DEFAULT
 	fadescreen FADE_TO_BLACK
 	factory_setswapped
@@ -142,8 +144,10 @@ BattleFrontier_BattleFactoryPreBattleRoom_EventScript_AskSwapMon::
 	setorcopyvar VAR_0x8005, VAR_RESULT
 	factory_getopponentstyle
 	setorcopyvar VAR_0x8006, VAR_RESULT
+	special ShowTeamPreviewInfoWindow
 	call BattleFrontier_BattleFactoryPreBattleRoom_EventScript_CommentOnOpponentType
 	call BattleFrontier_BattleFactoryPreBattleRoom_EventScript_CommentOnOpponentStyle
+	special RemoveTeamPreviewInfoWindow
 	switch VAR_DIFFICULTY_MODE
 	case 0, BattleFrontier_BattleFactoryPreBattleRoom_EventScript_AskSwapMonTwice
 	case 1, BattleFrontier_BattleFactoryPreBattleRoom_EventScript_CheckSwapMon1

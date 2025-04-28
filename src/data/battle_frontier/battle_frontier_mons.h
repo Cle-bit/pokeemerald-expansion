@@ -12309,35 +12309,35 @@ const struct TrainerMon gBattleFrontierMons[NUM_FRONTIER_MONS] =
     },
     [FRONTIER_MON_SMEARGLE_1] = {
         .species = SPECIES_SMEARGLE, //图图犬
-        .moves = {MOVE_SPORE, MOVE_AQUA_RING, MOVE_TAIL_GLOW, MOVE_BATON_PASS}, //蘑菇孢子，水流环，萤火，接棒
+        .moves = {MOVE_SPORE, MOVE_MINIMIZE, MOVE_TAIL_GLOW, MOVE_BATON_PASS}, //蘑菇孢子，变小，萤火，接棒
         .heldItem = ITEM_FOCUS_SASH,
         .ev = TRAINER_PARTY_EVS(248, 0, 8, 252, 0, 0),
         .nature = NATURE_TIMID
     },
     [FRONTIER_MON_SMEARGLE_2] = {
         .species = SPECIES_SMEARGLE, //图图犬
-        .moves = {MOVE_SPORE, MOVE_SHELL_SMASH, MOVE_SPIKY_SHIELD, MOVE_BATON_PASS}, //蘑菇孢子，破壳，尖刺防守，接棒
+        .moves = {MOVE_SPORE, MOVE_SHELL_SMASH, MOVE_MINIMIZE, MOVE_BATON_PASS}, //蘑菇孢子，破壳，变小，接棒
         .heldItem = ITEM_FOCUS_SASH,
         .ev = TRAINER_PARTY_EVS(248, 0, 8, 252, 0, 0),
         .nature = NATURE_TIMID
     },
     [FRONTIER_MON_SMEARGLE_3] = {
         .species = SPECIES_SMEARGLE, //图图犬
-        .moves = {MOVE_SPORE, MOVE_MAGIC_COAT, MOVE_STEALTH_ROCK, MOVE_SPIKES}, //蘑菇孢子，魔法反射，隐形岩，撒菱
-        .heldItem = ITEM_FOCUS_SASH,
-        .ev = TRAINER_PARTY_EVS(252, 0, 0, 252, 0, 4),
-        .nature = NATURE_TIMID
+        .moves = {MOVE_POPULATION_BOMB, MOVE_PIN_MISSILE, MOVE_BONE_RUSH, MOVE_BULLET_SEED}, //鼠数儿，飞弹针，骨棒乱打，种子机关枪
+        .heldItem = ITEM_LOADED_DICE,
+        .ev = TRAINER_PARTY_EVS(4, 252, 0, 252, 0, 0),
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_SMEARGLE_4] = {
         .species = SPECIES_SMEARGLE, //图图犬
-        .moves = {MOVE_BOOMBURST, MOVE_ERUPTION, MOVE_WATER_SPOUT, MOVE_DRAGON_ENERGY}, //爆音波，喷火，喷水，巨龙威能
-        .heldItem = ITEM_CHOICE_SCARF,
-        .ev = TRAINER_PARTY_EVS(4, 0, 0, 252, 252, 0),
-        .nature = NATURE_TIMID
+        .moves = {MOVE_POPULATION_BOMB, MOVE_SCALE_SHOT, MOVE_ROCK_BLAST, MOVE_ICICLE_SPEAR}, //鼠数儿，鳞射，岩石爆击，冰锥
+        .heldItem = ITEM_LOADED_DICE,
+        .ev = TRAINER_PARTY_EVS(4, 252, 0, 252, 0, 0),
+        .nature = NATURE_JOLLY
     },
     [FRONTIER_MON_SMEARGLE_5] = {
         .species = SPECIES_SMEARGLE, //图图犬
-        .moves = {MOVE_SPORE, MOVE_FOLLOW_ME, MOVE_SPIKY_SHIELD, MOVE_FAKE_OUT}, //蘑菇孢子，看我嘛，尖刺防守，击掌奇袭
+        .moves = {MOVE_SPORE, MOVE_FOLLOW_ME, MOVE_BURNING_BULWARK, MOVE_FAKE_OUT}, //蘑菇孢子，看我嘛，火焰守护，击掌奇袭
         .heldItem = ITEM_FOCUS_SASH,
         .ev = TRAINER_PARTY_EVS(252, 0, 0, 252, 0, 4),
         .nature = NATURE_JOLLY

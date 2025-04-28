@@ -18,6 +18,9 @@
 #include "constants/trainers.h"
 #include "constants/moves.h"
 #include "constants/items.h"
+#include "pokemon_icon.h"
+#include "window.h"
+#include "menu.h"
 
 static bool8 sPerformedRentalSwap;
 
@@ -36,11 +39,13 @@ static void SetOpponentGfxVar(void);
 static void GenerateOpponentMons(void);
 static void GenerateInitialRentalMons(void);
 static void GetOpponentMostCommonMonType(void);
-static void ModifyFactoryWinStreaks(void);
 static void GetOpponentBattleStyle(void);
 static void RestorePlayerPartyHeldItems(void);
 static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange);
 static u8 GetMoveBattleStyle(u16 move);
+void ModifyFactoryWinStreaks(void);
+void ShowTeamPreviewInfoWindow(void);
+void RemoveTeamPreviewInfoWindow(void);
 
 // Number of moves needed on the team to be considered using a certain battle style
 static const u8 sRequiredMoveCounts[FACTORY_NUM_STYLES - 1] = {
@@ -177,6 +182,7 @@ static const u16 sInitialRentalMonRanges[][2] =
 
 // 工厂测试模式专用宝可梦列表
 static const u16 factoryMonsGen9[] = {
+    FRONTIER_MON_SMEARGLE_1, FRONTIER_MON_SMEARGLE_2, FRONTIER_MON_SMEARGLE_3, FRONTIER_MON_SMEARGLE_4, FRONTIER_MON_SMEARGLE_5,
     FRONTIER_MON_TORNADUS_INCARNATE_1, FRONTIER_MON_TORNADUS_INCARNATE_2, FRONTIER_MON_TORNADUS_INCARNATE_3, FRONTIER_MON_TORNADUS_INCARNATE_1,
     FRONTIER_MON_THUNDURUS_INCARNATE_1, FRONTIER_MON_THUNDURUS_INCARNATE_2, FRONTIER_MON_THUNDURUS_INCARNATE_3, FRONTIER_MON_THUNDURUS_INCARNATE_1,
     FRONTIER_MON_LANDORUS_INCARNATE_1, FRONTIER_MON_LANDORUS_INCARNATE_2, FRONTIER_MON_LANDORUS_INCARNATE_3, FRONTIER_MON_LANDORUS_INCARNATE_1,
@@ -1785,4 +1791,64 @@ void ModifyFactoryWinStreaks(void)
         gSaveBlock2Ptr->frontier.factoryWinStreaks[FRONTIER_MODE_DOUBLES][FRONTIER_LVL_OPEN] += delta;
         gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[FRONTIER_MODE_DOUBLES][FRONTIER_LVL_OPEN] = gSaveBlock2Ptr->frontier.factoryWinStreaks[FRONTIER_MODE_DOUBLES][FRONTIER_LVL_OPEN];
     }
+}
+
+static const struct WindowTemplate sTeamPreviewWindowTemplate = {
+    .bg = 0,
+    .tilemapLeft = 9,
+    .tilemapTop = 1,
+    .width = 12,
+    .height = 3,
+    .paletteNum = 15,
+    .baseBlock = 8
+};
+
+// EWRAM
+static EWRAM_DATA u8 spriteIdData[FRONTIER_PARTY_SIZE] = {};
+static u8 teamPreviewWindowId;
+
+void ShowTeamPreviewInfoWindow(void)
+{
+    struct WindowTemplate teamPreviewWindow = sTeamPreviewWindowTemplate;
+    u8 xOffset;
+    u8 yOffset;
+    u8 i;
+    u16 species[FRONTIER_PARTY_SIZE];   // 存储敌方队伍物种的数组
+
+    // 从生成的临时队伍中获取物种信息
+    for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+    {
+        u16 monId = gFrontierTempParty[i];
+        species[i] = gFacilityTrainerMons[monId].species;
+    }
+
+    // 窗口布局
+    yOffset = 18;
+    xOffset = 90;
+
+    teamPreviewWindowId = AddWindow(&teamPreviewWindow);
+    DrawStdWindowFrame(teamPreviewWindowId, FALSE);
+
+    // 绘制宝可梦图标
+    for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+    {
+        LoadMonIconPalette(species[i]);
+        spriteIdData[i] = CreateMonIcon(species[i], SpriteCB_MonIcon, xOffset, yOffset, 0, 0);
+        gSprites[spriteIdData[i]].oam.priority = 0;
+        xOffset += 32;
+    }
+    LoadMonIconPalettes();
+    CopyWindowToVram(teamPreviewWindowId, COPYWIN_GFX);
+}
+
+void RemoveTeamPreviewInfoWindow(void)
+{
+    u8 i;
+
+    ClearStdWindowAndFrame(teamPreviewWindowId, FALSE);
+    for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+    {
+        FreeAndDestroyMonIconSprite(&gSprites[spriteIdData[i]]);
+    }
+    RemoveWindow(teamPreviewWindowId);
 }
