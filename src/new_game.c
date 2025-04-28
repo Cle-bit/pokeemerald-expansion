@@ -255,6 +255,7 @@ static void NewGameFactoryTest(void)
 
     //Battle Options
     VarSet(VAR_DIFFICULTY_MODE, 2);
+    FlagSet(FLAG_SANDBOX_MODE);
     FlagSet(B_FLAG_SLEEP_CLAUSE);
 
     //Flying Spots

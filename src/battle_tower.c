@@ -1660,7 +1660,7 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
     u32 ability=0, friendship, j;
     bool8 abilityFound = FALSE;
     u32 nature = fmon->nature;
-    u16 factory0iv = 0;
+    u16 factory0IV = 0;
 
     CreateMon(dst, fmon->species, level, fixedIV, TRUE, nature, otID, OT_ID_PRESET);
 
@@ -1740,7 +1740,7 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
     // 使用monId进行检查
     if (IsIdInTrickRoomAttack(monId))
     {
-        SetMonData(dst, MON_DATA_SPEED_IV, &(factory0iv));
+        SetMonData(dst, MON_DATA_SPEED_IV, &(factory0IV));
     }
 
     u32 isShiny = (Random() % 12 == 0) ? TRUE : FALSE; // 1/12 概率
