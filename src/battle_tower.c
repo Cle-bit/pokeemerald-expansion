@@ -1567,6 +1567,10 @@ static void FillTentTrainerParty(u8 monsCount)
 
 static const u16 sPriorityAbilities[] = 
 {
+    ABILITY_MAGIC_GUARD,
+    ABILITY_POWER_CONSTRUCT,
+    ABILITY_ICE_FACE,
+    ABILITY_SKILL_LINK,
     ABILITY_MAGIC_BOUNCE,
     ABILITY_CONTRARY,
     ABILITY_TRIAGE,
