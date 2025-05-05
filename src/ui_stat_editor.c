@@ -251,17 +251,6 @@ static const struct SpriteTemplate sSpriteTemplate_Selector =
     .callback = SelectorCallback
 };
 
-// Begin Generic UI Initialization Code
-void Task_OpenStatEditorFromStartMenu(u8 taskId)
-{
-    if (!gPaletteFade.active)
-    {
-        CleanupOverworldWindowsAndTilemaps();
-        StatEditor_Init(CB2_ReturnToFieldWithOpenMenu);
-        DestroyTask(taskId);
-    }
-}
-
 // This is our main initialization function if you want to call the menu from elsewhere
 void StatEditor_Init(MainCallback callback)
 {
@@ -640,6 +629,7 @@ static void PrintMonStats()
     u16 level = GetMonData(ReturnPartyMon(), MON_DATA_LEVEL);
     u16 personality = GetMonData(ReturnPartyMon(), MON_DATA_PERSONALITY);
     u16 gender = GetGenderFromSpeciesAndPersonality(sStatEditorDataPtr->speciesID, personality);
+    u8 abilityNum;
 
     FillWindowPixelBuffer(WINDOW_2, PIXEL_FILL(TEXT_COLOR_TRANSPARENT));
     FillWindowPixelBuffer(WINDOW_3, PIXEL_FILL(TEXT_COLOR_TRANSPARENT));
@@ -702,6 +692,7 @@ static void PrintMonStats()
 
     // Print ability / nature / name / level / gender
 
+    //species
 #ifdef POKEMON_EXPANSION
     StringCopy(gStringVar2, GetSpeciesName(sStatEditorDataPtr->speciesID));
 #else
@@ -710,10 +701,12 @@ static void PrintMonStats()
 
     AddTextPrinterParameterized4(WINDOW_3, FONT_NARROW, 4, 2, 0, 0, sMenuWindowFontColors[FONT_WHITE], 0xFF, gStringVar2);
 
+    //level
     ConvertIntToDecimalStringN(gStringVar1, level, STR_CONV_MODE_RIGHT_ALIGN, 3);
     StringExpandPlaceholders(gStringVar2, sText_MonLevel);
     AddTextPrinterParameterized4(WINDOW_3, FONT_SMALL_NARROW, 4, 18, 0, 0, sMenuWindowFontColors[FONT_WHITE], TEXT_SKIP_DRAW, gStringVar2);
 
+    //gender
     StringCopy(text, gText_MaleSymbol);
     if (gender != MON_GENDERLESS)
     {
@@ -724,11 +717,14 @@ static void PrintMonStats()
         AddTextPrinterParameterized4(WINDOW_3, FONT_NORMAL, 41 + 8, 19, 0, 0, sGenderColors[(gender == MON_FEMALE)], TEXT_SKIP_DRAW, text);
     }
 
+    //nature
     nature = GetNature(ReturnPartyMon());
-    StringCopy(gStringVar2, gNatureNamePointers[nature]);
+    StringCopy(gStringVar2, gNaturesInfo[nature].name);
     AddTextPrinterParameterized4(WINDOW_3, FONT_SMALL_NARROW, 4, 50, 0, 0, sMenuWindowFontColors[FONT_WHITE], 0xFF, gStringVar2);
 
-    StringCopy(gStringVar2, gAbilityNames[gSpeciesInfo[sStatEditorDataPtr->speciesID].abilities[GetMonData(ReturnPartyMon(), MON_DATA_ABILITY_NUM)]]);
+    // ability
+    abilityNum = GetMonData(ReturnPartyMon(), MON_DATA_ABILITY_NUM);
+    StringCopy(gStringVar2, gAbilitiesInfo[GetAbilityBySpecies(sStatEditorDataPtr->speciesID, abilityNum)].name);
     AddTextPrinterParameterized4(WINDOW_3, FONT_SMALL_NARROW, 4, 34, 0, 0, sMenuWindowFontColors[FONT_WHITE], 0xFF, gStringVar2);
 
     PutWindowTilemap(WINDOW_3);
@@ -822,7 +818,7 @@ static void Task_StatEditorMain(u8 taskId) // input control when first loaded in
         gTasks[taskId].func = Task_MenuEditingStat;
         if(sStatEditorDataPtr->editingStat == 0)
             StartSpriteAnim(&gSprites[sStatEditorDataPtr->selectorSpriteId], 1);
-        if((sStatEditorDataPtr->editingStat == 255 || (sStatEditorDataPtr->evTotal == 510)) && (sStatEditorDataPtr->selector_x == 0))
+        if((sStatEditorDataPtr->editingStat == 252 || (sStatEditorDataPtr->evTotal == 508)) && (sStatEditorDataPtr->selector_x == 0))
             StartSpriteAnim(&gSprites[sStatEditorDataPtr->selectorSpriteId], 2);
         if((sStatEditorDataPtr->editingStat == 31) && (sStatEditorDataPtr->selector_x == 1))
             StartSpriteAnim(&gSprites[sStatEditorDataPtr->selectorSpriteId], 2);
@@ -918,8 +914,8 @@ static void ChangeAndUpdateStat()
 
 #define STAT_MINIMUM          0  
 #define IV_MAX_SINGLE_STAT    31   
-#define EV_MAX_SINGLE_STAT    255   
-#define EV_MAX_TOTAL          510            
+#define EV_MAX_SINGLE_STAT    252   
+#define EV_MAX_TOTAL          508            
                 
 #define EDITING_EVS     0
 #define EDITING_IVS     1
