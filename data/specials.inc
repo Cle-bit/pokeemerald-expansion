@@ -565,3 +565,4 @@ gSpecials::
 	def_special GetCodeFeedback
 	def_special ShowTeamPreviewInfoWindow
 	def_special RemoveTeamPreviewInfoWindow
+	def_special DoSlidingPuzzle
