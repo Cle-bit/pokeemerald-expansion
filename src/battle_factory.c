@@ -182,7 +182,7 @@ static const u16 sInitialRentalMonRanges[][2] =
 
 // 工厂测试模式专用宝可梦列表
 static const u16 factoryMonsGen9[] = {
-    FRONTIER_MON_SMEARGLE_1, FRONTIER_MON_SMEARGLE_2, FRONTIER_MON_SMEARGLE_3, FRONTIER_MON_SMEARGLE_4, FRONTIER_MON_SMEARGLE_5,
+    FRONTIER_MON_SMEARGLE_1, FRONTIER_MON_SMEARGLE_2, FRONTIER_MON_SMEARGLE_3, FRONTIER_MON_SMEARGLE_4,
     FRONTIER_MON_TORNADUS_INCARNATE_1, FRONTIER_MON_TORNADUS_INCARNATE_2, FRONTIER_MON_TORNADUS_INCARNATE_3, FRONTIER_MON_TORNADUS_INCARNATE_1,
     FRONTIER_MON_THUNDURUS_INCARNATE_1, FRONTIER_MON_THUNDURUS_INCARNATE_2, FRONTIER_MON_THUNDURUS_INCARNATE_3, FRONTIER_MON_THUNDURUS_INCARNATE_1,
     FRONTIER_MON_LANDORUS_INCARNATE_1, FRONTIER_MON_LANDORUS_INCARNATE_2, FRONTIER_MON_LANDORUS_INCARNATE_3, FRONTIER_MON_LANDORUS_INCARNATE_1,
@@ -1620,15 +1620,13 @@ void FillFactoryBrainParty(void)
 static u16 GetFactoryMonId(u32 WinStreak, bool8 useBetterRange)
 {
     u16 monId;
-    const u16 normalRangeEnd = 2191;
-    const u16 betterRangeStart = 2192;
-    const u16 betterRangeEnd = 2368;
-    const u16 bestRangeStart = 2369;
-    const u16 bestRangeEnd = 2516;
+    const u16 betterRangeStart = FRONTIER_MON_PECHARUNT_1;
+    const u16 bestRangeStart = FRONTIER_MON_REGIDRAGO_1;
+    const u16 bestRangeEnd = FRONTIER_MON_CALYREX_ICE_4;
 
 // 定义范围计算函数式宏
-#define RAND_NORMAL() (Random() % (normalRangeEnd + 1))
-#define RAND_BETTER() (betterRangeStart + (Random() % (betterRangeEnd - betterRangeStart + 1)))
+#define RAND_NORMAL() (Random() % betterRangeStart)
+#define RAND_BETTER() (betterRangeStart + (Random() % (bestRangeStart - betterRangeStart)))
 #define RAND_BEST()  (bestRangeStart + (Random() % (bestRangeEnd - bestRangeStart + 1)))
 
     if (useBetterRange)

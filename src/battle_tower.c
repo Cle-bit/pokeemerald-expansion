@@ -1567,21 +1567,6 @@ static void FillTentTrainerParty(u8 monsCount)
 
 static const u16 sPriorityAbilities[] = 
 {
-    //其它
-    ABILITY_MAGIC_GUARD,
-    ABILITY_MAGIC_BOUNCE,
-    ABILITY_POWER_CONSTRUCT,
-    ABILITY_ICE_FACE,
-    ABILITY_SKILL_LINK,
-    ABILITY_CONTRARY,
-    ABILITY_TRIAGE,
-    ABILITY_PROTEAN,
-    ABILITY_LIBERO,
-    ABILITY_PUNK_ROCK,
-    ABILITY_SPEED_BOOST,
-    ABILITY_COMMANDER,
-    ABILITY_PRANKSTER,
-    ABILITY_NO_GUARD,
     //天气
     ABILITY_DRIZZLE,
     ABILITY_DROUGHT,
@@ -1596,6 +1581,21 @@ static const u16 sPriorityAbilities[] =
     ABILITY_GRASSY_SURGE,
     ABILITY_MISTY_SURGE,
     ABILITY_PSYCHIC_SURGE,
+    //其它
+    ABILITY_MAGIC_GUARD,
+    ABILITY_MAGIC_BOUNCE,
+    ABILITY_ICE_FACE,
+    ABILITY_SKILL_LINK,
+    ABILITY_CONTRARY,
+    ABILITY_TRIAGE,
+    ABILITY_PROTEAN,
+    ABILITY_LIBERO,
+    ABILITY_LIQUID_VOICE,
+    ABILITY_PUNK_ROCK,
+    ABILITY_SPEED_BOOST,
+    ABILITY_COMMANDER,
+    ABILITY_PRANKSTER,
+    ABILITY_NO_GUARD,
     //皮肤
     ABILITY_GALVANIZE,
     ABILITY_PIXILATE
@@ -1642,9 +1642,44 @@ static bool8 CheckItemAbilityCombo(u16 ability, u16 heldItem)
     return FALSE;
 }
 
+static bool8 CheckMoveAbilityCombo(u16 ability, const u16 *moves)
+{
+    for (u8 i = 0; i < MAX_MON_MOVES; ++i)
+    {
+        u16 move = moves[i];
+
+        // 检查反伤招式与对应特性
+        if ((ability == ABILITY_RECKLESS || ability == ABILITY_ROCK_HEAD) && 
+            IsBattleMoveRecoil(move))
+            return TRUE;
+
+        // 检查受Sheer Force影响的招式
+        if (ability == ABILITY_SHEER_FORCE && 
+            MoveIsAffectedBySheerForce(move))
+            return TRUE;
+
+        // 检查拳击类招式
+        if (ability == ABILITY_IRON_FIST && 
+            IsPunchingMove(move))
+            return TRUE;
+
+        // 检查咬类招式
+        if (ability == ABILITY_STRONG_JAW && 
+            IsBitingMove(move))
+            return TRUE;
+
+        // 检查切割类招式
+        if (ability == ABILITY_SHARPNESS && 
+            IsSlicingMove(move))
+            return TRUE;
+    }
+
+    return FALSE;  // 无匹配组合
+}
+
 static bool8 HasPriorityAbility(u16 ability, const u16 *priorityList, u32 listSize)
 {
-    for (u32 j = 0; j < listSize; j++)
+    for (u8 j = 0; j < listSize; j++)
     {
         if (ability == priorityList[j])
             return TRUE;
@@ -1654,7 +1689,7 @@ static bool8 HasPriorityAbility(u16 ability, const u16 *priorityList, u32 listSi
 
 // 检查戏法空间id
 static bool8 IsIdInTrickRoomAttack(u16 monid) {
-    for (u16 i = 0; i < TrickRoomAttackSize; ++i) {
+    for (u8 i = 0; i < TrickRoomAttackSize; ++i) {
         if (TrickRoomAttack[i] == monid) {
             return TRUE;
         }
@@ -1690,9 +1725,11 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
     SetMonData(dst, MON_DATA_FRIENDSHIP, &friendship);
     SetMonData(dst, MON_DATA_HELD_ITEM, &fmon->heldItem);
 
-    // try to set ability. Otherwise, random possible abilities
-    // 第一阶段：检查道具与特性组合
+    // Give the chosen Pokémon its specified ability.
     const struct SpeciesInfo *speciesInfo = &gSpeciesInfo[fmon->species];
+    const u16 *moves = fmon->moves;
+
+    // 第一阶段：检查道具组合
     for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
     {
         u16 currentAbility = speciesInfo->abilities[i];
@@ -1704,7 +1741,22 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
         }
     }
 
-    // 第二阶段：如果没有找到道具组合，检查优先特性列表
+    // 第二阶段：检查招式与特性组合
+    if (!abilityFound)
+    {
+        for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
+        {
+            u16 currentAbility = speciesInfo->abilities[i];
+            if (CheckMoveAbilityCombo(currentAbility, moves))
+            {
+                ability = i;
+                abilityFound = TRUE;
+                break;
+            }
+        }
+    }
+
+    // 第三阶段：检查优先特性列表
     if (!abilityFound)
     {
         for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
@@ -1719,21 +1771,22 @@ void CreateFacilityMon(const struct TrainerMon *fmon, u16 level, u8 fixedIV, u32
         }
     }
 
-    // 第三阶段：如果仍未找到，随机选择有效能力
+    // 第四阶段：随机选择有效能力
     if (!abilityFound)
     {
         u8 validAbilities[NUM_ABILITY_SLOTS];
-        u8 validCount = 0;
+        s8 validCount = 0;
         for (u8 i = 0; i < NUM_ABILITY_SLOTS; ++i)
         {
             if (speciesInfo->abilities[i] != ABILITY_NONE)
                 validAbilities[validCount++] = i;
         }
-        ability = validAbilities[Random() % validCount];
+        if (validCount > 0) // 确保至少有一个有效能力
+            ability = validAbilities[Random() % validCount];
     }
 
     SetMonData(dst, MON_DATA_ABILITY_NUM, &ability);
-    
+
     if (fmon->ev != NULL)
     {
         SetMonData(dst, MON_DATA_HP_EV, &(fmon->ev[0]));
