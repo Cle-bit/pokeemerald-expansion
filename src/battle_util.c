@@ -4050,7 +4050,7 @@ bool32 TryChangeBattleWeather(u32 battler, u32 battleWeatherId, bool32 viaAbilit
     {
         return FALSE;
     }
-    else if (B_ABILITY_WEATHER < GEN_6 && viaAbility)
+    else if (GetGenConfig(GEN_CONFIG_ABILITY_WEATHER) < GEN_6 && viaAbility)
     {
         gBattleWeather = sBattleWeatherInfo[battleWeatherId].flag;
         return TRUE;
@@ -4900,7 +4900,7 @@ u32 AbilityBattleEffects(u32 caseID, u32 battler, u32 ability, u32 special, u32 
                         {
                             move = gBattleMons[i].moves[j];
                             moveType = GetBattleMoveType(move);
-                            if (CalcTypeEffectivenessMultiplier(move, moveType, i, battler, ABILITY_ANTICIPATION, FALSE) >= UQ_4_12(2.0))
+                            if (CalcTypeEffectivenessMultiplier(move, moveType, i, battler, ABILITY_ANTICIPATION, FALSE) >= UQ_4_12(2.0) || GetMoveEffect(move) == EFFECT_OHKO)
                             {
                                 effect++;
                                 break;
@@ -8202,6 +8202,7 @@ u32 ItemBattleEffects(enum ItemCaseId caseID, u32 battler, bool32 moveTurn)
             break;
         case HOLD_EFFECT_LIFE_ORB:
             if (IsBattlerAlive(gBattlerAttacker)
+                && !IsBattleMoveStatus(gCurrentMove)
                 && (IsBattlerTurnDamaged(gBattlerTarget) || !(gBattleStruct->moveResultFlags[gBattlerTarget] & MOVE_RESULT_NO_EFFECT)) // Needs the second check in case of Substitute
                 && !(TestIfSheerForceAffected(gBattlerAttacker, gCurrentMove))
                 && GetBattlerAbility(gBattlerAttacker) != ABILITY_MAGIC_GUARD
@@ -9352,7 +9353,7 @@ static inline u32 CalcMoveBasePowerAfterModifiers(struct DamageCalculationData *
             modifier = uq4_12_multiply(modifier, UQ_4_12(0.5));
         break;
     case EFFECT_STOMPING_TANTRUM:
-        if (gBattleStruct->battlerState[battlerAtk].lastMoveFailed)
+        if (gBattleStruct->battlerState[battlerAtk].stompingTantrumTimer == 1)
             modifier = uq4_12_multiply(modifier, UQ_4_12(2.0));
         break;
     case EFFECT_MAGNITUDE:
@@ -12201,8 +12202,8 @@ void ClearDamageCalcResults(void)
 bool32 DoesDestinyBondFail(u32 battler)
 {
     if (B_DESTINY_BOND_FAIL >= GEN_7
-        && GetMoveEffect(gLastResultingMoves[battler]) == EFFECT_DESTINY_BOND
-        && !gBattleStruct->battlerState[battler].lastMoveFailed)
+        && GetMoveEffect(gLastLandedMoves[battler]) == EFFECT_DESTINY_BOND
+        && GetMoveEffect(gLastResultingMoves[battler]) == EFFECT_DESTINY_BOND)
         return TRUE;
     return FALSE;
 }
