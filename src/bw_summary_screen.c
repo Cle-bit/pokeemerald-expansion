@@ -2104,12 +2104,12 @@ static bool8 DecompressGraphics(void)
         sMonSummaryScreen->switchCounter++;
         break;
     case 18:
-        if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+        if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
             LoadCompressedSpriteSheet(&sSpriteSheet_StatGrades);
         sMonSummaryScreen->switchCounter++;
         break;
     case 19:
-        if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+        if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
             LoadSpritePalette(&sSpritePal_StatGrades);
         sMonSummaryScreen->switchCounter++;
         break;
@@ -2375,7 +2375,7 @@ static void ChangeSummaryState(s16 *data, u8 taskId)
         tSkillsState = SKILL_STATE_EVS;
         break;
     case SKILL_STATE_EVS:
-        if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+        if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
             tSkillsState = SKILL_STATE_IVS;
         else
             tSkillsState = SKILL_STATE_STATS;
@@ -2399,7 +2399,7 @@ static void DrawNextSkillsButtonPrompt(u8 mode)
             PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_EVS);
             break;
         case SKILL_STATE_EVS:
-            if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+            if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
             {
                 ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_EVS);
                 PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_IVS);
@@ -2417,7 +2417,7 @@ static void DrawNextSkillsButtonPrompt(u8 mode)
 static void Task_HandleInput(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
-    u8 defaultSkillsState = (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED) ? SKILL_STATE_IVS : SKILL_STATE_STATS;
+    u8 defaultSkillsState = (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED) ? SKILL_STATE_IVS : SKILL_STATE_STATS;
 
     if (MenuHelpers_ShouldWaitForLinkRecv() != TRUE && !gPaletteFade.active)
     {
@@ -2465,13 +2465,13 @@ static void Task_HandleInput(u8 taskId)
             }
             else
             {
-                if (BW_SUMMARY_IV_EV_DISPLAY != BW_IV_EV_HIDDEN)
+                if (VarGet(VAR_BW_IVEV_DISPLAY) != BW_IV_EV_HIDDEN)
                 {
                     // Cycle through IVs/EVs/stats on pressing A
                     ChangeSummaryState(data, taskId);
                     DrawNextSkillsButtonPrompt(tSkillsState);
                     PlaySE(SE_SELECT);
-                    if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+                    if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
                         ShowGradeIcons(tSkillsState);
                     else
                         BufferAndPrintStats_HandleState(tSkillsState);
@@ -2655,14 +2655,14 @@ static void Task_ChangeSummaryMon(u8 taskId)
         } 
         else if (sMonSummaryScreen->currPageIndex == PSS_PAGE_SKILLS)
         {
-            if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_PRECISE)
+            if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_PRECISE)
                 DrawNextSkillsButtonPrompt(SKILL_STATE_STATS);
-            else if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+            else if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
                 DrawNextSkillsButtonPrompt(SKILL_STATE_IVS);
         }
         break;
     case 12:
-        if (sMonSummaryScreen->currPageIndex == PSS_PAGE_SKILLS && BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+        if (sMonSummaryScreen->currPageIndex == PSS_PAGE_SKILLS && VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
             ShowGradeIcons(SKILL_STATE_IVS);
         break;
     case 13:
@@ -2828,7 +2828,7 @@ static void PssScrollEnd(u8 taskId)
     TryDrawHPBar();
     TryDrawExperienceProgressBar();
 
-    if (sMonSummaryScreen->currPageIndex == PSS_PAGE_SKILLS && BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+    if (sMonSummaryScreen->currPageIndex == PSS_PAGE_SKILLS && VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
         ShowGradeIcons(SKILL_STATE_IVS);
 
     if (sMonSummaryScreen->currPageIndex == PSS_PAGE_INFO)
@@ -3672,9 +3672,9 @@ static void PrintPageNamesAndStats(void)
     PrintAOrBButtonIcon(PSS_LABEL_WINDOW_PROMPT_SWITCH, FALSE, iconXPos);
     PrintTextOnWindow(PSS_LABEL_WINDOW_PROMPT_SWITCH, sText_Switch, stringXPos, 1, 0, 1);
 
-    if (BW_SUMMARY_IV_EV_DISPLAY != BW_IV_EV_HIDDEN)
+    if (VarGet(VAR_BW_IVEV_DISPLAY) != BW_IV_EV_HIDDEN)
     {
-        if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+        if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
         {
             stringXPos = GetStringRightAlignXOffset(FONT_NORMAL, sText_ViewIVs_Graded, skillsLabelWidth);
             iconXPos = stringXPos - 16;
@@ -3736,9 +3736,9 @@ static void PutPageWindowTilemaps(u8 page)
     case PSS_PAGE_SKILLS:
         PutWindowTilemap(PSS_LABEL_WINDOW_POKEMON_SKILLS_TITLE);
         PutWindowTilemap(PSS_LABEL_WINDOW_POKEMON_SKILLS_EXP);
-        if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_PRECISE)
+        if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_PRECISE)
             PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_IVS);
-        else if (BW_SUMMARY_IV_EV_DISPLAY == BW_IV_EV_GRADED)
+        else if (VarGet(VAR_BW_IVEV_DISPLAY) == BW_IV_EV_GRADED)
             PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_EVS);
         break;
     case PSS_PAGE_BATTLE_MOVES:
@@ -3783,7 +3783,7 @@ static void ClearPageWindowTilemaps(u8 page)
         break;
     case PSS_PAGE_SKILLS:
         ClearWindowTilemap(PSS_LABEL_WINDOW_POKEMON_SKILLS_EXP);
-        if (BW_SUMMARY_IV_EV_DISPLAY != BW_IV_EV_HIDDEN)
+        if (VarGet(VAR_BW_IVEV_DISPLAY) != BW_IV_EV_HIDDEN)
         {
             ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_STATS);
             ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_EVS);

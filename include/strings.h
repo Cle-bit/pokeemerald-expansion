@@ -2424,4 +2424,34 @@ extern const u8 gText_Rename[]; // change nickname from summary screen
 // Switch Caught Mon into Party
 extern const u8 gText_CannotSendMonToBoxHM[];
 
+//Option Menu
+extern const u8 gText_OptionMenuSave[];
+
+extern const u8 gText_ExpSharing[];
+extern const u8 gText_ExpSharingOff[];
+extern const u8 gText_ExpSharingOn[];
+
+extern const u8 gText_QuickBattleRun[];
+extern const u8 gText_QuickBattleRunOff[];
+extern const u8 gText_QuickBattleRunBA[];
+extern const u8 gText_QuickBattleRunR[];
+
+extern const u8 gText_Follower[];
+extern const u8 gText_FollowerOn[];
+extern const u8 gText_FollowerOff[];
+
+extern const u8 gText_RButtonMode[];
+extern const u8 gText_RButtonModeAutoRun[];
+extern const u8 gText_RButtonModeDexNav[];
+extern const u8 gText_RButtonModeMission[];
+
+extern const u8 gText_PokedexMode[];
+extern const u8 gText_PokeDexModeBlack[];
+extern const u8 gText_PokeDexModeWhite[];
+
+extern const u8 gText_IvEvDisplay[];
+extern const u8 gText_IvEvDisplayHidden[];
+extern const u8 gText_IvEvDisplayGraded[];
+extern const u8 gText_IvEvDisplayPrecise[];
+
 #endif // GUARD_STRINGS_H

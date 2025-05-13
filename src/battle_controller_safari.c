@@ -25,6 +25,7 @@
 #include "constants/songs.h"
 #include "constants/trainers.h"
 #include "constants/rgb.h"
+#include "event_data.h"
 
 static void SafariHandleDrawTrainerPic(u32 battler);
 static void SafariHandleSuccessBallThrowAnim(u32 battler);
@@ -181,12 +182,18 @@ static void HandleInputChooseAction(u32 battler)
             ActionSelectionCreateCursorAt(gActionSelectionCursor[battler], 0);
         }
     }
-    else if (B_QUICK_MOVE_CURSOR_TO_RUN && JOY_NEW(B_BUTTON))
+    else if (VarGet(VAR_QUICK_BATTLE_RUN) == 1 && JOY_NEW(B_BUTTON))
     {
         PlaySE(SE_SELECT);
         ActionSelectionDestroyCursorAt(gActionSelectionCursor[battler]);
         gActionSelectionCursor[battler] = 3;
         ActionSelectionCreateCursorAt(gActionSelectionCursor[battler], 0);
+    }
+    else if (VarGet(VAR_QUICK_BATTLE_RUN) == 2 && JOY_NEW(R_BUTTON))
+    {
+        PlaySE(SE_SELECT);
+        BtlController_EmitTwoReturnValues(battler, BUFFER_B, B_ACTION_RUN, 0);
+        SafariBufferExecCompleted(battler);
     }
 }
 

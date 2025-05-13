@@ -141,10 +141,10 @@
 #define VAR_ROUTE126_STATE                               0x4079 // Unused Var
 #define VAR_ROUTE127_STATE                               0x407A // Unused Var
 #define VAR_ROUTE128_STATE                               0x407B
-#define VAR_ROUTE129_STATE                               0x407C // Unused Var
-#define VAR_ROUTE130_STATE                               0x407D // Unused Var
-#define VAR_ROUTE131_STATE                               0x407E // Unused Var
 #define VAR_ROUTE132_STATE                               0x407F // Unused Var
+#define VAR_UNUSED_0x407C                                0x407C // Quick_Battle_Run
+#define VAR_UNUSED_0x407D                                0x407D // R_Button_Mode
+#define VAR_UNUSED_0x407E                                0x407E // Bw_IvEv_Display
 #define VAR_ROUTE133_STATE                               0x4080 // Unused Var
 #define VAR_ROUTE134_STATE                               0x4081 // Unused Var
 #define VAR_LITTLEROOT_HOUSES_STATE_MAY                  0x4082

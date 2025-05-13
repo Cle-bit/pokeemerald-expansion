@@ -989,21 +989,22 @@ const u8 gText_BattleStyle[] = _("BATTLE STYLE");
 const u8 gText_Sound[] = _("SOUND");
 const u8 gText_Frame[] = _("FRAME");
 const u8 gText_OptionMenuCancel[] = _("CANCEL");
+const u8 gText_OptionMenuSave[] = _("SAVE");
 const u8 gText_ButtonMode[] = _("BUTTON MODE");
-const u8 gText_TextSpeedSlow[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SLOW");
-const u8 gText_TextSpeedMid[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MID");
-const u8 gText_TextSpeedFast[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}FAST");
-const u8 gText_BattleSceneOn[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}ON");
-const u8 gText_BattleSceneOff[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}OFF");
-const u8 gText_BattleStyleShift[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SHIFT");
-const u8 gText_BattleStyleSet[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}SET");
-const u8 gText_SoundMono[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}MONO");
-const u8 gText_SoundStereo[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}STEREO");
-const u8 gText_FrameType[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}TYPE");
-const u8 gText_FrameTypeNumber[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}");
-const u8 gText_ButtonTypeNormal[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}NORMAL");
-const u8 gText_ButtonTypeLR[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}LR");
-const u8 gText_ButtonTypeLEqualsA[] = _("{COLOR GREEN}{SHADOW LIGHT_GREEN}L=A");
+const u8 gText_TextSpeedSlow[] = _("SLOW");
+const u8 gText_TextSpeedMid[] = _("MID");
+const u8 gText_TextSpeedFast[] = _("FAST");
+const u8 gText_BattleSceneOn[] = _("ON");
+const u8 gText_BattleSceneOff[] = _("OFF");
+const u8 gText_BattleStyleShift[] = _("SHIFT");
+const u8 gText_BattleStyleSet[] = _("SET");
+const u8 gText_SoundMono[] = _("MONO");
+const u8 gText_SoundStereo[] = _("STEREO");
+const u8 gText_FrameType[] = _("TYPE");
+const u8 gText_FrameTypeNumber[] = _("");
+const u8 gText_ButtonTypeNormal[] = _("NORMAL");
+const u8 gText_ButtonTypeLR[] = _("LR");
+const u8 gText_ButtonTypeLEqualsA[] = _("L=A");
 const u8 gText_NumPlayerLink[] = _("{STR_VAR_1}P LINK");
 const u8 gText_BronzeCard[] = _("BRONZE");
 const u8 gText_CopperCard[] = _("COPPER");
@@ -1298,3 +1299,31 @@ const u8 gText_PM[] = _("PM");
 const u8 gText_Relearn[] = _("{START_BUTTON} RELEARN"); // future note: don't decap this, because it mimics the summary screen BG graphics which will not get decapped
 const u8 gText_Rename[] = _("RENAME");
 const u8 gText_CannotSendMonToBoxHM[] = _("Cannot send that mon to the box,\nbecause it knows a HM move.{PAUSE_UNTIL_PRESS}");
+
+//Option-Menu
+const u8 gText_ExpSharing[] = _("EXP SHARE");
+const u8 gText_ExpSharingOn[] = _("ON");
+const u8 gText_ExpSharingOff[] = _("OFF");
+
+const u8 gText_QuickBattleRun[] = _("BATTLE RUN");
+const u8 gText_QuickBattleRunOff[] = _("OFF");
+const u8 gText_QuickBattleRunBA[] = _(".{B_BUTTON}{A_BUTTON}");
+const u8 gText_QuickBattleRunR[] = _(".{R_BUTTON}");
+
+const u8 gText_Follower[] = _("FOLLOWER");
+const u8 gText_FollowerOn[] = _("ON");
+const u8 gText_FollowerOff[] = _("OFF");
+
+const u8 gText_RButtonMode[] = _("R BUTTON MODE");
+const u8 gText_RButtonModeAutoRun[] = _("RUN");
+const u8 gText_RButtonModeDexNav[] = _("DEX");
+const u8 gText_RButtonModeMission[] = _("MIS");
+
+const u8 gText_PokedexMode[] = _("HGSS POKEDEX");
+const u8 gText_PokeDexModeWhite[] = _("WHITE");
+const u8 gText_PokeDexModeBlack[] = _("BLACK");
+
+const u8 gText_IvEvDisplay[] = _("IVEV");
+const u8 gText_IvEvDisplayHidden[] = _("OFF");
+const u8 gText_IvEvDisplayGraded[] = _("GRAD");
+const u8 gText_IvEvDisplayPrecise[] = _("PREC");

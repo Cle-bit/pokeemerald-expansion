@@ -46,6 +46,7 @@
 #include "menu.h"
 #include "pokemon_summary_screen.h"
 #include "type_icons.h"
+#include "event_data.h"
 
 static void PlayerBufferExecCompleted(u32 battler);
 static void PlayerHandleLoadMonSprite(u32 battler);
@@ -391,7 +392,7 @@ static void HandleInputChooseAction(u32 battler)
             BtlController_EmitTwoReturnValues(battler, BUFFER_B, B_ACTION_CANCEL_PARTNER, 0);
             PlayerBufferExecCompleted(battler);
         }
-        else if (B_QUICK_MOVE_CURSOR_TO_RUN)
+        else if (VarGet(VAR_QUICK_BATTLE_RUN) == 1)
         {
             if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER)) // If wild battle, pressing B moves cursor to "Run".
             {
@@ -399,6 +400,18 @@ static void HandleInputChooseAction(u32 battler)
                 ActionSelectionDestroyCursorAt(gActionSelectionCursor[battler]);
                 gActionSelectionCursor[battler] = 3;
                 ActionSelectionCreateCursorAt(gActionSelectionCursor[battler], 0);
+            }
+        }
+    }
+    else if (JOY_NEW(R_BUTTON) || gPlayerDpadHoldFrames > 59)
+    {
+        if (VarGet(VAR_QUICK_BATTLE_RUN) == 2)
+        {
+            if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER)) // If wild battle, pressing R "Runs" away.
+            {
+                PlaySE(SE_SELECT);
+                BtlController_EmitTwoReturnValues(battler, BUFFER_B, B_ACTION_RUN, 0);
+                PlayerBufferExecCompleted(battler);
             }
         }
     }
