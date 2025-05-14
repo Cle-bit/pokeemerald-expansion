@@ -776,8 +776,8 @@ void CB2_InitOptionPlusMenu(void)
         sOptions->sel_battle[MENUITEM_BATTLE_QUICKBATTLERUN] = VarGet(VAR_QUICK_BATTLE_RUN);
 
         //Overworld
-        sOptions->sel_battle[MENUITEM_OVERWORLD_FOLLOWER]    = FlagGet(B_FLAG_FOLLOWERS_DISABLED);
-        sOptions->sel_battle[MENUITEM_OVERWORLD_RBUTTONMODE] = VarGet(VAR_R_BUTTON_MODE);
+        sOptions->sel_overworld[MENUITEM_OVERWORLD_FOLLOWER]    = FlagGet(B_FLAG_FOLLOWERS_DISABLED);
+        sOptions->sel_overworld[MENUITEM_OVERWORLD_RBUTTONMODE] = VarGet(VAR_R_BUTTON_MODE);
 
         sOptions->submenu = MENU_GENERAL;
 
