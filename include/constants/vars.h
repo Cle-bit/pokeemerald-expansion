@@ -112,22 +112,22 @@
 #define VAR_LILYCOVE_CITY_STATE                          0x405C // Unused Var
 #define VAR_MOSSDEEP_CITY_STATE                          0x405D
 #define VAR_SOOTOPOLIS_CITY_STATE                        0x405E
-#define VAR_EVER_GRANDE_CITY_STATE                       0x405F // Unused Var
+#define VAR_EVER_GRANDE_CITY_STATE                       0x405F // Game Corner
 #define VAR_ROUTE101_STATE                               0x4060
-#define VAR_ROUTE102_STATE                               0x4061 // Unused Var
-#define VAR_ROUTE103_STATE                               0x4062 // Unused Var
+#define VAR_ROUTE102_STATE                               0x4061 // Game Corner
+#define VAR_ROUTE103_STATE                               0x4062 // Game Corner
 #define VAR_ROUTE104_STATE                               0x4063
-#define VAR_ROUTE105_STATE                               0x4064 // Unused Var
-#define VAR_ROUTE106_STATE                               0x4065 // Unused Var
-#define VAR_ROUTE107_STATE                               0x4066 // Unused Var
-#define VAR_ROUTE108_STATE                               0x4067 // Unused Var
-#define VAR_ROUTE109_STATE                               0x4068 // Unused Var
+#define VAR_ROUTE105_STATE                               0x4064 // Game Corner
+#define VAR_ROUTE106_STATE                               0x4065 // Game Corner
+#define VAR_ROUTE107_STATE                               0x4066 // Game Corner
+#define VAR_ROUTE108_STATE                               0x4067 // Game Corner
+#define VAR_ROUTE109_STATE                               0x4068 // Game Corner
 #define VAR_ROUTE110_STATE                               0x4069
-#define VAR_ROUTE111_STATE                               0x406A // Unused Var
-#define VAR_ROUTE112_STATE                               0x406B // Unused Var
-#define VAR_ROUTE113_STATE                               0x406C // Unused Var
-#define VAR_ROUTE114_STATE                               0x406D // Unused Var
-#define VAR_ROUTE115_STATE                               0x406E // Unused Var
+#define VAR_ROUTE111_STATE                               0x406A // Game Corner
+#define VAR_ROUTE112_STATE                               0x406B // Game Corner
+#define VAR_ROUTE113_STATE                               0x406C // Game Corner
+#define VAR_ROUTE114_STATE                               0x406D // Game Corner
+#define VAR_ROUTE115_STATE                               0x406E // Game Corner
 #define VAR_ROUTE116_STATE                               0x406F
 #define VAR_ROUTE117_STATE                               0x4070 // Unused Var
 #define VAR_ROUTE118_STATE                               0x4071

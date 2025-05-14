@@ -54,8 +54,8 @@
 #define FLAG_UNUSED_0x028    0x28 // DEXNAV
 #define FLAG_UNUSED_0x029    0x29 // DEXNAV
 #define FLAG_UNUSED_0x02A    0x2A // DEXNAV
-#define FLAG_UNUSED_0x02B    0x2B // Unused Flag
-#define FLAG_UNUSED_0x02C    0x2C // Unused Flag
+#define FLAG_UNUSED_0x02B    0x2B // Game Corner
+#define FLAG_UNUSED_0x02C    0x2C // Game Corner
 #define FLAG_UNUSED_0x02D    0x2D // Unused Flag
 #define FLAG_UNUSED_0x02E    0x2E // Unused Flag
 #define FLAG_UNUSED_0x02F    0x2F // Unused Flag
