@@ -379,7 +379,7 @@ static const u8 sText_Desc_QuickBattleRun_BA[]  = _("Pushing {B_BUTTON} and then
 static const u8 sText_Desc_QuickBattleRun_Off[] = _("{COLOR GREEN}Disables{COLOR DARK_GRAY} quick running from wild\nbattles.");
 
 //Overworld
-static const u8 sText_Desc_Follower_On[]          = _("{COLOR GREEN}Disables{COLOR DARK_GRAY} follower POKéMON in HGSS\nstyle.");
+static const u8 sText_Desc_Follower_On[]          = _("{COLOR GREEN}Enables{COLOR DARK_GRAY} follower POKéMON in HGSS\nstyle.");
 static const u8 sText_Desc_Follower_Off[]         = _("{COLOR GREEN}Disables{COLOR DARK_GRAY} the use of follower POKéMON.");
 static const u8 sText_Desc_RButtonMode_AutoRun[]  = _("Pushing {R_BUTTON} in overworld will activate\n{COLOR GREEN}Auto Run.");
 static const u8 sText_Desc_RButtonMode_DexNav[]   = _("Pushing {R_BUTTON} in overworld will navigate\nto {COLOR GREEN}Dexnav Menu.");
