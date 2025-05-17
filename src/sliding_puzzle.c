@@ -19,6 +19,7 @@
 #include "window.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "random.h"
 
 static void CB2_LoadSlidingPuzzle(void);
 static void CB2_SlidingPuzzle(void);
@@ -425,6 +426,8 @@ void DoSlidingPuzzle(void)
     gMain.savedCallback = CB2_ReturnToFieldContinueScriptPlayMapMusic;
 }
 
+#define VAR_PUZZLE_ID VAR_UNUSED_0x40A8
+
 static void CB2_LoadSlidingPuzzle(void)
 {
     switch (gMain.state)
@@ -464,7 +467,7 @@ static void CB2_LoadSlidingPuzzle(void)
     case 3:
         sSlidingPuzzle = AllocZeroed(sizeof(*sSlidingPuzzle));
         sSlidingPuzzle->heldTile = __;
-        sSlidingPuzzle->puzzleId = gSpecialVar_0x8004;
+        sSlidingPuzzle->puzzleId = VarGet(VAR_PUZZLE_ID);
         sSlidingPuzzle->solved = gSpecialVar_0x8005;
         break;
     case 4:
@@ -712,40 +715,131 @@ static void CreateCursorSprite(void)
     sSlidingPuzzle->cursorSpriteId = spriteId;
 }
 
+#define VAR_PUZZLE_DIFFICULTY VAR_UNUSED_0x40A1
+
 static void CreateTileSprites(void)
 {
-    u8 row, col, puzzleId, tile;
-    for (row = 0; row < NUM_SLIDING_PUZZLE_ROWS; ++row)
+    u8 row, col;
+    u8 tempLayout[NUM_SLIDING_PUZZLE_ROWS][NUM_SLIDING_PUZZLE_COLS];
+    u8 tempOrientations[NUM_SLIDING_PUZZLE_ROWS][NUM_SLIDING_PUZZLE_COLS];
+    const u8 puzzleId = sSlidingPuzzle->puzzleId; // 始终使用当前谜题ID
+
+    if (sSlidingPuzzle->solved)
     {
-        for (col = 0; col < NUM_SLIDING_PUZZLE_COLS; ++col)
+        // 解答模式使用独立的方向数组
+        memcpy(tempLayout, sPuzzleLayouts[SLIDING_PUZZLE_SOLVED], sizeof(tempLayout));
+        memcpy(tempOrientations, sTileOrientations_SOLVED[puzzleId], sizeof(tempOrientations)); // 谜题对应的解答方向
+    }
+    else
+    {
+        // 根据难度选择方向数组
+        u8 difficulty = VarGet(VAR_PUZZLE_DIFFICULTY);
+
+        if (difficulty >= PUZZLE_DIFFICULTY_COUNT)
+            difficulty = PUZZLE_DIFFICULTY_EASY; // 默认值
+
+        // 复制原始布局和方向（根据难度）
+        memcpy(tempLayout, sPuzzleLayouts[puzzleId], sizeof(tempLayout));
+        memcpy(tempOrientations, (*sTileOrientationsTable[difficulty])[puzzleId], sizeof(tempOrientations));
+
+        u8 movableTiles[16], validPositions[24][2];
+        u8 tileCount = 0, posCount = 0;
+
+        // 收集可移动块和位置（逻辑不变）
+        for (row = 0; row < NUM_SLIDING_PUZZLE_ROWS; row++)
         {
-            if (sSlidingPuzzle->solved)
-                puzzleId = SLIDING_PUZZLE_SOLVED;
-            else
-                puzzleId = sSlidingPuzzle->puzzleId;
-
-            tile = sPuzzleLayouts[puzzleId][row][col];
-            if (tile != __)
+            for (col = 0; col < NUM_SLIDING_PUZZLE_COLS; col++)
             {
-                u8 spriteId = CreateSprite(&sSpriteTemplate_Tiles,
-                                           sColumnXCoords[col],
-                                           sRowYCoords[row],
-                                           2);
-                struct Sprite *sprite = &gSprites[spriteId];
-                sprite->sAnimating = FALSE;
-                sprite->sRow = row;
-                sprite->sCol = col;
-                sprite->sTileId = tile;
-                sprite->sOrientation = sTileOrientations[puzzleId][row][col];
-                if (sprite->sOrientation >= ORIENTATION_MAX)
-                    sprite->sOrientation = ORIENTATION_0;
-                StartSpriteAnim(sprite, tile - 1);
-                StartSpriteAffineAnim(sprite, sprite->sOrientation);
-                tile = spriteId;
+                if (tempOrientations[row][col] != IMMOVABLE_TILE)
+                {
+                    validPositions[posCount][0] = row;
+                    validPositions[posCount][1] = col;
+                    if (tempLayout[row][col] != __)
+                        movableTiles[tileCount++] = tempLayout[row][col];
+                    posCount++;
+                }
             }
-
-            sSlidingPuzzle->tiles[row][col] = tile;
         }
+
+        // Fisher-Yates打乱合法位置
+        for (u8 i = 0; i < posCount - 1; i++)
+        {
+            u8 j = i + (Random() % (posCount - i));
+
+            // 交换行
+            u8 tempRow;
+            SWAP(validPositions[i][0], validPositions[j][0], tempRow);
+
+            // 交换列
+            u8 tempCol;
+            SWAP(validPositions[i][1], validPositions[j][1], tempCol);
+        }
+
+        // 清空可移动位置并重新分配
+        for (u8 i = 0; i < posCount; i++)
+        {
+            u8 r = validPositions[i][0], c = validPositions[i][1];
+            tempLayout[r][c] = __;
+            if (i < tileCount)
+            {
+                tempLayout[r][c] = movableTiles[i];
+                tempOrientations[r][c] = Random() % ORIENTATION_MAX;
+            }
+        }
+    }
+
+    for (row = 0; row < NUM_SLIDING_PUZZLE_ROWS; row++)
+    {
+        for (col = 0; col < NUM_SLIDING_PUZZLE_COLS; col++)
+        {
+            const u8 currentTile = tempLayout[row][col];
+            if (currentTile == __)
+                continue;
+
+            // 获取方向并确保有效性
+            const u8 currentOrient = tempOrientations[row][col] % ORIENTATION_MAX;
+
+            const u8 spriteId = CreateSprite(
+                &sSpriteTemplate_Tiles,
+                sColumnXCoords[col],
+                sRowYCoords[row],
+                2);
+            struct Sprite *sprite = &gSprites[spriteId];
+
+            // 初始化
+            sprite->sAnimating = FALSE;
+            sprite->sRow = row;
+            sprite->sCol = col;
+            sprite->sTileId = currentTile;
+            sprite->sOrientation = currentOrient; // 使用已处理的合法方向
+
+            // 动画和仿射变换
+            StartSpriteAnim(sprite, currentTile - 1);
+            StartSpriteAffineAnim(sprite, sprite->sOrientation);
+
+            sSlidingPuzzle->tiles[row][col] = spriteId;
+        }
+    }
+}
+
+static bool32 CursorIsOnImmovableTile(void)
+{
+    struct Sprite *cursor = &gSprites[sSlidingPuzzle->cursorSpriteId];
+    const u8 puzzleId = sSlidingPuzzle->puzzleId;
+
+    if (sSlidingPuzzle->solved)
+    {
+        // 解答模式使用独立的方向数组
+        return sTileOrientations_SOLVED[puzzleId][cursor->sRow][cursor->sCol] == IMMOVABLE_TILE;
+    }
+    else
+    {
+        // 根据难度选择方向数组
+        u8 difficulty = VarGet(VAR_PUZZLE_DIFFICULTY);
+
+        if (difficulty >= PUZZLE_DIFFICULTY_COUNT)
+            difficulty = PUZZLE_DIFFICULTY_EASY; // 默认值
+        return (*sTileOrientationsTable[difficulty])[puzzleId][cursor->sRow][cursor->sCol] == IMMOVABLE_TILE;
     }
 }
 
@@ -790,16 +884,6 @@ static bool32 CursorIsOnTile(void)
     struct Sprite *cursor = &gSprites[sSlidingPuzzle->cursorSpriteId];
 
     if (sSlidingPuzzle->tiles[cursor->sRow][cursor->sCol] != __)
-        return TRUE;
-
-    return FALSE;
-}
-
-static bool32 CursorIsOnImmovableTile(void)
-{
-    struct Sprite *cursor = &gSprites[sSlidingPuzzle->cursorSpriteId];
-
-    if (sTileOrientations[sSlidingPuzzle->puzzleId][cursor->sRow][cursor->sCol] == IMMOVABLE_TILE)
         return TRUE;
 
     return FALSE;

@@ -144,7 +144,6 @@ Debug_EventScript_Script_1::
 
 Debug_EventScript_Script_2::
 	fadescreen FADE_TO_BLACK
-	setvar VAR_0x8004, 2
 	setvar VAR_0x8005, FALSE // or TRUE if you want to display the solved puzzle
 	special DoSlidingPuzzle
 	waitstate
