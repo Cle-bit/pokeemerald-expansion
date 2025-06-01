@@ -137,6 +137,14 @@ Debug_EventScript_Text_DefensiveIVs:
 	.string "HP IVs: {STR_VAR_1}, DEF IVs: {STR_VAR_2}, SPDEF IVs: {STR_VAR_3}$"
 
 Debug_EventScript_Script_1::
+	goto_if_eq VAR_UNUSED_0x4052, 3, Debug_EventScript_PALETTE_FULL
+	addvar VAR_UNUSED_0x4052, 1
+	release
+	end
+
+
+Debug_EventScript_PALETTE_FULL::
+	setvar VAR_UNUSED_0x4052, 0
 	release
 	end
 
