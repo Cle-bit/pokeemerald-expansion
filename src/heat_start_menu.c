@@ -1253,7 +1253,7 @@ static u8 SaveConfirmSaveCallback(void) {
   //RemoveStartMenuWindow();
   ShowSaveInfoWindow();
 
-  if (InBattlePyramid()) {
+  if (InBattlePyramid_()) {
     ShowSaveMessage(gText_BattlePyramidConfirmRest, SaveYesNoCallback);
   } else {
     ShowSaveMessage(gText_ConfirmSave, SaveYesNoCallback);
