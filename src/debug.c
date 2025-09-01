@@ -372,6 +372,7 @@ extern const u8 Debug_EventScript_EWRAMCounters[];
 extern const u8 Debug_Follower_NPC_Event_Script[];
 extern const u8 Debug_Follower_NPC_Not_Enabled[];
 extern const u8 Debug_EventScript_Steven_Multi[];
+extern const u8 Debug_EventScript_Mining_Minigame[];
 extern const u8 Debug_EventScript_PrintTimeOfDay[];
 extern const u8 Debug_EventScript_TellTheTime[];
 extern const u8 Debug_EventScript_FakeRTCNotEnabled[];
@@ -543,6 +544,7 @@ static const struct DebugMenuOption sDebugMenu_Actions_Utilities[] =
     { COMPOUND_STRING("EWRAM Counters…"),   DebugAction_ExecuteScript, Debug_EventScript_EWRAMCounters },
     { COMPOUND_STRING("Follower NPC…"),     DebugAction_OpenSubMenu, sDebugMenu_Actions_FollowerNPCMenu },
     { COMPOUND_STRING("Steven Multi"),      DebugAction_ExecuteScript, Debug_EventScript_Steven_Multi },
+    { COMPOUND_STRING("Mining Game"),       DebugAction_ExecuteScript, Debug_EventScript_Mining_Minigame },    
     { NULL }
 };
 
@@ -1544,6 +1546,11 @@ static void DebugAction_Util_CheatStart(u8 taskId)
 
     InitTimeBasedEvents();
     Debug_DestroyMenu_Full_Script(taskId, Debug_CheatStart);
+}
+
+static void DebugAction_Util_Mining_Minigame(u8 taskId)
+{
+    Debug_DestroyMenu_Full_Script(taskId, Debug_EventScript_Mining_Minigame);
 }
 
 void BufferExpansionVersion(struct ScriptContext *ctx)
