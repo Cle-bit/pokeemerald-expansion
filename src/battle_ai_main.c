@@ -3570,8 +3570,43 @@ static s32 AI_DoubleBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
                 }
                 break;
             case EFFECT_SWAGGER:
+            {
+                bool32 preferMistySwagger = FALSE;
+                bool32 partnerIsPhysicalAttacker = (HasMoveWithCategory(battlerAtkPartner, DAMAGE_CATEGORY_PHYSICAL)
+                                                 && gBattleMons[battlerAtkPartner].attack > gBattleMons[battlerAtkPartner].spAttack);
+                bool32 partnerAlreadyChoseSwagger = (aiData->partnerMove != MOVE_NONE && partnerEffect == EFFECT_SWAGGER);
+
+                if (partnerAlreadyChoseSwagger)
+                {
+                    RETURN_SCORE_MINUS(10);
+                }
+
+                if ((gAiThinkingStruct->aiFlags[battlerAtk] & AI_FLAG_DOUBLE_BATTLE)
+                 && IsBattlerTerrainAffected(battlerAtkPartner, STATUS_FIELD_MISTY_TERRAIN)
+                 && partnerIsPhysicalAttacker
+                 && gBattleMons[battlerAtkPartner].statStages[STAT_ATK] < MAX_STAT_STAGE)
+                {
+                    u8 attackStage = gBattleMons[battlerAtkPartner].statStages[STAT_ATK];
+                    u32 swaggerUses = 0;
+
+                    if (attackStage > DEFAULT_STAT_STAGE)
+                        swaggerUses = (attackStage - DEFAULT_STAT_STAGE) / 2;
+
+                    if (swaggerUses == 0)
+                        preferMistySwagger = TRUE;
+                    else if (swaggerUses == 1)
+                        preferMistySwagger = AI_RandLessThan(85); // ~33% chance
+                    else
+                        preferMistySwagger = AI_RandLessThan(25); // ~10% chance
+                }
+
+                if (preferMistySwagger)
+                {
+                    RETURN_SCORE_PLUS(GOOD_EFFECT);
+                }
+
                 if (gBattleMons[battlerAtkPartner].statStages[STAT_ATK] < MAX_STAT_STAGE
-                 && HasMoveWithCategory(battlerAtkPartner, DAMAGE_CATEGORY_PHYSICAL)
+                 && partnerIsPhysicalAttacker
                  && (!AI_CanBeConfused(battlerAtk, battlerAtkPartner, move, atkPartnerAbility)
                   || atkPartnerHoldEffect == HOLD_EFFECT_CURE_CONFUSION
                   || atkPartnerHoldEffect == HOLD_EFFECT_CURE_STATUS))
@@ -3579,6 +3614,7 @@ static s32 AI_DoubleBattle(u32 battlerAtk, u32 battlerDef, u32 move, s32 score)
                     RETURN_SCORE_PLUS(WEAK_EFFECT);
                 }
                 break;
+            }
             case EFFECT_FLATTER:
                 if (gBattleMons[battlerAtkPartner].statStages[STAT_SPATK] < MAX_STAT_STAGE
                  && HasMoveWithCategory(battlerAtkPartner, DAMAGE_CATEGORY_SPECIAL)
