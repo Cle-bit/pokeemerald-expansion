@@ -181,6 +181,7 @@ enum DebugBattleEnvironment
 #define DEBUG_NUMBER_DIGITS_VARIABLE_VALUE 5
 #define DEBUG_NUMBER_DIGITS_ITEMS 4
 #define DEBUG_NUMBER_DIGITS_ITEM_QUANTITY 3
+#define DEBUG_GIVE_ITEM_DEFAULT_QTY 10
 
 #define DEBUG_NUMBER_ICON_X 210
 #define DEBUG_NUMBER_ICON_Y 50
@@ -3183,14 +3184,45 @@ static void DebugAction_PCBag_Fill_PCBoxes_Slow(u8 taskId)
     Debug_DestroyMenu_Full_Script(taskId, Debug_BoxFilledMessage);
 }
 
+static bool32 DebugIsRegularItemInFillRange(u16 itemId)
+{
+    if (itemId >= ITEM_VENUSAURITE && itemId <= ITEM_GRISEOUS_ORB)
+        return TRUE;
+
+    if (itemId >= ITEM_SILK_SCARF && itemId <= ITEM_UTILITY_UMBRELLA)
+        return TRUE;
+
+    if (itemId >= ITEM_ABILITY_SHIELD && itemId <= ITEM_TINY_BAMBOO_SHOOT)
+        return TRUE;
+
+    return FALSE;
+}
+
+static bool32 DebugItemIsMegaOrZCrystal(u16 itemId)
+{
+    if (itemId >= ITEM_VENUSAURITE && itemId <= ITEM_DIANCITE)
+        return TRUE;
+
+    if (itemId >= ITEM_NORMALIUM_Z && itemId <= ITEM_ULTRANECROZIUM_Z)
+        return TRUE;
+
+    return FALSE;
+}
+
+static u16 DebugGetDefaultItemQuantity(u16 itemId)
+{
+    return DebugItemIsMegaOrZCrystal(itemId) ? 1 : DEBUG_GIVE_ITEM_DEFAULT_QTY;
+}
+
 static void DebugAction_PCBag_Fill_PCItemStorage(u8 taskId)
 {
     u16 itemId;
 
     for (itemId = 1; itemId < ITEMS_COUNT; itemId++)
     {
-        if (!CheckPCHasItem(itemId, MAX_PC_ITEM_CAPACITY))
-            AddPCItem(itemId, MAX_PC_ITEM_CAPACITY);
+        u16 qty = DebugGetDefaultItemQuantity(itemId);
+        if (!CheckPCHasItem(itemId, qty))
+            AddPCItem(itemId, qty);
     }
 }
 
@@ -3200,8 +3232,13 @@ static void DebugAction_PCBag_Fill_PocketItems(u8 taskId)
 
     for (itemId = 1; itemId < ITEMS_COUNT; itemId++)
     {
-        if (GetItemPocket(itemId) == POCKET_ITEMS && CheckBagHasSpace(itemId, MAX_BAG_ITEM_CAPACITY))
-            AddBagItem(itemId, MAX_BAG_ITEM_CAPACITY);
+        if (GetItemPocket(itemId) == POCKET_ITEMS
+         && DebugIsRegularItemInFillRange(itemId))
+        {
+            u16 qty = DebugGetDefaultItemQuantity(itemId);
+            if (CheckBagHasSpace(itemId, qty))
+                AddBagItem(itemId, qty);
+        }
     }
 }
 
@@ -3230,10 +3267,10 @@ static void DebugAction_PCBag_Fill_PocketBerries(u8 taskId)
 {
     u16 itemId;
 
-    for (itemId = FIRST_BERRY_INDEX; itemId < LAST_BERRY_INDEX; itemId++)
+    for (itemId = ITEM_CHERI_BERRY; itemId <= ITEM_MARANGA_BERRY; itemId++)
     {
-        if (CheckBagHasSpace(itemId, MAX_BAG_ITEM_CAPACITY))
-            AddBagItem(itemId, MAX_BAG_ITEM_CAPACITY);
+        if (CheckBagHasSpace(itemId, DEBUG_GIVE_ITEM_DEFAULT_QTY))
+            AddBagItem(itemId, DEBUG_GIVE_ITEM_DEFAULT_QTY);
     }
 }
 
