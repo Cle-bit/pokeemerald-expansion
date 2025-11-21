@@ -9,6 +9,7 @@
 //AND OTHER RHH POKEEMERALD-EXPANSION CONTRIBUTORS
 #include "global.h"
 #include "battle.h"
+#include "battle_ai_util.h"
 #include "battle_setup.h"
 #include "berry.h"
 #include "clock.h"
@@ -68,6 +69,7 @@
 #include "constants/expansion.h"
 #include "constants/flags.h"
 #include "constants/items.h"
+#include "constants/pokemon.h"
 #include "constants/map_groups.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
@@ -189,6 +191,8 @@ enum DebugBattleEnvironment
 #define DEBUG_MAX_MENU_ITEMS 20
 #define DEBUG_MAX_SUB_MENU_LEVELS 4
 
+#define DEBUG_FINAL_EVO_MIN_TOTAL_BST 464
+
 // *******************************
 struct DebugMenuOption;
 
@@ -277,6 +281,12 @@ static void DebugAction_PCBag_Fill_PocketBerries(u8 taskId);
 static void DebugAction_PCBag_Fill_PocketKeyItems(u8 taskId);
 static void DebugAction_PCBag_ClearBag(u8 taskId);
 static void DebugAction_PCBag_ClearBoxes(u8 taskId);
+static bool32 IsBattleOnlyForm(u16 species);
+static bool32 IsCosmeticDuplicateForm(u16 species);
+static bool32 FinalEvoPassesBaseStatFilter(u16 species);
+static bool32 IsFinalEvolutionSpecies(u16 species);
+static bool32 IsAllowedFinalEvolutionSpecies(u16 species);
+static u16 BuildFinalEvolutionSpeciesList(u16 *speciesList, u16 maxCount, u16 *totalCount);
 
 static void DebugAction_Party_HealParty(u8 taskId);
 static void DebugAction_Party_ClearParty(u8 taskId);
@@ -401,6 +411,8 @@ static const u8 sDebugText_Colored_False[] = _("{COLOR RED}FALSE");
 static const u8 sDebugText_Dashes[] =        _("---");
 static const u8 sDebugText_Empty[] =         _("");
 static const u8 sDebugText_Continue[] =      _("Continue…");
+static const u8 sDebugText_FinalEvoFillMessage[] = _("Final evolutions: {STR_VAR_1}\nSlots filled: {STR_VAR_2}");
+static const u8 sDebugText_FinalEvoFillNone[] = _("No final evolutions found.");
 // Util Menu
 static const u8 sDebugText_Util_WarpToMap_SelectMapGroup[] = _("Group: {STR_VAR_1}{CLEAR_TO 90}\n{CLEAR_TO 90}\n\n{STR_VAR_3}{CLEAR_TO 90}");
 static const u8 sDebugText_Util_WarpToMap_SelectMap[] =      _("Map: {STR_VAR_1}{CLEAR_TO 90}\nMapSec:{CLEAR_TO 90}\n{STR_VAR_2}{CLEAR_TO 90}\n{STR_VAR_3}{CLEAR_TO 90}");
@@ -3120,37 +3132,225 @@ static void DebugAction_TimeMenu_ChangeWeekdays(u8 taskId)
 // *******************************
 // Actions PCBag
 
+static bool32 IsSpeciesInRange(u16 species, u16 first, u16 last)
+{
+    return species >= first && species <= last;
+}
+
+static bool32 IsBattleOnlyForm(u16 species)
+{
+    switch (SanitizeSpeciesId(species))
+    {
+    // Weather/ability triggered alternates
+    case SPECIES_CASTFORM_SUNNY:
+    case SPECIES_CASTFORM_RAINY:
+    case SPECIES_CASTFORM_SNOWY:
+    case SPECIES_CHERRIM_SUNSHINE:
+    // Zen Mode
+    case SPECIES_DARMANITAN_ZEN:
+    case SPECIES_DARMANITAN_GALAR_ZEN:
+    // Temporary ability / move forms
+    case SPECIES_WISHIWASHI_SCHOOL:
+    case SPECIES_MIMIKYU_BUSTED:
+    case SPECIES_AEGISLASH_BLADE:
+    case SPECIES_GRENINJA_ASH:
+    case SPECIES_MELOETTA_PIROUETTE:
+    case SPECIES_ZYGARDE_COMPLETE:
+    case SPECIES_CRAMORANT_GULPING:
+    case SPECIES_CRAMORANT_GORGING:
+    case SPECIES_EISCUE_NOICE:
+    case SPECIES_MORPEKO_HANGRY:
+    case SPECIES_PALAFIN_HERO:
+    // Battle-only legendary states
+    case SPECIES_XERNEAS_ACTIVE:
+    case SPECIES_ZACIAN_CROWNED:
+    case SPECIES_ZAMAZENTA_CROWNED:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+static bool32 IsCosmeticDuplicateForm(u16 species)
+{
+    static const struct
+    {
+        u16 first;
+        u16 last;
+    } sCosmeticRanges[] = {
+        {SPECIES_FLABEBE_YELLOW, SPECIES_FLABEBE_WHITE},
+        {SPECIES_FLOETTE_YELLOW, SPECIES_FLOETTE_WHITE},
+        {SPECIES_FLORGES_YELLOW, SPECIES_FLORGES_WHITE},
+        {SPECIES_FURFROU_HEART, SPECIES_FURFROU_PHARAOH},
+        {SPECIES_SHELLOS_EAST, SPECIES_GASTRODON_EAST},
+        {SPECIES_DEERLING_SUMMER, SPECIES_DEERLING_WINTER},
+        {SPECIES_SAWSBUCK_SUMMER, SPECIES_SAWSBUCK_WINTER},
+        {SPECIES_VIVILLON_POLAR, SPECIES_VIVILLON_POKEBALL},
+        {SPECIES_MINIOR_METEOR_ORANGE, SPECIES_MINIOR_METEOR_VIOLET},
+        {SPECIES_MINIOR_CORE_ORANGE, SPECIES_MINIOR_CORE_VIOLET},
+        {SPECIES_ALCREMIE_STRAWBERRY_RUBY_CREAM, SPECIES_ALCREMIE_STRAWBERRY_RAINBOW_SWIRL},
+        {SPECIES_ALCREMIE_BERRY_VANILLA_CREAM, SPECIES_ALCREMIE_BERRY_RAINBOW_SWIRL},
+        {SPECIES_ALCREMIE_LOVE_VANILLA_CREAM, SPECIES_ALCREMIE_LOVE_RAINBOW_SWIRL},
+        {SPECIES_ALCREMIE_STAR_VANILLA_CREAM, SPECIES_ALCREMIE_STAR_RAINBOW_SWIRL},
+        {SPECIES_ALCREMIE_CLOVER_VANILLA_CREAM, SPECIES_ALCREMIE_CLOVER_RAINBOW_SWIRL},
+        {SPECIES_ALCREMIE_FLOWER_VANILLA_CREAM, SPECIES_ALCREMIE_FLOWER_RAINBOW_SWIRL},
+        {SPECIES_ALCREMIE_RIBBON_VANILLA_CREAM, SPECIES_ALCREMIE_RIBBON_RAINBOW_SWIRL},
+        {SPECIES_UNOWN_B, SPECIES_UNOWN_QUESTION},
+        {SPECIES_BASCULIN_BLUE_STRIPED, SPECIES_BASCULIN_WHITE_STRIPED},
+        {SPECIES_SQUAWKABILLY_BLUE, SPECIES_SQUAWKABILLY_WHITE},
+        {SPECIES_GOURGEIST_SMALL, SPECIES_GOURGEIST_SUPER},
+    };
+
+    species = SanitizeSpeciesId(species);
+
+    for (u32 i = 0; i < ARRAY_COUNT(sCosmeticRanges); i++)
+    {
+        if (IsSpeciesInRange(species, sCosmeticRanges[i].first, sCosmeticRanges[i].last))
+            return TRUE;
+    }
+
+    switch (species)
+    {
+    case SPECIES_MAUSHOLD_FOUR:
+    case SPECIES_DUDUNSPARCE_THREE_SEGMENT:
+    case SPECIES_SINISTEA_ANTIQUE:
+    case SPECIES_POLTEAGEIST_ANTIQUE:
+    case SPECIES_MAGEARNA_ORIGINAL:
+    case SPECIES_KELDEO_RESOLUTE:
+    case SPECIES_SINISTCHA_UNREMARKABLE:
+    case SPECIES_UNOWN:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+static bool32 FinalEvoPassesBaseStatFilter(u16 species)
+{
+    species = SanitizeSpeciesId(species);
+    if (DEBUG_FINAL_EVO_MIN_TOTAL_BST <= 0)
+        return TRUE;
+
+    return GetTotalBaseStat(species) >= DEBUG_FINAL_EVO_MIN_TOTAL_BST;
+}
+
+static bool32 IsFinalEvolutionSpecies(u16 species)
+{
+    const struct Evolution *evolutions = GetSpeciesEvolutions(species);
+
+    if (evolutions != NULL)
+    {
+        for (u32 i = 0; evolutions[i].method != EVOLUTIONS_END; i++)
+        {
+            if (evolutions[i].method != EVO_NONE
+             && SanitizeSpeciesId(evolutions[i].targetSpecies) != SPECIES_NONE)
+                return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+static bool32 IsAllowedFinalEvolutionSpecies(u16 species)
+{
+    species = SanitizeSpeciesId(species);
+    if (!IsSpeciesEnabled(species) || !IsFinalEvolutionSpecies(species))
+        return FALSE;
+
+    const struct SpeciesInfo *info = &gSpeciesInfo[species];
+    if (info->isLegendary
+     || info->isMythical
+     || info->isTotem
+     || info->isMegaEvolution
+     || info->isPrimalReversion
+     || info->isUltraBurst
+     || info->isGigantamax
+     || info->isTeraForm)
+        return FALSE;
+
+    if (IsBattleOnlyForm(species) || IsCosmeticDuplicateForm(species))
+        return FALSE;
+
+    if (!FinalEvoPassesBaseStatFilter(species))
+        return FALSE;
+
+    return TRUE;
+}
+
+static u16 BuildFinalEvolutionSpeciesList(u16 *speciesList, u16 maxCount, u16 *totalCount)
+{
+    u16 finalCount = 0;
+    u16 total = 0;
+
+    if (speciesList == NULL || maxCount == 0)
+    {
+        if (totalCount != NULL)
+            *totalCount = 0;
+        return 0;
+    }
+
+    for (u16 species = SPECIES_BULBASAUR; species < NUM_SPECIES; species++)
+    {
+        if (IsAllowedFinalEvolutionSpecies(species))
+        {
+            total++;
+            if (finalCount < maxCount)
+                speciesList[finalCount++] = species;
+        }
+    }
+
+    if (totalCount != NULL)
+        *totalCount = total;
+
+    return finalCount;
+}
+
 static void DebugAction_PCBag_Fill_PCBoxes_Fast(u8 taskId) //Credit: Sierraffinity
 {
     int boxId, boxPosition;
-    u32 personality;
     struct BoxPokemon boxMon;
-    u16 species = SPECIES_BULBASAUR;
+    u16 finalSpeciesList[TOTAL_BOXES_COUNT * IN_BOX_COUNT];
+    u16 totalFinalSpecies = 0;
+    u16 finalSpeciesCount = BuildFinalEvolutionSpeciesList(finalSpeciesList, ARRAY_COUNT(finalSpeciesList), &totalFinalSpecies);
+    u16 speciesIndex = 0;
+    u16 filledSlots = 0;
     u8 speciesName[POKEMON_NAME_LENGTH + 1];
 
-    personality = Random32();
-
-    CreateBoxMon(&boxMon, species, 100, USE_RANDOM_IVS, FALSE, personality, OT_ID_PLAYER_ID, 0);
+    if (totalFinalSpecies == 0 || finalSpeciesCount == 0)
+    {
+        StringExpandPlaceholders(gStringVar4, sDebugText_FinalEvoFillNone);
+        Debug_DestroyMenu_Full_Script(taskId, Debug_ShowFieldMessageStringVar4);
+        return;
+    }
 
     for (boxId = 0; boxId < TOTAL_BOXES_COUNT; boxId++)
     {
-        for (boxPosition = 0; boxPosition < IN_BOX_COUNT; boxPosition++, species++)
+        for (boxPosition = 0; boxPosition < IN_BOX_COUNT; boxPosition++)
         {
             if (!GetBoxMonData(&gPokemonStoragePtr->boxes[boxId][boxPosition], MON_DATA_SANITY_HAS_SPECIES))
             {
+                if (speciesIndex >= finalSpeciesCount)
+                    break;
+
+                u16 species = finalSpeciesList[speciesIndex++];
+                CreateBoxMon(&boxMon, species, 100, MAX_PER_STAT_IVS, FALSE, Random32(), OT_ID_PLAYER_ID, 0);
                 StringCopy(speciesName, GetSpeciesName(species));
                 SetBoxMonData(&boxMon, MON_DATA_NICKNAME, &speciesName);
                 SetBoxMonData(&boxMon, MON_DATA_SPECIES, &species);
                 GiveBoxMonInitialMoveset(&boxMon);
                 gPokemonStoragePtr->boxes[boxId][boxPosition] = boxMon;
+                filledSlots++;
             }
         }
+        if (speciesIndex >= finalSpeciesCount)
+            break;
     }
 
     // Set flag for user convenience
     FlagSet(FLAG_SYS_POKEMON_GET);
-    Debug_DestroyMenu_Full(taskId);
-    ScriptContext_Enable();
+    ConvertIntToDecimalStringN(gStringVar1, totalFinalSpecies, STR_CONV_MODE_LEFT_ALIGN, 4);
+    ConvertIntToDecimalStringN(gStringVar2, filledSlots, STR_CONV_MODE_LEFT_ALIGN, 4);
+    StringExpandPlaceholders(gStringVar4, sDebugText_FinalEvoFillMessage);
+    Debug_DestroyMenu_Full_Script(taskId, Debug_ShowFieldMessageStringVar4);
 }
 
 static void DebugAction_PCBag_Fill_PCBoxes_Slow(u8 taskId)
