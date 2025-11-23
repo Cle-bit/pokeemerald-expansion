@@ -15,6 +15,7 @@
 #include "dewford_trend.h"
 #include "berry.h"
 #include "rtc.h"
+#include "clock.h"
 #include "easy_chat.h"
 #include "event_data.h"
 #include "money.h"
@@ -44,18 +45,24 @@
 #include "berry_powder.h"
 #include "mystery_gift.h"
 #include "union_room_chat.h"
+#include "debug.h"
 #include "constants/map_groups.h"
 #include "constants/items.h"
+#include "constants/battle_frontier.h"
+#include "constants/coins.h"
+#include "constants/flags.h"
 #include "difficulty.h"
 #include "follower_npc.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
+extern const u8 Debug_CheatStart[];
 
 static void ClearFrontierRecord(void);
-static void WarpToTruck(void);
+static void WarpToBattleFrontier(void);
 static void ResetMiniGamesRecords(void);
 static void ResetItemFlags(void);
 static void ResetDexNav(void);
+static void ApplyNewGameCheats(void);
 
 EWRAM_DATA bool8 gDifferentSaveFile = FALSE;
 EWRAM_DATA bool8 gEnableContestDebugging = FALSE;
@@ -129,9 +136,9 @@ static void ClearFrontierRecord(void)
     gSaveBlock2Ptr->frontier.opponentNames[1][0] = EOS;
 }
 
-static void WarpToTruck(void)
+static void WarpToBattleFrontier(void)
 {
-    SetWarpDestination(MAP_GROUP(MAP_INSIDE_OF_TRUCK), MAP_NUM(MAP_INSIDE_OF_TRUCK), WARP_ID_NONE, -1, -1);
+    SetWarpDestination(MAP_GROUP(MAP_BATTLE_FRONTIER_OUTSIDE_EAST), MAP_NUM(MAP_BATTLE_FRONTIER_OUTSIDE_EAST), WARP_ID_NONE, 16, 15);
     WarpIntoMap();
 }
 
@@ -197,7 +204,7 @@ void NewGameInitData(void)
     InitDewfordTrend();
     ResetFanClub();
     ResetLotteryCorner();
-    WarpToTruck();
+    WarpToBattleFrontier();
     RunScriptImmediately(EventScript_ResetAllMapFlags);
     ResetMiniGamesRecords();
     InitUnionRoomChatRegisteredTexts();
@@ -212,6 +219,7 @@ void NewGameInitData(void)
     SetCurrentDifficultyLevel(DIFFICULTY_NORMAL);
     ResetItemFlags();
     ResetDexNav();
+    ApplyNewGameCheats();
     ClearFollowerNPCData();
 }
 
@@ -236,4 +244,22 @@ static void ResetDexNav(void)
     memset(gSaveBlock3Ptr->dexNavSearchLevels, 0, sizeof(gSaveBlock3Ptr->dexNavSearchLevels));
 #endif
     gSaveBlock3Ptr->dexNavChain = 0;
+}
+
+static void ApplyNewGameCheats(void)
+{
+    RunScriptImmediately(Debug_CheatStart);
+    FlagSet(FLAG_SYS_FRONTIER_PASS);
+    SetMoney(&gSaveBlock1Ptr->money, MAX_MONEY);
+    SetCoins(MAX_COINS);
+    if (!CheckBagHasItem(ITEM_COIN_CASE, 1))
+        AddBagItem(ITEM_COIN_CASE, 1);
+    gSaveBlock2Ptr->frontier.battlePoints = MAX_BATTLE_FRONTIER_POINTS;
+    FlagSet(FLAG_SYS_CLOCK_SET);
+    RtcInitLocalTimeOffset(10, 0);
+    InitTimeBasedEvents();
+    Debug_FillPocketItems();
+    Debug_FillPocketBerries();
+    Debug_FillPocketKeyItems();
+    Debug_FillPCBoxesFast();
 }

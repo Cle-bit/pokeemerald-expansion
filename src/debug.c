@@ -271,6 +271,7 @@ static void DebugAction_TimeMenu_ChangeWeekdays(u8 taskId);
 static void DebugAction_CreateFollowerNPC(u8 taskId);
 static void DebugAction_DestroyFollowerNPC(u8 taskId);
 
+static u16 FillPCBoxesWithFinalEvos(u16 *totalFinalSpeciesOut, u16 *finalSpeciesCountOut);
 static void DebugAction_PCBag_Fill_PCBoxes_Fast(u8 taskId);
 static void DebugAction_PCBag_Fill_PCBoxes_Slow(u8 taskId);
 static void DebugAction_PCBag_Fill_PCItemStorage(u8 taskId);
@@ -3304,7 +3305,7 @@ static u16 BuildFinalEvolutionSpeciesList(u16 *speciesList, u16 maxCount, u16 *t
     return finalCount;
 }
 
-static void DebugAction_PCBag_Fill_PCBoxes_Fast(u8 taskId) //Credit: Sierraffinity
+static u16 FillPCBoxesWithFinalEvos(u16 *totalFinalSpeciesOut, u16 *finalSpeciesCountOut)
 {
     int boxId, boxPosition;
     struct BoxPokemon boxMon;
@@ -3315,12 +3316,13 @@ static void DebugAction_PCBag_Fill_PCBoxes_Fast(u8 taskId) //Credit: Sierraffini
     u16 filledSlots = 0;
     u8 speciesName[POKEMON_NAME_LENGTH + 1];
 
+    if (totalFinalSpeciesOut != NULL)
+        *totalFinalSpeciesOut = totalFinalSpecies;
+    if (finalSpeciesCountOut != NULL)
+        *finalSpeciesCountOut = finalSpeciesCount;
+
     if (totalFinalSpecies == 0 || finalSpeciesCount == 0)
-    {
-        StringExpandPlaceholders(gStringVar4, sDebugText_FinalEvoFillNone);
-        Debug_DestroyMenu_Full_Script(taskId, Debug_ShowFieldMessageStringVar4);
-        return;
-    }
+        return 0;
 
     for (boxId = 0; boxId < TOTAL_BOXES_COUNT; boxId++)
     {
@@ -3347,10 +3349,31 @@ static void DebugAction_PCBag_Fill_PCBoxes_Fast(u8 taskId) //Credit: Sierraffini
 
     // Set flag for user convenience
     FlagSet(FLAG_SYS_POKEMON_GET);
+    return filledSlots;
+}
+
+static void DebugAction_PCBag_Fill_PCBoxes_Fast(u8 taskId) //Credit: Sierraffinity
+{
+    u16 totalFinalSpecies = 0;
+    u16 finalSpeciesCount = 0;
+    u16 filledSlots = FillPCBoxesWithFinalEvos(&totalFinalSpecies, &finalSpeciesCount);
+
+    if (totalFinalSpecies == 0 || finalSpeciesCount == 0)
+    {
+        StringExpandPlaceholders(gStringVar4, sDebugText_FinalEvoFillNone);
+        Debug_DestroyMenu_Full_Script(taskId, Debug_ShowFieldMessageStringVar4);
+        return;
+    }
+
     ConvertIntToDecimalStringN(gStringVar1, totalFinalSpecies, STR_CONV_MODE_LEFT_ALIGN, 4);
     ConvertIntToDecimalStringN(gStringVar2, filledSlots, STR_CONV_MODE_LEFT_ALIGN, 4);
     StringExpandPlaceholders(gStringVar4, sDebugText_FinalEvoFillMessage);
     Debug_DestroyMenu_Full_Script(taskId, Debug_ShowFieldMessageStringVar4);
+}
+
+void Debug_FillPCBoxesFast(void)
+{
+    FillPCBoxesWithFinalEvos(NULL, NULL);
 }
 
 static void DebugAction_PCBag_Fill_PCBoxes_Slow(u8 taskId)
@@ -3483,6 +3506,21 @@ static void DebugAction_PCBag_Fill_PocketKeyItems(u8 taskId)
         if (GetItemPocket(itemId) == POCKET_KEY_ITEMS && CheckBagHasSpace(itemId, 1))
             AddBagItem(itemId, 1);
     }
+}
+
+void Debug_FillPocketItems(void)
+{
+    DebugAction_PCBag_Fill_PocketItems(0);
+}
+
+void Debug_FillPocketBerries(void)
+{
+    DebugAction_PCBag_Fill_PocketBerries(0);
+}
+
+void Debug_FillPocketKeyItems(void)
+{
+    DebugAction_PCBag_Fill_PocketKeyItems(0);
 }
 
 static void DebugAction_PCBag_ClearBag(u8 taskId)
