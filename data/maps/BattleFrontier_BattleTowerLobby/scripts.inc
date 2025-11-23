@@ -166,7 +166,18 @@ BattleFrontier_BattleTowerLobby_EventScript_SetBravoTrainerOn::
 	setvar VAR_BRAVO_TRAINER_BATTLE_TOWER_ON, TRUE
 	return
 
+BattleFrontier_BattleTowerLobby_EventScript_ModeUnavailable::
+	lock
+	faceplayer
+	msgbox BattleFrontier_BattleTowerLobby_Text_ModeUnavailable, MSGBOX_DEFAULT
+	release
+	end
+
 BattleFrontier_BattleTowerLobby_EventScript_SinglesAttendant::
+	goto BattleFrontier_BattleTowerLobby_EventScript_ModeUnavailable
+
+@ Original singles flow kept for future re-enable
+BattleFrontier_BattleTowerLobby_EventScript_SinglesAttendant_Original::
 	lock
 	faceplayer
 	setvar VAR_FRONTIER_FACILITY, FRONTIER_FACILITY_TOWER
@@ -251,6 +262,7 @@ BattleFrontier_BattleTowerLobby_EventScript_TryEnterDoublesChallenge::
 	message BattleFrontier_BattleTowerLobby_Text_WhichLevelMode
 	waitmessage
 	multichoice 17, 6, MULTI_LEVEL_MODE, FALSE
+	call BattleFrontier_BattleTowerLobby_EventScript_MapLevelChoice
 	switch VAR_RESULT
 	case FRONTIER_LVL_TENT, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
 	case MULTI_B_PRESSED, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
@@ -295,6 +307,10 @@ BattleFrontier_BattleTowerLobby_EventScript_ExplainDoublesChallenge::
 	end
 
 BattleFrontier_BattleTowerLobby_EventScript_MultisAttendant::
+	goto BattleFrontier_BattleTowerLobby_EventScript_ModeUnavailable
+
+@ Original multis flow kept for future re-enable
+BattleFrontier_BattleTowerLobby_EventScript_MultisAttendant_Original::
 	lock
 	faceplayer
 	setvar VAR_FRONTIER_FACILITY, FRONTIER_FACILITY_TOWER
@@ -316,6 +332,7 @@ BattleFrontier_BattleTowerLobby_EventScript_TryEnterMultisChallenge::
 	message BattleFrontier_BattleTowerLobby_Text_WhichLevelMode
 	waitmessage
 	multichoice 17, 6, MULTI_LEVEL_MODE, FALSE
+	call BattleFrontier_BattleTowerLobby_EventScript_MapLevelChoice
 	switch VAR_RESULT
 	case FRONTIER_LVL_TENT, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
 	case MULTI_B_PRESSED, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
@@ -360,6 +377,10 @@ BattleFrontier_BattleTowerLobby_EventScript_ExplainMultisChallenge::
 	end
 
 BattleFrontier_BattleTowerLobby_EventScript_LinkMultisAttendant::
+	goto BattleFrontier_BattleTowerLobby_EventScript_ModeUnavailable
+
+@ Original link multis flow kept for future re-enable
+BattleFrontier_BattleTowerLobby_EventScript_LinkMultisAttendant_Original::
 	lock
 	faceplayer
 	setvar VAR_FRONTIER_FACILITY, FRONTIER_FACILITY_TOWER
@@ -380,6 +401,7 @@ BattleFrontier_BattleTowerLobby_EventScript_TryEnterLinkMultisChallenge::
 	message BattleFrontier_BattleTowerLobby_Text_WhichLevelMode
 	waitmessage
 	multichoice 17, 6, MULTI_LEVEL_MODE, FALSE
+	call BattleFrontier_BattleTowerLobby_EventScript_MapLevelChoice
 	switch VAR_RESULT
 	case FRONTIER_LVL_TENT, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
 	case MULTI_B_PRESSED, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
@@ -839,9 +861,22 @@ BattleFrontier_BattleTowerLobby_EventScript_CableLinkSuccessful::
 	end
 
 BattleFrontier_BattleTowerLobby_EventScript_ExplainLinkMultisChallenge::
-	msgbox BattleFrontier_BattleTowerLobby_Text_ExplainLinkMultisChallenge, MSGBOX_DEFAULT
-	goto BattleFrontier_BattleTowerLobby_EventScript_AskEnterLinkMultisChallenge
+	msgbox BattleFrontier_BattleTowerLobby_Text_ModeUnavailable, MSGBOX_DEFAULT
+	return
 	end
+
+BattleFrontier_BattleTowerLobby_EventScript_MapLevelChoice::
+	goto_if_eq VAR_RESULT, 0, BattleFrontier_BattleTowerLobby_EventScript_MapOpenLevel
+	goto_if_eq VAR_RESULT, 1, BattleFrontier_BattleTowerLobby_EventScript_MapLv50
+	return
+
+BattleFrontier_BattleTowerLobby_EventScript_MapOpenLevel::
+	setvar VAR_RESULT, FRONTIER_LVL_OPEN
+	return
+
+BattleFrontier_BattleTowerLobby_EventScript_MapLv50::
+	setvar VAR_RESULT, FRONTIER_LVL_50
+	return
 
 BattleFrontier_BattleTowerLobby_EventScript_TryWirelessLink::
 	setvar VAR_0x8004, LINK_GROUP_BATTLE_TOWER
@@ -1067,7 +1102,7 @@ BattleFrontier_BattleTowerLobby_Text_LookForwardToAnotherChallenge:
 
 BattleFrontier_BattleTowerLobby_Text_WhichLevelMode:
 	.string "The BATTLE ROOM offers two levels\n"
-	.string "of challenge, Level 50 and Open Level.\l"
+	.string "of challenge, Open Level and Level 50.\l"
 	.string "Which is your choice?$"
 
 @ Unused
@@ -1130,8 +1165,8 @@ BattleFrontier_BattleTowerLobby_Text_NotEnoughValidMonsLvOpenSingles:
 
 BattleFrontier_BattleTowerLobby_Text_NotEnoughValidMonsLv50Doubles:
 	.string "Excuse me!\p"
-	.string "You don't have four eligible POKéMON.\p"
-	.string "You must have four different POKéMON\n"
+	.string "You don't have six eligible POKéMON.\p"
+	.string "You must have six different POKéMON\n"
 	.string "of Level 50 or less to enter.\p"
 	.string "They also must be holding different\n"
 	.string "kinds of items.\p"
@@ -1139,12 +1174,15 @@ BattleFrontier_BattleTowerLobby_Text_NotEnoughValidMonsLv50Doubles:
 
 BattleFrontier_BattleTowerLobby_Text_NotEnoughValidMonsLvOpenDoubles:
 	.string "Excuse me!\p"
-	.string "You don't have four eligible POKéMON.\p"
-	.string "You must have four different POKéMON\n"
+	.string "You don't have six eligible POKéMON.\p"
+	.string "You must have six different POKéMON\n"
 	.string "to enter.\p"
 	.string "They also must be holding different\n"
 	.string "kinds of items.\p"
 	.string "EGGS{STR_VAR_1}.$"
+
+BattleFrontier_BattleTowerLobby_Text_ModeUnavailable:
+	.string "This mode is temporarily unavailable.$"
 
 BattleFrontier_BattleTowerLobby_Text_NotEnoughValidMonsLv50Multis:
 	.string "Excuse me!\p"
@@ -1208,7 +1246,7 @@ BattleFrontier_BattleTowerLobby_Text_TakeDoublesChallenge:
 BattleFrontier_BattleTowerLobby_Text_ExplainDoublesChallenge:
 	.string "The BATTLE TOWER's DOUBLE BATTLE\n"
 	.string "ROOMS are facilities for conducting\l"
-	.string "DOUBLE BATTLES with four POKéMON.\p"
+	.string "DOUBLE BATTLES with six POKéMON.\p"
 	.string "There are many DOUBLE BATTLE ROOMS\n"
 	.string "in the BATTLE TOWER for team battles.\p"
 	.string "In each of the DOUBLE BATTLE ROOMS,\n"
@@ -1221,7 +1259,7 @@ BattleFrontier_BattleTowerLobby_Text_ExplainDoublesChallenge:
 	.string "you will be disqualified.$"
 
 BattleFrontier_BattleTowerLobby_Text_PleaseSelectFourMons:
-	.string "Now please select the four POKéMON\n"
+	.string "Now please select the six POKéMON\n"
 	.string "that are to be entered.$"
 
 BattleFrontier_BattleTowerLobby_Text_WelcomeMultiBattle:
@@ -1379,7 +1417,7 @@ BattleFrontier_BattleTowerLobby_Text_ExplainMonRules:
 	.string "a certain number of POKéMON.\p"
 	.string "The SINGLE BATTLE mode requires\n"
 	.string "three POKéMON.\p"
-	.string "The DOUBLE BATTLE mode requires four,\n"
+	.string "The DOUBLE BATTLE mode requires six,\n"
 	.string "and the MULTI modes both require two.$"
 
 BattleFrontier_BattleTowerLobby_Text_ExplainSalonRules:
