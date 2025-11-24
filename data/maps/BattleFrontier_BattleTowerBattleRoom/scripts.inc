@@ -52,7 +52,7 @@ BattleFrontier_BattleTowerBattleRoom_EventScript_DefeatedOpponent::
 	call BattleFrontier_EventScript_IncrementWinStreak
 	tower_setbattlewon
 	switch VAR_RESULT
-	case 7, BattleFrontier_BattleTowerBattleRoom_EventScript_WarpToLobbyWon
+	case 5, BattleFrontier_BattleTowerBattleRoom_EventScript_WarpToLobbyWon
 	applymovement LOCALID_TOWER_BATTLE_OPPONENT, BattleFrontier_BattleTowerBattleRoom_Movement_OpponentExit
 	waitmovement 0
 	removeobject LOCALID_TOWER_BATTLE_OPPONENT
@@ -151,8 +151,6 @@ BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyForOpponent::
 	case 2, BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor3rdOpponent
 	case 3, BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor4thOpponent
 	case 4, BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor5thOpponent
-	case 5, BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor6thOpponent
-	case 6, BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor7thOpponent
 
 BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor2ndOpponent::
 	message BattleFrontier_BattleTowerBattleRoom_Text_ReadyFor2ndOpponent
@@ -171,16 +169,6 @@ BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor4thOpponent::
 
 BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor5thOpponent::
 	message BattleFrontier_BattleTowerBattleRoom_Text_ReadyFor5thOpponent
-	waitmessage
-	return
-
-BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor6thOpponent::
-	message BattleFrontier_BattleTowerBattleRoom_Text_ReadyFor6thOpponent
-	waitmessage
-	return
-
-BattleFrontier_BattleTowerBattleRoom_EventScript_ReadyFor7thOpponent::
-	message BattleFrontier_BattleTowerBattleRoom_Text_ReadyFor7thOpponent
 	waitmessage
 	return
 
@@ -458,14 +446,6 @@ BattleFrontier_BattleTowerBattleRoom_Text_ReadyFor5thOpponent:
 	.string "You will be facing opponent no. 5.\n"
 	.string "Are you ready?$"
 
-BattleFrontier_BattleTowerBattleRoom_Text_ReadyFor6thOpponent:
-	.string "You will be facing opponent no. 6.\n"
-	.string "Are you ready?$"
-
-BattleFrontier_BattleTowerBattleRoom_Text_ReadyFor7thOpponent:
-	.string "You will be facing opponent no. 7.\n"
-	.string "Are you ready?$"
-
 BattleFrontier_BattleTowerBattleRoom_Text_RecordYourBattle:
 	.string "Record your battle on your\n"
 	.string "FRONTIER PASS?$"
@@ -560,4 +540,3 @@ BattleFrontier_BattleTowerBattleRoom_Text_WishICouldBattleYouAgain:
 	.string "I have never had a POKéMON battle\n"
 	.string "so enjoyable before…\p"
 	.string "I wish I could battle with you again…$"
-

@@ -116,7 +116,7 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
             COMPOUND_STRING("I'm terribly sorry…")       //Gold
         },
         .battledBit = {1 << 0, 1 << 1},
-        .streakAppearances = {35, 70, 35, 1},
+        .streakAppearances = {5, 10, 5, 1},
     },
     [FRONTIER_FACILITY_DOME] =
     {
@@ -1928,7 +1928,7 @@ static void GiveBattlePoints(void)
     switch (facility)
     {
     case FRONTIER_FACILITY_TOWER:
-        challengeNum = gSaveBlock2Ptr->frontier.towerWinStreaks[battleMode][lvlMode] / FRONTIER_STAGES_PER_CHALLENGE;
+        challengeNum = gSaveBlock2Ptr->frontier.towerWinStreaks[battleMode][lvlMode] / TOWER_STAGES_PER_CHALLENGE;
         break;
     case FRONTIER_FACILITY_DOME:
         challengeNum = gSaveBlock2Ptr->frontier.domeWinStreaks[battleMode][lvlMode];

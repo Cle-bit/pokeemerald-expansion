@@ -4359,7 +4359,7 @@ static void DoTVShowBravoTrainerBattleTower(void)
     case BRAVOTOWER_STATE_INTRO:
         TVShowConvertInternationalString(gStringVar1, show->bravoTrainerTower.playerName, show->bravoTrainerTower.playerLanguage);
         StringCopy(gStringVar2, GetSpeciesName(show->bravoTrainerTower.species));
-        if (show->bravoTrainerTower.numFights >= FRONTIER_STAGES_PER_CHALLENGE)
+        if (show->bravoTrainerTower.numFights >= TOWER_STAGES_PER_CHALLENGE)
             sTVShowState = BRAVOTOWER_STATE_NEW_RECORD;
         else
             sTVShowState = BRAVOTOWER_STATE_LOST;

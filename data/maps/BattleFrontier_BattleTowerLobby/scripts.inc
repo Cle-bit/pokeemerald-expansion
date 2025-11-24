@@ -62,7 +62,7 @@ BattleFrontier_BattleTowerLobby_EventScript_WonChallenge::
 	faceplayer
 	frontier_isbrain
 	goto_if_eq VAR_RESULT, TRUE, BattleFrontier_BattleTowerLobby_EventScript_DefeatedMaiden
-	message BattleFrontier_BattleTowerLobby_Text_CongratsBeatenSeven
+	message BattleFrontier_BattleTowerLobby_Text_CongratsBeatenfive
 	waitmessage
 	goto BattleFrontier_BattleTowerLobby_EventScript_GiveRibbons
 
@@ -520,7 +520,7 @@ BattleFrontier_BattleTowerLobby_EventScript_Woman::
 	end
 
 BattleFrontier_BattleTowerLobby_EventScript_Boy::
-	msgbox BattleFrontier_BattleTowerLobby_Text_CanLeaveUntilLossOrSevenWins, MSGBOX_NPC
+	msgbox BattleFrontier_BattleTowerLobby_Text_CanLeaveUntilLossOrfiveWins, MSGBOX_NPC
 	end
 
 BattleFrontier_BattleTowerLobby_EventScript_ShowSinglesResults::
@@ -979,14 +979,14 @@ BattleFrontier_BattleTowerLobby_Text_DidntSaveBeforeQuitting:
 	.string "Because of that, your challenge so far\n"
 	.string "has been disqualified. Sorry!$"
 
-BattleFrontier_BattleTowerLobby_Text_CongratsBeatenSeven:
+BattleFrontier_BattleTowerLobby_Text_CongratsBeatenfive:
 	.string "Congratulations!\n"
-	.string "You've beaten all seven TRAINERS!\p"
+	.string "You've beaten all five TRAINERS!\p"
 	.string "$"
 
 @ Unused
 BattleFrontier_BattleTowerLobby_Text_EarnedFabulousPrize:
-	.string "For beating seven TRAINERS in a row,\n"
+	.string "For beating five TRAINERS in a row,\n"
 	.string "you have earned this fabulous prize!\p"
 	.string "$"
 
@@ -1019,14 +1019,14 @@ BattleFrontier_BattleTowerLobby_Text_ProgressWillBeSaved:
 BattleFrontier_BattleTowerLobby_Text_AboutToFace50thTrainer:
 	.string "You're finally about to face the\n"
 	.string "50th TRAINER.\p"
-	.string "From here on, every time you beat seven\n"
+	.string "From here on, every time you beat five\n"
 	.string "TRAINERS in a row, your POKéMON will\l"
 	.string "receive a commemorative RIBBON.\p"
 	.string "Good luck!$"
 
 BattleFrontier_BattleTowerLobby_Text_HereAreSomeRibbons:
 	.string "Here are some RIBBONS for beating\n"
-	.string "seven tough TRAINERS in a row.\p"
+	.string "five tough TRAINERS in a row.\p"
 	.string "{PLAYER} received some RIBBONS!$"
 
 BattleFrontier_BattleTowerLobby_Text_PutRibbonOnMons:
@@ -1071,10 +1071,10 @@ BattleFrontier_BattleTowerLobby_Text_WinsInRowRecorded:
 	.string "I'd better not get beaten in\n"
 	.string "an embarrassing way!$"
 
-BattleFrontier_BattleTowerLobby_Text_CanLeaveUntilLossOrSevenWins:
+BattleFrontier_BattleTowerLobby_Text_CanLeaveUntilLossOrfiveWins:
 	.string "Once you've entered the BATTLE TOWER,\n"
 	.string "you can't leave until you either lose\l"
-	.string "or you beat seven TRAINERS in a row.\p"
+	.string "or you beat five TRAINERS in a row.\p"
 	.string "You'd best be certain that you're up\n"
 	.string "to the challenge.$"
 
@@ -1220,8 +1220,8 @@ BattleFrontier_BattleTowerLobby_Text_ExplainSinglesChallenge:
 	.string "There are many SINGLE BATTLE ROOMS\n"
 	.string "in the BATTLE TOWER for team battles.\p"
 	.string "In each of the SINGLE BATTLE ROOMS,\n"
-	.string "seven TRAINERS await your challenge.\p"
-	.string "If you manage to defeat all seven,\n"
+	.string "five TRAINERS await your challenge.\p"
+	.string "If you manage to defeat all five,\n"
 	.string "you will earn Battle Points.\p"
 	.string "If you want to interrupt your\n"
 	.string "challenge, please save the game.\p"
@@ -1250,8 +1250,8 @@ BattleFrontier_BattleTowerLobby_Text_ExplainDoublesChallenge:
 	.string "There are many DOUBLE BATTLE ROOMS\n"
 	.string "in the BATTLE TOWER for team battles.\p"
 	.string "In each of the DOUBLE BATTLE ROOMS,\n"
-	.string "seven TRAINERS await your challenge.\p"
-	.string "If you manage to defeat all seven,\n"
+	.string "five TRAINERS await your challenge.\p"
+	.string "If you manage to defeat all five,\n"
 	.string "you will earn Battle Points.\p"
 	.string "If you want to interrupt your\n"
 	.string "challenge, please save the game.\p"
@@ -1287,9 +1287,9 @@ BattleFrontier_BattleTowerLobby_Text_ExplainMultisChallenge:
 	.string "as your partner in MULTI BATTLES.\p"
 	.string "Once you have partnered up, you will\n"
 	.string "be shown to a MULTI BATTLE ROOM.\p"
-	.string "In the MULTI BATTLE ROOM, seven\n"
+	.string "In the MULTI BATTLE ROOM, five\n"
 	.string "tag teams await your challenge.\p"
-	.string "If you manage to defeat all seven\n"
+	.string "If you manage to defeat all five\n"
 	.string "teams, you will earn Battle Points.\p"
 	.string "If you want to interrupt your\n"
 	.string "challenge, please save the game.\p"
@@ -1322,14 +1322,14 @@ BattleFrontier_BattleTowerLobby_Text_ExplainLinkMultisChallenge:
 	.string "enter two different kinds of POKéMON.\p"
 	.string "There are many MULTI BATTLE ROOMS\n"
 	.string "in the BATTLE TOWER for team battles.\p"
-	.string "In a MULTI BATTLE ROOM, seven\n"
+	.string "In a MULTI BATTLE ROOM, five\n"
 	.string "tag teams await you and your friend\l"
 	.string "to make a tag-team challenge.\p"
-	.string "If you manage to defeat all seven\n"
+	.string "If you manage to defeat all five\n"
 	.string "teams, you will earn Battle Points.\p"
 	.string "Please beware that unlike other ROOMS,\n"
 	.string "you may not interrupt your challenge.\p"
-	.string "Once you start, you must battle seven\n"
+	.string "Once you start, you must battle five\n"
 	.string "MULTI BATTLES in a row nonstop.$"
 
 BattleFrontier_BattleTowerLobby_Text_PleaseSelectTwoMons2:
@@ -1386,7 +1386,7 @@ BattleFrontier_BattleTowerLobby_Text_SaveGameBeforeShowingIn:
 BattleFrontier_BattleTowerLobby_Text_CongratsDefeatedMaiden:
 	.string "Congratulations!\n"
 	.string "You have defeated the SALON MAIDEN\l"
-	.string "and swept seven TRAINERS!$"
+	.string "and swept four TRAINERS!$"
 
 BattleFrontier_BattleTowerLobby_Text_AwardYouTheseBattlePoints:
 	.string "In recognition of your infinite talent,\n"
@@ -1428,7 +1428,7 @@ BattleFrontier_BattleTowerLobby_Text_ExplainSalonRules:
 	.string "examining other TRAINERS'\l"
 	.string "POKéMON and their moves.\p"
 	.string "You may choose a new tag partner\n"
-	.string "after winning seven straight matches.$"
+	.string "after winning five straight matches.$"
 
 BattleFrontier_BattleTowerLobby_Text_ExplainMultiLinkRules:
 	.string "The LINK MULTI BATTLE Mode is for two\n"
