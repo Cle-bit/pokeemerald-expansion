@@ -22,6 +22,7 @@
 #include "script.h"
 #include "constants/abilities.h"
 #include "constants/battle_ai.h"
+#include "constants/battle_frontier.h"
 #include "constants/battle_move_effects.h"
 #include "constants/moves.h"
 #include "constants/items.h"
@@ -204,6 +205,8 @@ static u64 GetAiFlags(u16 trainerId, u32 battler)
             flags = AI_FLAG_FIRST_BATTLE;
         else if (gBattleTypeFlags & BATTLE_TYPE_FACTORY)
             flags = GetAiScriptsInBattleFactory();
+        else if ((gBattleTypeFlags & BATTLE_TYPE_BATTLE_TOWER))
+            flags = AI_FLAG_SMART_TRAINER | AI_FLAG_DOUBLE_BATTLE;
         else if (gBattleTypeFlags & (BATTLE_TYPE_FRONTIER | BATTLE_TYPE_EREADER_TRAINER | BATTLE_TYPE_TRAINER_HILL | BATTLE_TYPE_SECRET_BASE))
             flags = AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT;
         else

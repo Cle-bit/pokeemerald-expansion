@@ -23,6 +23,7 @@
 #include "field_message_box.h"
 #include "tv.h"
 #include "battle_factory.h"
+#include "data/battle_frontier/battle_tower_doubles_teams.h"
 #include "constants/abilities.h"
 #include "constants/apprentice.h"
 #include "constants/battle_ai.h"
@@ -78,10 +79,15 @@ static void FillTentTrainerParty_(u16 trainerId, u8 firstMonId, u8 monCount);
 static void FillFactoryFrontierTrainerParty(u16 trainerId, u8 firstMonId);
 static void FillFactoryTentTrainerParty(u16 trainerId, u8 firstMonId);
 static u8 GetFrontierTrainerFixedIvs(u16 trainerId);
+static void FillTowerDoublesFixedTeam(void);
+static bool8 TowerDoubleTeamAlreadyUsed(u8 battleIndex, u16 teamIndex);
+static u16 ChooseTowerDoubleTeamIndex(u8 battleIndex, bool8 isFinal, u16 poolCount);
 #if FREE_BATTLE_TOWER_E_READER == FALSE
 static void SetEReaderTrainerChecksum(struct BattleTowerEReaderTrainer *ereaderTrainer);
 #endif //FREE_BATTLE_TOWER_E_READER
 static u8 SetTentPtrsGetLevel(void);
+
+#define TOWER_DOUBLE_TEAM_SAVE_START 10
 
 #include "data/battle_frontier/battle_frontier_trainer_mons.h"
 #include "data/battle_frontier/battle_frontier_trainers.h"
@@ -968,9 +974,17 @@ static void SetNextFacilityOpponent(void)
     {
         u16 id;
         u32 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
+        u32 facility = VarGet(VAR_FRONTIER_FACILITY);
         u16 winStreak = GetCurrentFacilityWinStreak();
         u32 challengeNum = winStreak / TOWER_STAGES_PER_CHALLENGE;
         SetFacilityPtrsGetLevel();
+
+        if (facility == FRONTIER_FACILITY_TOWER
+         && TRAINER_BATTLE_PARAM.opponentA == TRAINER_FRONTIER_BRAIN)
+        {
+            SetBattleFacilityTrainerGfxId(TRAINER_BATTLE_PARAM.opponentA, 0);
+            return;
+        }
 
         if (battleMode == FRONTIER_MODE_MULTIS || battleMode == FRONTIER_MODE_LINK_MULTIS)
         {
@@ -1548,8 +1562,108 @@ static bool8 IsFrontierTrainerFemale(u16 trainerId)
         return FALSE;
 }
 
+static u16 GetSavedTowerDoubleTeam(u8 battleIndex)
+{
+    u16 storage = TOWER_DOUBLE_TEAM_SAVE_START + battleIndex;
+
+    if (storage < ARRAY_COUNT(gSaveBlock2Ptr->frontier.trainerIds))
+        return gSaveBlock2Ptr->frontier.trainerIds[storage];
+
+    return 0xFFFF;
+}
+
+static void SaveTowerDoubleTeam(u8 battleIndex, u16 teamIndex)
+{
+    u16 storage = TOWER_DOUBLE_TEAM_SAVE_START + battleIndex;
+
+    if (storage < ARRAY_COUNT(gSaveBlock2Ptr->frontier.trainerIds))
+        gSaveBlock2Ptr->frontier.trainerIds[storage] = teamIndex;
+}
+
+static bool8 TowerDoubleTeamAlreadyUsed(u8 battleIndex, u16 teamIndex)
+{
+    u8 i;
+
+    for (i = 0; i < battleIndex; i++)
+    {
+        if (GetSavedTowerDoubleTeam(i) == teamIndex)
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+static u16 ChooseTowerDoubleTeamIndex(u8 battleIndex, bool8 isFinal, u16 poolCount)
+{
+    u16 teamIndex;
+
+    do
+    {
+        teamIndex = Random() % poolCount;
+    } while (!isFinal && TowerDoubleTeamAlreadyUsed(battleIndex, teamIndex));
+
+    return teamIndex;
+}
+
+static void FillTowerDoublesFixedTeam(void)
+{
+    u8 i;
+    u8 level;
+    u8 fixedIV;
+    u32 otID;
+    u8 battleIndex = gSaveBlock2Ptr->frontier.curChallengeBattleNum;
+    bool8 isFinal = (battleIndex >= TOWER_STAGES_PER_CHALLENGE - 1);
+    const struct TrainerMon (*pool)[FRONTIER_DOUBLES_PARTY_SIZE];
+    u16 poolCount;
+    u16 teamIndex;
+
+    ZeroEnemyPartyMons();
+
+    if (isFinal)
+    {
+        pool = sBattleTowerDoubleLegendaryTeams;
+        poolCount = BATTLE_TOWER_DOUBLE_LEGENDARY_TEAM_COUNT;
+    }
+    else
+    {
+        pool = sBattleTowerDoubleNormalTeams;
+        poolCount = BATTLE_TOWER_DOUBLE_NORMAL_TEAM_COUNT;
+    }
+
+    if (poolCount == 0)
+        return;
+
+    teamIndex = GetSavedTowerDoubleTeam(battleIndex);
+    if (teamIndex == 0xFFFF || teamIndex >= poolCount || (!isFinal && TowerDoubleTeamAlreadyUsed(battleIndex, teamIndex)))
+        teamIndex = ChooseTowerDoubleTeamIndex(battleIndex, isFinal, poolCount);
+
+    SaveTowerDoubleTeam(battleIndex, teamIndex);
+
+    level = SetFacilityPtrsGetLevel();
+    fixedIV = GetFrontierTrainerFixedIvs(TRAINER_BATTLE_PARAM.opponentA);
+    otID = Random32();
+
+    for (i = 0; i < FRONTIER_DOUBLES_PARTY_SIZE; i++)
+    {
+        struct TrainerMon mon = pool[teamIndex][i];
+
+        mon.ball = isFinal ? ITEM_MASTER_BALL : ITEM_POKE_BALL;
+        mon.isShiny = isFinal;
+        mon.gender = TRAINER_MON_RANDOM_GENDER;
+        mon.lvl = level;
+        CreateFacilityMon(&mon, level, fixedIV, otID, 0, &gEnemyParty[i]);
+    }
+}
+
 void FillFrontierTrainerParty(u8 monsCount)
 {
+    if (VarGet(VAR_FRONTIER_FACILITY) == FRONTIER_FACILITY_TOWER
+     && VarGet(VAR_FRONTIER_BATTLE_MODE) == FRONTIER_MODE_DOUBLES)
+    {
+        FillTowerDoublesFixedTeam();
+        return;
+    }
+
     ZeroEnemyPartyMons();
     FillTrainerParty(TRAINER_BATTLE_PARAM.opponentA, 0, monsCount);
 }

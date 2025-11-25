@@ -1715,9 +1715,16 @@ u8 GetFrontierBrainStatus(void)
     s32 status = FRONTIER_BRAIN_NOT_READY;
     s32 facility = VarGet(VAR_FRONTIER_FACILITY);
     s32 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
+    s32 battleNum = gSaveBlock2Ptr->frontier.curChallengeBattleNum;
     u16 winStreakNoModifier = GetCurrentFacilityWinStreak();
     s32 winStreak = winStreakNoModifier + gFrontierBrainInfo[facility].streakAppearances[3];
     s32 symbolsCount;
+
+    // Tower doubles: always fight the Frontier Brain on the 5th battle, independent of symbols.
+    if (facility == FRONTIER_FACILITY_TOWER && battleMode == FRONTIER_MODE_DOUBLES)
+    {
+        return (battleNum == TOWER_STAGES_PER_CHALLENGE - 1) ? FRONTIER_BRAIN_STREAK : FRONTIER_BRAIN_NOT_READY;
+    }
 
     if (battleMode != FRONTIER_MODE_SINGLES)
         return FRONTIER_BRAIN_NOT_READY;
@@ -2660,7 +2667,12 @@ u8 GetFrontierBrainMonEvs(u8 monId, u8 evStatId)
 s32 GetFronterBrainSymbol(void)
 {
     s32 facility = VarGet(VAR_FRONTIER_FACILITY);
+    s32 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
     s32 symbol = GetPlayerSymbolCountForFacility(facility);
+
+    // Tower doubles ignore symbol progression (fixed Brain team).
+    if (facility == FRONTIER_FACILITY_TOWER && battleMode == FRONTIER_MODE_DOUBLES)
+        return 0;
 
     if (symbol == 2)
     {
