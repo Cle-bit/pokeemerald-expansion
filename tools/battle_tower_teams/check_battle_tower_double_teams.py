@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Set
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]
 DOUBLES_PATH = REPO_ROOT / "src/data/battle_frontier/battle_tower_doubles_teams.h"
 SPECIES_INFO_GLOBS = ["src/data/pokemon/species_info/*.h"]
 LEVEL_UP_PATH = REPO_ROOT / "src/data/pokemon/level_up_learnsets"
