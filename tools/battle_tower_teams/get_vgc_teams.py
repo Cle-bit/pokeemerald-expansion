@@ -8,20 +8,29 @@ from bs4 import BeautifulSoup
 
 
 VICTORY_ROAD_URLS = [
-    "https://victoryroad.pro/sv-rental-teams/",
-    "https://victoryroad.pro/sv-rental-teams-reg-set-a/",
-    "https://victoryroad.pro/sv-rental-teams-reg-set-b/",
-    "https://victoryroad.pro/sv-rental-teams-reg-set-c/",
-    "https://victoryroad.pro/sv-rental-teams-reg-set-d/",
-    "https://victoryroad.pro/sv-rental-teams-reg-set-e/",
-    "https://victoryroad.pro/sv-rental-teams-reg-set-f/",
-    "https://victoryroad.pro/sv-rental-teams-reg-set-g/",
-    "https://victoryroad.pro/sv-rental-teams-reg-set-h/",
-    "https://victoryroad.pro/sv-rental-teams-vgc-reg-set-i/",
+    "https://victoryroad.pro/pokemon-sword-shield-rental-vgc-teams/",
+    "https://victoryroad.pro/pokemon-sword-shield-rental-vgc-teams-2020/",
+    "https://victoryroad.pro/pokemon-sword-shield-rental-vgc-teams-2021/",
+    "https://victoryroad.pro/resources/sample-teams-for-vgc-2019-sun-series/",
+    "https://victoryroad.pro/pokemon-bdsp-sample-vgc-teams/",
 ]
+
+# 额外的 pokepaste 链接
+EXTRA_POKEPASTE_URLS = [
+    # 示例：
+    # "https://pokepast.es/75256ba8091a2a31",
+    # "https://pokepast.es/5f207be27316be70",
+    # "https://pokepast.es/340fff3569c79428",
+]
+
+# 额外 pokepaste 链接来源文本文件路径：
+EXTRA_PASTE_TEXT_FILE = r"C:\Users\86159\Desktop\extra_pokepastes.txt"
 
 # 输出文件路径
 OUTPUT_PATH = r"C:\Users\86159\Desktop\vgc_teams.md"
+
+# 初始 Team 编号，可按需修改
+TEAM_START_NO = 787
 
 HEADERS = {
     "User-Agent": (
@@ -76,6 +85,25 @@ def find_pokepaste_links(page_url: str) -> List[str]:
             links.append(href)
 
     return links
+
+
+def extract_pokepaste_links_from_text(text: str) -> List[str]:
+    """
+    从任意文本中用正则提取 pokepast.es 链接。
+    支持：
+      https://pokepast.es/xxxx
+      http://pokepast.es/xxxx
+    """
+    pattern = r"https?://pokepast\.es/[0-9a-fA-F]+"
+    found = re.findall(pattern, text)
+    # 去重并保持顺序
+    seen = set()
+    result = []
+    for url in found:
+        if url not in seen:
+            seen.add(url)
+            result.append(url)
+    return result
 
 
 def pokepaste_to_raw_url(paste_url: str) -> str:
@@ -160,28 +188,51 @@ def print_progress(done: int, total: int, bar_len: int = 30):
 def main():
     # 1. 从多个 Victory Road 页面收集所有 pokepast 链接
     all_paste_urls: List[str] = []
+
     for page in VICTORY_ROAD_URLS:
         print(f"正在解析页面：{page}")
         links = find_pokepaste_links(page)
         print(f"  找到 {len(links)} 个 pokepast 链接")
         all_paste_urls.extend(links)
 
+    # 2. 加入代码里手动写的 EXTRA_POKEPASTE_URLS
+    if EXTRA_POKEPASTE_URLS:
+        print(f"从 EXTRA_POKEPASTE_URLS 中读取到 {len(EXTRA_POKEPASTE_URLS)} 个额外链接")
+        all_paste_urls.extend(EXTRA_POKEPASTE_URLS)
+
+    # 3.（可选）如果存在额外文本文件，从中提取 pokepaste 链接
+    if EXTRA_PASTE_TEXT_FILE and os.path.exists(EXTRA_PASTE_TEXT_FILE):
+        print(f"从文本文件中提取额外 pokepaste 链接：{EXTRA_PASTE_TEXT_FILE}")
+        with open(EXTRA_PASTE_TEXT_FILE, "r", encoding="utf-8-sig") as f:
+            txt = f.read()
+        extra_from_txt = extract_pokepaste_links_from_text(txt)
+        print(f"  在文本中找到 {len(extra_from_txt)} 个 pokepaste 链接")
+        all_paste_urls.extend(extra_from_txt)
+
     if not all_paste_urls:
-        print("没有从页面中找到任何 pokepast.es 链接，请检查页面结构或脚本逻辑。")
+        print("没有找到任何 pokepast.es 链接，请检查页面 / 配置 / 文本文件。")
         return
 
-    total = len(all_paste_urls)
-    print(f"总共找到 {total} 个队伍 Paste 链接。")
+    # 4. 全局去重并保持顺序
+    seen = set()
+    unique_urls: List[str] = []
+    for url in all_paste_urls:
+        if url not in seen:
+            seen.add(url)
+            unique_urls.append(url)
+
+    total = len(unique_urls)
+    print(f"最终去重后共有 {total} 个队伍 Paste 链接。")
 
     # 确保输出目录存在
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 
-    # 2. 逐个访问 pokepast，写入 markdown 文件，并展示进度条
+    # 5. 逐个访问 pokepast，写入 markdown 文件，并展示进度条
     print("开始抓取并写入 vgc_teams.md ...")
 
-    # ★ 用 utf-8-sig，方便 Windows 记事本识别
+    # 在 main() 内写入 Team 编号部分：
     with open(OUTPUT_PATH, "w", encoding="utf-8-sig") as f:
-        for idx, paste_url in enumerate(all_paste_urls, start=1):
+        for idx, paste_url in enumerate(unique_urls, start=1):
             print_progress(idx - 1, total)
 
             try:
@@ -192,9 +243,10 @@ def main():
 
             normalized = normalize_paste(paste_text)
 
-            f.write(f"Team{idx}\n")
+            team_no = TEAM_START_NO + idx - 1  # 计算真正编号
+            f.write(f"Team{team_no}\n")
             f.write(normalized)
-            f.write("\n\n")  # 队伍之间空一行
+            f.write("\n\n")
 
             print_progress(idx, total)
 

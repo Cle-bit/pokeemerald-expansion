@@ -108,9 +108,9 @@ def resolve_alias(name: str, alias: Dict[str, str]) -> str:
 def parse_species_name(line: str) -> str:
     before_at = line.split("@", 1)[0].strip()
     paren_contents = [m.group(1).strip() for m in re.finditer(r"\(([^()]*)\)", before_at)]
-    for content in paren_contents:
-        if content not in GENDER_MARKS:
-            return content
+    non_gender = [c for c in paren_contents if c not in GENDER_MARKS]
+    if non_gender:
+        return non_gender[-1]
     if paren_contents:
         idx = before_at.find("(")
         if idx > 0:
@@ -133,9 +133,10 @@ def normalize_stat(token: str) -> str:
 
 
 def parse_stat_line(text: str, default: int) -> List[int]:
+    text = re.sub(r"[\u200b-\u200f\u2060\ufeff]", "", text)
     values = [default] * 6
     for part in text.split("/"):
-        part = part.strip()
+        part = re.sub(r"[\u200b-\u200f\u2060\ufeff]", "", part).strip()
         if not part:
             continue
         match = re.match(r"(\d+)\s*([A-Za-z]+)", part)
