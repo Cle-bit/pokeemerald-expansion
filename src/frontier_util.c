@@ -116,7 +116,7 @@ const struct FrontierBrain gFrontierBrainInfo[NUM_FRONTIER_FACILITIES] =
             COMPOUND_STRING("I'm terribly sorry…")       //Gold
         },
         .battledBit = {1 << 0, 1 << 1},
-        .streakAppearances = {5, 10, 5, 1},
+        .streakAppearances = {50, 100, 50, 1},
     },
     [FRONTIER_FACILITY_DOME] =
     {
@@ -1720,11 +1720,8 @@ u8 GetFrontierBrainStatus(void)
     s32 winStreak = winStreakNoModifier + gFrontierBrainInfo[facility].streakAppearances[3];
     s32 symbolsCount;
 
-    // Tower doubles: always fight the Frontier Brain on the 5th battle, independent of symbols.
     if (facility == FRONTIER_FACILITY_TOWER && battleMode == FRONTIER_MODE_DOUBLES)
-    {
         return (battleNum == TOWER_STAGES_PER_CHALLENGE - 1) ? FRONTIER_BRAIN_STREAK : FRONTIER_BRAIN_NOT_READY;
-    }
 
     if (battleMode != FRONTIER_MODE_SINGLES)
         return FRONTIER_BRAIN_NOT_READY;
@@ -1992,7 +1989,20 @@ static void GetFacilitySymbolCount(void)
 static void GiveFacilitySymbol(void)
 {
     s32 facility = VarGet(VAR_FRONTIER_FACILITY);
-    if (GetPlayerSymbolCountForFacility(facility) == 0)
+    s32 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
+    u8 symbols = GetPlayerSymbolCountForFacility(facility);
+
+    // Tower doubles medals require 50/100 streaks even though the Brain appears every 5th battle.
+    if (facility == FRONTIER_FACILITY_TOWER && battleMode == FRONTIER_MODE_DOUBLES)
+    {
+        u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
+        u16 winStreak = gSaveBlock2Ptr->frontier.towerWinStreaks[FRONTIER_MODE_DOUBLES][lvlMode];
+
+        if ((symbols == 0 && winStreak < 50) || (symbols == 1 && winStreak < 100))
+            return;
+    }
+
+    if (symbols == 0)
         FlagSet(FLAG_SYS_TOWER_SILVER + facility * 2);
     else
         FlagSet(FLAG_SYS_TOWER_GOLD + facility * 2);
@@ -2667,12 +2677,7 @@ u8 GetFrontierBrainMonEvs(u8 monId, u8 evStatId)
 s32 GetFronterBrainSymbol(void)
 {
     s32 facility = VarGet(VAR_FRONTIER_FACILITY);
-    s32 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
     s32 symbol = GetPlayerSymbolCountForFacility(facility);
-
-    // Tower doubles ignore symbol progression (fixed Brain team).
-    if (facility == FRONTIER_FACILITY_TOWER && battleMode == FRONTIER_MODE_DOUBLES)
-        return 0;
 
     if (symbol == 2)
     {

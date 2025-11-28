@@ -262,7 +262,6 @@ BattleFrontier_BattleTowerLobby_EventScript_TryEnterDoublesChallenge::
 	message BattleFrontier_BattleTowerLobby_Text_WhichLevelMode
 	waitmessage
 	multichoice 17, 6, MULTI_LEVEL_MODE, FALSE
-	call BattleFrontier_BattleTowerLobby_EventScript_MapLevelChoice
 	switch VAR_RESULT
 	case FRONTIER_LVL_TENT, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
 	case MULTI_B_PRESSED, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
@@ -332,7 +331,6 @@ BattleFrontier_BattleTowerLobby_EventScript_TryEnterMultisChallenge::
 	message BattleFrontier_BattleTowerLobby_Text_WhichLevelMode
 	waitmessage
 	multichoice 17, 6, MULTI_LEVEL_MODE, FALSE
-	call BattleFrontier_BattleTowerLobby_EventScript_MapLevelChoice
 	switch VAR_RESULT
 	case FRONTIER_LVL_TENT, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
 	case MULTI_B_PRESSED, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
@@ -401,7 +399,6 @@ BattleFrontier_BattleTowerLobby_EventScript_TryEnterLinkMultisChallenge::
 	message BattleFrontier_BattleTowerLobby_Text_WhichLevelMode
 	waitmessage
 	multichoice 17, 6, MULTI_LEVEL_MODE, FALSE
-	call BattleFrontier_BattleTowerLobby_EventScript_MapLevelChoice
 	switch VAR_RESULT
 	case FRONTIER_LVL_TENT, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
 	case MULTI_B_PRESSED, BattleFrontier_BattleTowerLobby_EventScript_CancelChallenge
@@ -865,19 +862,6 @@ BattleFrontier_BattleTowerLobby_EventScript_ExplainLinkMultisChallenge::
 	return
 	end
 
-BattleFrontier_BattleTowerLobby_EventScript_MapLevelChoice::
-	goto_if_eq VAR_RESULT, 0, BattleFrontier_BattleTowerLobby_EventScript_MapOpenLevel
-	goto_if_eq VAR_RESULT, 1, BattleFrontier_BattleTowerLobby_EventScript_MapLv50
-	return
-
-BattleFrontier_BattleTowerLobby_EventScript_MapOpenLevel::
-	setvar VAR_RESULT, FRONTIER_LVL_OPEN
-	return
-
-BattleFrontier_BattleTowerLobby_EventScript_MapLv50::
-	setvar VAR_RESULT, FRONTIER_LVL_50
-	return
-
 BattleFrontier_BattleTowerLobby_EventScript_TryWirelessLink::
 	setvar VAR_0x8004, LINK_GROUP_BATTLE_TOWER
 	goto BattleFrontier_BattleTowerLobby_EventScript_ChooseLeader
@@ -1102,7 +1086,7 @@ BattleFrontier_BattleTowerLobby_Text_LookForwardToAnotherChallenge:
 
 BattleFrontier_BattleTowerLobby_Text_WhichLevelMode:
 	.string "The BATTLE ROOM offers two levels\n"
-	.string "of challenge, Open Level and Level 50.\l"
+	.string "of challenge, Level 50 and Open Level.\l"
 	.string "Which is your choice?$"
 
 @ Unused
