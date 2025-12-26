@@ -317,6 +317,51 @@ AI_DOUBLE_BATTLE_TEST("AI will choose Bulldoze if it triggers its ally's ability
     }
 }
 
+AI_DOUBLE_BATTLE_TEST("AI will Swagger/Flatter allies that benefit from confusion and stop after Unburden consumes its berry")
+{
+    u16 move = MOVE_NONE, targetItem = ITEM_NONE;
+    enum Ability partnerAbility;
+
+    PARAMETRIZE { move = MOVE_SWAGGER; partnerAbility = ABILITY_UNBURDEN;     targetItem = ITEM_LUM_BERRY; }
+    PARAMETRIZE { move = MOVE_FLATTER; partnerAbility = ABILITY_UNBURDEN;     targetItem = ITEM_LUM_BERRY; }
+    PARAMETRIZE { move = MOVE_SWAGGER; partnerAbility = ABILITY_TANGLED_FEET; targetItem = ITEM_ORAN_BERRY; }
+    PARAMETRIZE { move = MOVE_FLATTER; partnerAbility = ABILITY_TANGLED_FEET; targetItem = ITEM_ORAN_BERRY; }
+
+    GIVEN {
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(move, MOVE_TACKLE); Speed(10); }
+        OPPONENT(SPECIES_LINOONE) { Ability(partnerAbility); Item(targetItem); Moves(MOVE_TACKLE); Speed(5); }
+    } WHEN {
+        TURN { EXPECT_MOVE(opponentLeft, move, target: opponentRight); }
+        if (partnerAbility == ABILITY_UNBURDEN)
+            TURN {
+                NOT_EXPECT_MOVE(opponentLeft, move);
+                EXPECT_MOVE(opponentLeft, MOVE_TACKLE);
+            }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("AI won't Swagger/Flatter a Good as Gold mon")
+{
+    u16 move = MOVE_NONE;
+
+    PARAMETRIZE { move = MOVE_SWAGGER; }
+    PARAMETRIZE { move = MOVE_FLATTER; }
+
+    GIVEN {
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
+        PLAYER(SPECIES_GHOLDENGO) { Item(ITEM_LUM_BERRY); Ability(ABILITY_GOOD_AS_GOLD); Moves(MOVE_CELEBRATE, MOVE_FOUL_PLAY); HP(1); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(move, MOVE_THUNDERBOLT); }
+    } WHEN {
+        TURN {
+            EXPECT_MOVE(opponent, MOVE_THUNDERBOLT);
+            NOT_EXPECT_MOVE(opponent, move);
+        }
+    }
+}
+
 AI_DOUBLE_BATTLE_TEST("AI will choose Beat Up on an ally with Justified if it will benefit the ally")
 {
     ASSUME(GetMoveEffect(MOVE_BEAT_UP) == EFFECT_BEAT_UP);
