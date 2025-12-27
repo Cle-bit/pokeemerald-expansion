@@ -329,17 +329,23 @@ AI_DOUBLE_BATTLE_TEST("AI will Swagger/Flatter allies that benefit from confusio
 
     GIVEN {
         AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
-        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
-        PLAYER(SPECIES_WOBBUFFET) { Speed(1); }
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); HP(400); }
+        PLAYER(SPECIES_WOBBUFFET) { Speed(1); HP(400); }
         OPPONENT(SPECIES_WOBBUFFET) { Moves(move, MOVE_TACKLE); Speed(10); }
         OPPONENT(SPECIES_LINOONE) { Ability(partnerAbility); Item(targetItem); Moves(MOVE_TACKLE); Speed(5); }
     } WHEN {
         TURN { EXPECT_MOVE(opponentLeft, move, target: opponentRight); }
-        if (partnerAbility == ABILITY_UNBURDEN)
-            TURN {
+        TURN {
+            if (partnerAbility == ABILITY_UNBURDEN)
+            {
                 NOT_EXPECT_MOVE(opponentLeft, move);
                 EXPECT_MOVE(opponentLeft, MOVE_TACKLE);
             }
+        }
+        TURN {
+            MOVE(playerLeft, MOVE_MEMENTO);
+            MOVE(playerRight, MOVE_MEMENTO);
+        }
     }
 }
 
