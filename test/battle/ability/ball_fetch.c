@@ -118,4 +118,26 @@ SINGLE_BATTLE_TEST("Ball Fetch doesn't trigger in Trainer Battles")
     }
 }
 
-TO_DO_BATTLE_TEST("Ball Fetch doesn't trigger in Max Raid Battles");
+WILD_BATTLE_TEST("Ball Fetch doesn't trigger in Max Raid Battles")
+{
+    u32 item = 0;
+
+    PARAMETRIZE { item = ITEM_POKE_BALL; }
+    PARAMETRIZE { item = ITEM_GREAT_BALL; }
+    PARAMETRIZE { item = ITEM_ULTRA_BALL; }
+    PARAMETRIZE { item = ITEM_STRANGE_BALL; }
+    PARAMETRIZE { item = ITEM_X_ACCURACY; }
+
+    gBattleTestRunnerState->data.recordedBattle.battleFlags |= BATTLE_TYPE_RAID;
+
+    GIVEN {
+        PLAYER(SPECIES_YAMPER) { Ability(ABILITY_BALL_FETCH); }
+        OPPONENT(SPECIES_METAGROSS);
+    } WHEN {
+        TURN { USE_ITEM(player, item, WITH_RNG(RNG_BALLTHROW_SHAKE, MAX_u16)); }
+    } SCENE {
+        NOT ABILITY_POPUP(player, ABILITY_BALL_FETCH);
+    } THEN {
+        EXPECT_EQ(player->item, ITEM_NONE);
+    }
+}
