@@ -88,7 +88,88 @@ SINGLE_BATTLE_TEST("Comatose Pokémon don't get poisoned by Toxic Spikes on swit
     }
 }
 
-TO_DO_BATTLE_TEST("Comatose makes Rest fail")
-TO_DO_BATTLE_TEST("Comatose isn't affected by Mold Breaker, Turboblaze or Teravolt")
-TO_DO_BATTLE_TEST("Comatose isn't affected by Poison Touch + Sunsteel Strike")
-TO_DO_BATTLE_TEST("Comatose boosts Dream Ball's multiplier")
+SINGLE_BATTLE_TEST("Comatose makes Rest fail")
+{
+    GIVEN {
+        ASSUME(GetMoveEffect(MOVE_REST) == EFFECT_REST);
+        PLAYER(SPECIES_KOMALA) { Ability(ABILITY_COMATOSE); HP(1); MaxHP(100); }
+        OPPONENT(SPECIES_WOBBUFFET);
+    } WHEN {
+        TURN { MOVE(player, MOVE_REST); }
+    } SCENE {
+        NONE_OF {
+            ANIMATION(ANIM_TYPE_MOVE, MOVE_REST, player);
+            HP_BAR(player);
+        }
+    } THEN {
+        EXPECT_EQ(player->hp, 1);
+        EXPECT_EQ(player->status1 & STATUS1_SLEEP, 0);
+    }
+}
+
+SINGLE_BATTLE_TEST("Comatose isn't affected by Mold Breaker, Turboblaze or Teravolt")
+{
+    enum Ability ability;
+
+    PARAMETRIZE { ability = ABILITY_MOLD_BREAKER; }
+    PARAMETRIZE { ability = ABILITY_TURBOBLAZE; }
+    PARAMETRIZE { ability = ABILITY_TERAVOLT; }
+
+    GIVEN {
+        ASSUME(GetMoveEffect(MOVE_TOXIC) == EFFECT_NON_VOLATILE_STATUS);
+        ASSUME(GetMoveNonVolatileStatus(MOVE_TOXIC) == MOVE_EFFECT_TOXIC);
+        PLAYER(SPECIES_KOMALA) { Ability(ABILITY_COMATOSE); }
+        OPPONENT(SPECIES_PINSIR) { Ability(ability); }
+    } WHEN {
+        TURN { MOVE(opponent, MOVE_TOXIC); }
+    } SCENE {
+        NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_TOXIC, opponent);
+        ABILITY_POPUP(player, ABILITY_COMATOSE);
+        MESSAGE("It doesn't affect Komala…");
+    } THEN {
+        EXPECT_EQ(player->status1, STATUS1_NONE);
+    }
+}
+
+SINGLE_BATTLE_TEST("Comatose isn't affected by Poison Touch + Sunsteel Strike")
+{
+    GIVEN {
+        ASSUME(MoveIgnoresTargetAbility(MOVE_SUNSTEEL_STRIKE));
+        ASSUME(MoveMakesContact(MOVE_SUNSTEEL_STRIKE));
+        PLAYER(SPECIES_KOMALA) { Ability(ABILITY_COMATOSE); }
+        OPPONENT(SPECIES_WOBBUFFET) { Ability(ABILITY_POISON_TOUCH); }
+    } WHEN {
+        TURN { MOVE(opponent, MOVE_SUNSTEEL_STRIKE, WITH_RNG(RNG_POISON_TOUCH, 1)); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SUNSTEEL_STRIKE, opponent);
+        HP_BAR(player);
+        NOT STATUS_ICON(player, poison: TRUE);
+    } THEN {
+        EXPECT_EQ(player->status1, STATUS1_NONE);
+    }
+}
+
+WILD_BATTLE_TEST("Comatose boosts Dream Ball's multiplier")
+{
+    enum Ability ability;
+    u16 rng;
+    bool32 shouldCatch;
+
+    PARAMETRIZE { ability = ABILITY_COMATOSE; rng = 0; shouldCatch = TRUE; }
+    PARAMETRIZE { ability = ABILITY_INSOMNIA; rng = MAX_u16; shouldCatch = FALSE; }
+
+    GIVEN {
+        ASSUME(B_DREAM_BALL_MODIFIER >= GEN_8);
+        PLAYER(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_KOMALA) { Ability(ability); MaxHP(100); HP(1); }
+    } WHEN {
+        TURN { USE_ITEM(player, ITEM_DREAM_BALL, WITH_RNG(RNG_BALLTHROW_SHAKE, rng)); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_SPECIAL, B_ANIM_BALL_THROW, player);
+    } THEN {
+        if (shouldCatch)
+            EXPECT_EQ(gBattleResults.caughtMonSpecies, SPECIES_KOMALA);
+        else
+            EXPECT_EQ(gBattleResults.caughtMonSpecies, SPECIES_NONE);
+    }
+}

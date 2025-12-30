@@ -29,7 +29,28 @@ SINGLE_BATTLE_TEST("Hex deals double damage to foes with a status", s16 damage)
     }
 }
 
-TO_DO_BATTLE_TEST("Hex deals double damage to Pokémon with Comatose")
+SINGLE_BATTLE_TEST("Hex deals double damage to Pokémon with Comatose", s16 damage)
+{
+    enum Ability ability;
+
+    PARAMETRIZE { ability = ABILITY_COMATOSE; }
+    PARAMETRIZE { ability = ABILITY_INSOMNIA; }
+
+    GIVEN {
+        ASSUME(GetMoveEffect(MOVE_HEX) == EFFECT_DOUBLE_POWER_ON_ARG_STATUS);
+        ASSUME(GetMoveEffectArg_Status(MOVE_HEX) == STATUS1_ANY);
+        PLAYER(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WOBBUFFET) { Ability(ability); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_HEX); }
+    } SCENE {
+        if (ability == ABILITY_COMATOSE)
+            MESSAGE("The opposing Wobbuffet is drowsing!");
+        HP_BAR(opponent, captureDamage: &results[i].damage);
+    } FINALLY {
+        EXPECT_MUL_EQ(results[1].damage, Q_4_12(2.0), results[0].damage);
+    }
+}
 
 SINGLE_BATTLE_TEST("Venoshock's power doubles if the target is poisoned/badly poisoned", s16 damage)
 {

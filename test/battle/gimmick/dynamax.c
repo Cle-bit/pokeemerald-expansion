@@ -249,9 +249,9 @@ SINGLE_BATTLE_TEST("Dynamax: Dynamaxed Pokemon are not affected by phazing moves
     GIVEN {
         ASSUME(GetMoveEffect(MOVE_DRAGON_TAIL) == EFFECT_HIT_SWITCH_TARGET);
         ASSUME(GetMoveEffect(MOVE_WHIRLWIND) == EFFECT_ROAR);
-        PLAYER(SPECIES_WOBBUFFET);
-        PLAYER(SPECIES_WYNAUT);
-        OPPONENT(SPECIES_WOBBUFFET);
+        PLAYER(SPECIES_WOBBUFFET) { Speed(20); }
+        PLAYER(SPECIES_WYNAUT) { Speed(15); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(10); }
     } WHEN {
         TURN { MOVE(opponent, MOVE_DRAGON_TAIL); MOVE(player, MOVE_SCRATCH, gimmick: GIMMICK_DYNAMAX); }
         TURN { MOVE(opponent, MOVE_WHIRLWIND); MOVE(player, MOVE_SCRATCH); }
@@ -1492,7 +1492,37 @@ DOUBLE_BATTLE_TEST("Dynamax: G-Max Chi Strike boosts allies' crit chance by 1 st
     }
 }
 
-TO_DO_BATTLE_TEST("Dynamax: Baton Pass doesn't pass G-Max Chi Strike's effect");
+DOUBLE_BATTLE_TEST("Dynamax: Baton Pass doesn't pass G-Max Chi Strike's effect")
+{
+    GIVEN {
+        ASSUME(GetMoveEffect(MOVE_BATON_PASS) == EFFECT_BATON_PASS);
+        ASSUME(MoveHasAdditionalEffect(MOVE_G_MAX_CHI_STRIKE, MOVE_EFFECT_CRIT_PLUS_SIDE));
+        PLAYER(SPECIES_MACHAMP) { Speed(100); GigantamaxFactor(TRUE); }
+        PLAYER(SPECIES_WOBBUFFET) { Speed(50); Moves(MOVE_BATON_PASS); }
+        PLAYER(SPECIES_WYNAUT) { Speed(30); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(10); MaxHP(1000); HP(1000); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(10); MaxHP(1000); HP(1000); }
+    } WHEN {
+        TURN { MOVE(playerLeft, MOVE_FORCE_PALM, target: opponentLeft, gimmick: GIMMICK_DYNAMAX); \
+               MOVE(playerRight, MOVE_BATON_PASS); \
+               MOVE(opponentLeft, MOVE_CELEBRATE); \
+               MOVE(opponentRight, MOVE_CELEBRATE); \
+               SEND_OUT(playerRight, 2); }
+    } SCENE {
+        MESSAGE("Machamp used G-Max Chi Strike!");
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_STATS_CHANGE, playerLeft);
+        MESSAGE("Machamp is getting pumped!");
+        ANIMATION(ANIM_TYPE_GENERAL, B_ANIM_STATS_CHANGE, playerRight);
+        MESSAGE("Wobbuffet is getting pumped!");
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_BATON_PASS, playerRight);
+    } THEN {
+        u8 leftBonusCrit = playerLeft->volatiles.bonusCritStages;
+        u8 rightBonusCrit = playerRight->volatiles.bonusCritStages;
+
+        EXPECT_EQ(leftBonusCrit, 1);
+        EXPECT_EQ(rightBonusCrit, 0);
+    }
+}
 
 DOUBLE_BATTLE_TEST("Dynamax: G-Max Depletion takes away 2 PP from the target's last move")
 {
