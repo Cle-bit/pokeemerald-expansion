@@ -71,8 +71,61 @@ DOUBLE_BATTLE_TEST("Analytic does not activate when not moving last with empty s
     }
 }
 
-TO_DO_BATTLE_TEST("Analytic takes into account modifications to speeed an priority (Gen 5-8)");       //Eg. Paralysis, Power Weight, Stall
-TO_DO_BATTLE_TEST("Analytic does not take into account modifications to speeed an priority (Gen 8)"); //Eg. Paralysis, Power Weight, Stall
+SINGLE_BATTLE_TEST("Analytic takes into account modifications to speeed an priority (Gen 5-8)", s16 damage)
+{
+    u16 item;
+    bool32 ignoresMods = (B_UPDATED_ABILITY_DATA == GEN_8);
+
+    PARAMETRIZE { item = ITEM_NONE; }
+    PARAMETRIZE { item = ITEM_POWER_WEIGHT; }
+    PARAMETRIZE { item = ITEM_LAGGING_TAIL; }
+
+    GIVEN {
+        ASSUME(gItemsInfo[ITEM_POWER_WEIGHT].holdEffect == HOLD_EFFECT_POWER_ITEM);
+        ASSUME(gItemsInfo[ITEM_LAGGING_TAIL].holdEffect == HOLD_EFFECT_LAGGING_TAIL);
+        PLAYER(SPECIES_MAGNEMITE) { Ability(ABILITY_ANALYTIC); Speed(30); if (item != ITEM_NONE) Item(item); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(20); }
+    } WHEN {
+        TURN { MOVE(opponent, MOVE_CELEBRATE); MOVE(player, MOVE_SCRATCH); }
+    } SCENE {
+        HP_BAR(opponent, captureDamage: &results[i].damage);
+    } FINALLY {
+        if (ignoresMods) {
+            EXPECT_EQ(results[0].damage, results[1].damage);
+            EXPECT_EQ(results[0].damage, results[2].damage);
+        } else {
+            EXPECT_MUL_EQ(results[0].damage, Q_4_12(1.3), results[1].damage);
+            EXPECT_MUL_EQ(results[0].damage, Q_4_12(1.3), results[2].damage);
+        }
+    }
+}
+
+SINGLE_BATTLE_TEST("Analytic does not take into account modifications to speeed an priority (Gen 8)", s16 damage)
+{
+    bool32 paralyzed;
+    bool32 ignoresMods = (B_UPDATED_ABILITY_DATA == GEN_8);
+
+    PARAMETRIZE { paralyzed = FALSE; }
+    PARAMETRIZE { paralyzed = TRUE; }
+
+    GIVEN {
+        PLAYER(SPECIES_MAGNEMITE) { Ability(ABILITY_ANALYTIC); Speed(30); if (paralyzed) Status1(STATUS1_PARALYSIS); }
+        OPPONENT(SPECIES_WOBBUFFET) { Speed(20); }
+    } WHEN {
+        if (paralyzed) {
+            TURN { MOVE(opponent, MOVE_CELEBRATE); MOVE(player, MOVE_SCRATCH, WITH_RNG(RNG_PARALYSIS, TRUE)); }
+        } else {
+            TURN { MOVE(opponent, MOVE_CELEBRATE); MOVE(player, MOVE_SCRATCH); }
+        }
+    } SCENE {
+        HP_BAR(opponent, captureDamage: &results[i].damage);
+    } FINALLY {
+        if (ignoresMods)
+            EXPECT_EQ(results[0].damage, results[1].damage);
+        else
+            EXPECT_MUL_EQ(results[0].damage, Q_4_12(1.3), results[1].damage);
+    }
+}
 
 // Triple Battles needed to test
 //TO_DO_BATTLE_TEST("If the Pokémon with Analytic is targeting a Pokémon in a flank position that chooses to switch with its ally in the middle, its move's power will always be normal when it attacks the Pokémon that is shifted into the flank position");

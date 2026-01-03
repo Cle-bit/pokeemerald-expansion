@@ -349,8 +349,120 @@ SINGLE_BATTLE_TEST("Anticipation considers Inverse Battle types")
     }
 }
 
-TO_DO_BATTLE_TEST("Anticipation causes notifies if an opponent has a Self-Destruct or Explosion (Gen4)");
-TO_DO_BATTLE_TEST("Anticipation considers Scrappy and Normalize into their effectiveness (Gen4)");
-TO_DO_BATTLE_TEST("Anticipation considers Gravity into their effectiveness (Gen4)");
-TO_DO_BATTLE_TEST("Anticipation doesn't trigger from Counter, Metal Burst or Mirror Coat (Gen4)");
-TO_DO_BATTLE_TEST("Anticipation treats Hidden Power as Normal Type (Gen4-5)");
+SINGLE_BATTLE_TEST("Anticipation causes notifies if an opponent has a Self-Destruct or Explosion (Gen4)")
+{
+    u32 move;
+    bool32 usesGen4Rules = (B_UPDATED_ABILITY_DATA < GEN_5);
+
+    PARAMETRIZE { move = MOVE_SELF_DESTRUCT; }
+    PARAMETRIZE { move = MOVE_EXPLOSION; }
+
+    GIVEN {
+        ASSUME(GetMoveEffect(move) == EFFECT_EXPLOSION);
+        PLAYER(SPECIES_EEVEE) { Ability(ABILITY_ANTICIPATION); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(move, MOVE_SCRATCH, MOVE_POUND, MOVE_CELEBRATE); }
+    } WHEN {
+        TURN { }
+    } SCENE {
+        if (usesGen4Rules)
+            ABILITY_POPUP(player, ABILITY_ANTICIPATION);
+        else
+            NOT ABILITY_POPUP(player, ABILITY_ANTICIPATION);
+    }
+}
+
+SINGLE_BATTLE_TEST("Anticipation considers Scrappy and Normalize into their effectiveness (Gen4)")
+{
+    bool32 normalizeCase;
+    bool32 usesGen4Rules = (B_UPDATED_ABILITY_DATA < GEN_5);
+
+    PARAMETRIZE { normalizeCase = TRUE; }
+    PARAMETRIZE { normalizeCase = FALSE; }
+
+    GIVEN {
+        ASSUME(GetMoveType(MOVE_CLOSE_COMBAT) == TYPE_FIGHTING);
+        if (normalizeCase) {
+            ASSUME(GetSpeciesType(SPECIES_EEVEE, 0) == TYPE_NORMAL);
+            ASSUME(GetSpeciesType(SPECIES_EEVEE, 1) == TYPE_NORMAL);
+            PLAYER(SPECIES_EEVEE) { Ability(ABILITY_ANTICIPATION); }
+            OPPONENT(SPECIES_DELCATTY) { Ability(ABILITY_NORMALIZE); Moves(MOVE_CLOSE_COMBAT, MOVE_SCRATCH, MOVE_POUND, MOVE_CELEBRATE); }
+        } else {
+            ASSUME(GetSpeciesType(SPECIES_DOUBLADE, 0) == TYPE_STEEL);
+            ASSUME(GetSpeciesType(SPECIES_DOUBLADE, 1) == TYPE_GHOST);
+            PLAYER(SPECIES_DOUBLADE) { Ability(ABILITY_ANTICIPATION); }
+            OPPONENT(SPECIES_KANGASKHAN) { Ability(ABILITY_SCRAPPY); Moves(MOVE_CLOSE_COMBAT, MOVE_SCRATCH, MOVE_POUND, MOVE_CELEBRATE); }
+        }
+    } WHEN {
+        TURN { }
+    } SCENE {
+        bool32 expectPopup = usesGen4Rules ? !normalizeCase : normalizeCase;
+        if (expectPopup)
+            ABILITY_POPUP(player, ABILITY_ANTICIPATION);
+        else
+            NOT ABILITY_POPUP(player, ABILITY_ANTICIPATION);
+    }
+}
+
+SINGLE_BATTLE_TEST("Anticipation considers Gravity into their effectiveness (Gen4)")
+{
+    bool32 usesGen4Rules = (B_UPDATED_ABILITY_DATA < GEN_5);
+
+    GIVEN {
+        PLAYER(SPECIES_SKARMORY);
+        OPPONENT(SPECIES_EEVEE) { Ability(ABILITY_ANTICIPATION); Moves(MOVE_EARTHQUAKE, MOVE_GRAVITY, MOVE_SCRATCH, MOVE_POUND); }
+    } WHEN {
+        TURN { MOVE(opponent, MOVE_GRAVITY); MOVE(player, MOVE_SKILL_SWAP); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_GRAVITY, opponent);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SKILL_SWAP, player);
+        if (usesGen4Rules)
+            ABILITY_POPUP(player, ABILITY_ANTICIPATION);
+        else
+            NOT ABILITY_POPUP(player, ABILITY_ANTICIPATION);
+    }
+}
+
+SINGLE_BATTLE_TEST("Anticipation doesn't trigger from Counter, Metal Burst or Mirror Coat (Gen4)")
+{
+    u32 move, species;
+    enum Type typeAtk, typeDef;
+    bool32 usesGen4Rules = (B_UPDATED_ABILITY_DATA < GEN_5);
+
+    PARAMETRIZE { move = MOVE_COUNTER; species = SPECIES_RATICATE; typeAtk = TYPE_FIGHTING; typeDef = TYPE_NORMAL; }
+    PARAMETRIZE { move = MOVE_METAL_BURST; species = SPECIES_ROGGENROLA; typeAtk = TYPE_STEEL; typeDef = TYPE_ROCK; }
+    PARAMETRIZE { move = MOVE_MIRROR_COAT; species = SPECIES_NIDORINO; typeAtk = TYPE_PSYCHIC; typeDef = TYPE_POISON; }
+
+    GIVEN {
+        ASSUME(GetMoveType(move) == typeAtk);
+        ASSUME(GetSpeciesType(species, 0) == typeDef);
+        ASSUME(GetSpeciesType(species, 1) == typeDef);
+        PLAYER(species);
+        OPPONENT(SPECIES_EEVEE) { Ability(ABILITY_ANTICIPATION); Moves(move, MOVE_SKILL_SWAP, MOVE_POUND, MOVE_CELEBRATE); }
+    } WHEN {
+        TURN { MOVE(opponent, MOVE_SKILL_SWAP); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SKILL_SWAP, opponent);
+        if (usesGen4Rules)
+            NOT ABILITY_POPUP(player, ABILITY_ANTICIPATION);
+        else
+            ABILITY_POPUP(player, ABILITY_ANTICIPATION);
+    }
+}
+
+SINGLE_BATTLE_TEST("Anticipation treats Hidden Power as Normal Type (Gen4-5)")
+{
+    bool32 treatsAsNormal = (B_HIDDEN_POWER_DMG < GEN_6);
+
+    GIVEN {
+        ASSUME(GetMoveEffect(MOVE_HIDDEN_POWER) == EFFECT_HIDDEN_POWER);
+        ASSUME(GetSpeciesType(SPECIES_EEVEE, 0) == TYPE_NORMAL);
+        ASSUME(GetSpeciesType(SPECIES_EEVEE, 1) == TYPE_NORMAL);
+        PLAYER(SPECIES_EEVEE) { Ability(ABILITY_ANTICIPATION); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(MOVE_HIDDEN_POWER, MOVE_SCRATCH, MOVE_POUND, MOVE_CELEBRATE); HPIV(30); AttackIV(2); DefenseIV(31); SpAttackIV(30); SpDefenseIV(30); SpeedIV(30); }
+    } WHEN {
+        TURN { }
+    } SCENE {
+        if (treatsAsNormal)
+            NOT ABILITY_POPUP(player, ABILITY_ANTICIPATION);
+    }
+}
