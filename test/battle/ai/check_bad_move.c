@@ -163,6 +163,8 @@ AI_SINGLE_BATTLE_TEST("Protect: AI avoids Protect vs moves that ignore protectio
     PARAMETRIZE { move = MOVE_PHANTOM_FORCE; shouldProtect = FALSE; }
     PARAMETRIZE { move = MOVE_HYPERSPACE_HOLE; shouldProtect = FALSE; }
     PARAMETRIZE { move = MOVE_HYPERSPACE_FURY; shouldProtect = FALSE; }
+    PARAMETRIZE { move = MOVE_HYPER_DRILL; shouldProtect = FALSE; }
+    PARAMETRIZE { move = MOVE_MIGHTY_CLEAVE; shouldProtect = FALSE; }
 
     PASSES_RANDOMLY(PREDICT_MOVE_CHANCE, 100, RNG_AI_PREDICT_MOVE);
     GIVEN {
@@ -195,6 +197,8 @@ AI_DOUBLE_BATTLE_TEST("Protect: AI avoids Protect vs moves that ignore protectio
     PARAMETRIZE { move = MOVE_PHANTOM_FORCE; shouldProtect = FALSE; }
     PARAMETRIZE { move = MOVE_HYPERSPACE_HOLE; shouldProtect = FALSE; }
     PARAMETRIZE { move = MOVE_HYPERSPACE_FURY; shouldProtect = FALSE; }
+    PARAMETRIZE { move = MOVE_HYPER_DRILL; shouldProtect = FALSE; }
+    PARAMETRIZE { move = MOVE_MIGHTY_CLEAVE; shouldProtect = FALSE; }
 
     PASSES_RANDOMLY(PREDICT_MOVE_CHANCE, 100, RNG_AI_PREDICT_MOVE);
     GIVEN {
