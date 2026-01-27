@@ -58,6 +58,36 @@ AI_DOUBLE_BATTLE_TEST("AI will not use Helping Hand if partner does not have any
     }
 }
 
+AI_DOUBLE_BATTLE_TEST("Order Up gets a stat-boost score from Commander")
+{
+    bool32 expectBoost = FALSE;
+    u16 partnerSpecies = SPECIES_NONE;
+    enum Ability partnerAbility = ABILITY_NONE;
+
+    PARAMETRIZE { expectBoost = TRUE;  partnerSpecies = SPECIES_TATSUGIRI_CURLY;    partnerAbility = ABILITY_COMMANDER; }
+    PARAMETRIZE { expectBoost = TRUE;  partnerSpecies = SPECIES_TATSUGIRI_DROOPY;   partnerAbility = ABILITY_COMMANDER; }
+    PARAMETRIZE { expectBoost = TRUE;  partnerSpecies = SPECIES_TATSUGIRI_STRETCHY; partnerAbility = ABILITY_COMMANDER; }
+    PARAMETRIZE { expectBoost = FALSE; partnerSpecies = SPECIES_TATSUGIRI_CURLY;    partnerAbility = ABILITY_STORM_DRAIN; }
+    PARAMETRIZE { expectBoost = FALSE; partnerSpecies = SPECIES_TATSUGIRI_DROOPY;   partnerAbility = ABILITY_STORM_DRAIN; }
+    PARAMETRIZE { expectBoost = FALSE; partnerSpecies = SPECIES_TATSUGIRI_STRETCHY; partnerAbility = ABILITY_STORM_DRAIN; }
+
+    GIVEN {
+        ASSUME(GetMoveAdditionalEffectById(MOVE_ORDER_UP, 0)->moveEffect == MOVE_EFFECT_ORDER_UP);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
+        PLAYER(SPECIES_WOBBUFFET);
+        PLAYER(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_DONDOZO) { Moves(MOVE_ORDER_UP, MOVE_DRAGON_CLAW); }
+        OPPONENT(partnerSpecies) { Ability(partnerAbility); }
+    } WHEN {
+        TURN {
+            if (expectBoost)
+                SCORE_GT(opponentLeft, MOVE_ORDER_UP, MOVE_DRAGON_CLAW, target:playerLeft);
+            else
+                SCORE_EQ(opponentLeft, MOVE_ORDER_UP, MOVE_DRAGON_CLAW, target:playerLeft);
+        }
+    }
+}
+
 AI_DOUBLE_BATTLE_TEST("AI skips Trick/Bestow when items are missing or target already holds one")
 {
     enum Move move = MOVE_NONE;
