@@ -5862,7 +5862,7 @@ static s32 AI_CalcAdditionalEffectScore(enum BattlerId battlerAtk, enum BattlerI
 
     if (IsSheerForceAffected(move, aiData->abilities[battlerAtk]))
     {
-        if (!(GetMoveEffect(move) == EFFECT_ORDER_UP
+        if (!(GetMoveEffect(move) == MOVE_EFFECT_ORDER_UP
             && gBattleStruct->battlerState[battlerAtk].commanderSpecies != SPECIES_NONE))
             return score;
     }
