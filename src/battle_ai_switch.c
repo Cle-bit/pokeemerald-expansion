@@ -32,6 +32,12 @@ struct IncomingHealInfo
     u16 healEndOfTurn:1;
     u16 curesStatus:1;
 };
+
+struct CommanderPairInfo
+{
+    u8 tatsugiriId;
+    u8 dondozoId;
+};
 static bool32 CanUseSuperEffectiveMoveAgainstOpponents(enum BattlerId battler);
 static bool32 FindMonWithFlagsAndSuperEffective(enum BattlerId battler, u16 flags, u32 moduloPercent);
 static u32 GetSwitchinHazardsDamage(enum BattlerId battler);
@@ -114,6 +120,91 @@ static void GetIncomingHealInfo(enum BattlerId battler, struct IncomingHealInfo 
         healInfo->healEndOfTurn = TRUE;
         healInfo->wishCounter = gBattleStruct->wish[battler].counter;
         healInfo->healAmount = GetWishHealAmountForBattler(battler);
+    }
+}
+
+static bool32 GetCommanderPairInfo(enum BattlerId battler, struct CommanderPairInfo *info)
+{
+    s32 firstId;
+    s32 lastId; // + 1
+    struct Pokemon *party;
+
+    if (!IsDoubleBattle())
+        return FALSE;
+
+    party = GetBattlerParty(battler);
+    GetAIPartyIndexes(battler, &firstId, &lastId);
+
+    info->tatsugiriId = PARTY_SIZE;
+    info->dondozoId = PARTY_SIZE;
+
+    for (s32 monIndex = firstId; monIndex < lastId; monIndex++)
+    {
+        if (!IsValidForBattle(&party[monIndex]))
+            continue;
+
+        u32 species = GetMonData(&party[monIndex], MON_DATA_SPECIES);
+        if (info->tatsugiriId == PARTY_SIZE
+         && GET_BASE_SPECIES_ID(species) == SPECIES_TATSUGIRI
+         && GetSpeciesAbility(species, GetMonData(&party[monIndex], MON_DATA_ABILITY_NUM)) == ABILITY_COMMANDER)
+        {
+            info->tatsugiriId = monIndex;
+        }
+        else if (info->dondozoId == PARTY_SIZE && GET_BASE_SPECIES_ID(species) == SPECIES_DONDOZO)
+        {
+            info->dondozoId = monIndex;
+        }
+
+        if (info->tatsugiriId != PARTY_SIZE && info->dondozoId != PARTY_SIZE)
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+static void GetCommanderFieldState(enum BattlerId battler, bool32 *tatsugiriActive, bool32 *dondozoActive, bool32 *pairActive)
+{
+    enum BattlerId battlerIn1;
+    enum BattlerId battlerIn2;
+    enum BattlerId battlers[2];
+
+    *tatsugiriActive = FALSE;
+    *dondozoActive = FALSE;
+    *pairActive = FALSE;
+
+    GetActiveBattlerIds(battler, &battlerIn1, &battlerIn2);
+    battlers[0] = battlerIn1;
+    battlers[1] = battlerIn2;
+
+    for (u32 i = 0; i < ARRAY_COUNT(battlers); i++)
+    {
+        enum BattlerId current = battlers[i];
+        if (!IsBattlerAlive(current))
+            continue;
+
+        if (gBattleStruct->battlerState[current].commandingDondozo)
+        {
+            *pairActive = TRUE;
+            *tatsugiriActive = TRUE;
+            continue;
+        }
+        if (gBattleStruct->battlerState[current].commanderSpecies)
+        {
+            *pairActive = TRUE;
+            *dondozoActive = TRUE;
+            continue;
+        }
+
+        if (GET_BASE_SPECIES_ID(gBattleMons[current].species) == SPECIES_TATSUGIRI)
+            *tatsugiriActive = TRUE;
+        else if (GET_BASE_SPECIES_ID(gBattleMons[current].species) == SPECIES_DONDOZO)
+            *dondozoActive = TRUE;
+    }
+
+    if (*pairActive)
+    {
+        *tatsugiriActive = TRUE;
+        *dondozoActive = TRUE;
     }
 }
 
@@ -1216,6 +1307,98 @@ static bool32 CanBattlerConsiderSwitch(enum BattlerId battler)
     if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
         return FALSE;
     return TRUE;
+}
+
+bool32 AI_ShouldForceCommanderPartnerSwitch(enum BattlerId battler, u32 *switchinId)
+{
+    struct CommanderPairInfo info;
+    struct Pokemon *party;
+    bool32 tatsugiriActive, dondozoActive, pairActive;
+    enum BattlerId battlerIn1, battlerIn2;
+    u32 missingId;
+
+    if (!CanBattlerConsiderSwitch(battler))
+        return FALSE;
+
+    if (!GetCommanderPairInfo(battler, &info))
+        return FALSE;
+
+    GetCommanderFieldState(battler, &tatsugiriActive, &dondozoActive, &pairActive);
+    if (pairActive || (tatsugiriActive == dondozoActive))
+        return FALSE;
+
+    if (GET_BASE_SPECIES_ID(gBattleMons[battler].species) == SPECIES_TATSUGIRI
+     || GET_BASE_SPECIES_ID(gBattleMons[battler].species) == SPECIES_DONDOZO)
+    {
+        return FALSE;
+    }
+
+    missingId = tatsugiriActive ? info.dondozoId : info.tatsugiriId;
+    if (missingId == PARTY_SIZE)
+        return FALSE;
+
+    party = GetBattlerParty(battler);
+    if (!IsValidForBattle(&party[missingId]))
+        return FALSE;
+
+    GetActiveBattlerIds(battler, &battlerIn1, &battlerIn2);
+    if (IsPartyMonOnFieldOrChosenToSwitch(missingId, battlerIn1, battlerIn2))
+        return FALSE;
+
+    *switchinId = missingId;
+    return TRUE;
+}
+
+void AI_ApplyCommanderPairSwitchIn(enum BattlerId battler, u32 chosenMonId)
+{
+    struct CommanderPairInfo info;
+    struct Pokemon *party;
+    bool32 tatsugiriActive, dondozoActive, pairActive;
+    bool32 chosenIsTatsugiri, chosenIsDondozo;
+    enum BattlerId partner;
+    u32 missingId;
+
+    if (!GetCommanderPairInfo(battler, &info))
+        return;
+
+    party = GetBattlerParty(battler);
+    if (chosenMonId >= PARTY_SIZE || !IsValidForBattle(&party[chosenMonId]))
+        return;
+
+    {
+        u32 species = GetMonData(&party[chosenMonId], MON_DATA_SPECIES);
+        chosenIsTatsugiri = (GET_BASE_SPECIES_ID(species) == SPECIES_TATSUGIRI
+            && GetSpeciesAbility(species, GetMonData(&party[chosenMonId], MON_DATA_ABILITY_NUM)) == ABILITY_COMMANDER);
+        chosenIsDondozo = (GET_BASE_SPECIES_ID(species) == SPECIES_DONDOZO);
+    }
+    if (!chosenIsTatsugiri && !chosenIsDondozo)
+        return;
+
+    GetCommanderFieldState(battler, &tatsugiriActive, &dondozoActive, &pairActive);
+    if (pairActive || tatsugiriActive || dondozoActive)
+        return;
+
+    missingId = chosenIsTatsugiri ? info.dondozoId : info.tatsugiriId;
+    if (missingId == PARTY_SIZE || missingId == chosenMonId)
+        return;
+
+    if (!IsValidForBattle(&party[missingId]))
+        return;
+
+    partner = BATTLE_PARTNER(battler);
+    if (!IsBattlerAlive(partner) || (gAbsentBattlerFlags & (1u << partner)))
+    {
+        gBattleStruct->AI_monToSwitchIntoId[partner] = missingId;
+        if (IsOnPlayerSide(partner))
+            gBattleStruct->monToSwitchIntoId[partner] = missingId;
+    }
+    else
+    {
+        if (!CanBattlerConsiderSwitch(partner))
+            return;
+        gBattleStruct->AI_monToSwitchIntoId[partner] = missingId;
+        gAiLogicData->shouldSwitch |= (1u << partner);
+    }
 }
 
 bool32 ShouldSwitch(enum BattlerId battler)

@@ -344,6 +344,8 @@ static void PlayerPartnerHandleChoosePokemon(enum BattlerId battler)
         gBattleStruct->AI_monToSwitchIntoId[battler] = PARTY_SIZE;
         gBattleStruct->monToSwitchIntoId[battler] = chosenMonId;
     }
+    if (gBattleResources->bufferA[battler][1] != PARTY_ACTION_CHOOSE_FAINTED_MON)
+        AI_ApplyCommanderPairSwitchIn(battler, chosenMonId);
     #if TESTING
     TestRunner_Battle_CheckSwitch(battler, chosenMonId);
     #endif

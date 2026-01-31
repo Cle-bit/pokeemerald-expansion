@@ -1977,6 +1977,90 @@ AI_DOUBLE_BATTLE_TEST("AI will not choose to switch out Dondozo with Commander T
     }
 }
 
+AI_DOUBLE_BATTLE_TEST("Commander pair: AI switches partner to Tatsugiri when only Dondozo is on the field")
+{
+    GIVEN {
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_SMART_SWITCHING);
+        PLAYER(SPECIES_WOBBUFFET) { Moves(MOVE_CELEBRATE); }
+        PLAYER(SPECIES_WOBBUFFET) { Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_DONDOZO) { Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_TATSUGIRI) { Ability(ABILITY_COMMANDER); Moves(MOVE_WATER_GUN); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_CELEBRATE);
+            MOVE(playerRight, MOVE_CELEBRATE);
+            EXPECT_MOVE(opponentLeft, MOVE_CELEBRATE);
+            EXPECT_SWITCH(opponentRight, 2);
+        }
+    }
+}
+
+AI_DOUBLE_BATTLE_TEST("Commander pair: AI switches partner to Dondozo when only Tatsugiri is on the field")
+{
+    GIVEN {
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_SMART_SWITCHING);
+        PLAYER(SPECIES_WOBBUFFET) { Moves(MOVE_CELEBRATE); }
+        PLAYER(SPECIES_WOBBUFFET) { Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_TATSUGIRI) { Ability(ABILITY_COMMANDER); Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_DONDOZO) { Moves(MOVE_WATER_GUN); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_CELEBRATE);
+            MOVE(playerRight, MOVE_CELEBRATE);
+            EXPECT_MOVE(opponentLeft, MOVE_CELEBRATE);
+            EXPECT_SWITCH(opponentRight, 2);
+        }
+    }
+}
+
+AI_DOUBLE_BATTLE_TEST("Commander pair: AI sends out Tatsugiri with Dondozo after a double KO")
+{
+    GIVEN {
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_SMART_MON_CHOICES | AI_FLAG_OMNISCIENT);
+        PLAYER(SPECIES_CHARMANDER) { Level(20); Speed(100); Moves(MOVE_EMBER); }
+        PLAYER(SPECIES_BULBASAUR) { Level(20); Speed(100); Moves(MOVE_RAZOR_LEAF); }
+        OPPONENT(SPECIES_ZIGZAGOON) { Level(1); HP(1); Speed(1); Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_ZIGZAGOON) { Level(1); HP(1); Speed(1); Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_DONDOZO) { Level(50); Moves(MOVE_WATER_GUN); }
+        OPPONENT(SPECIES_TATSUGIRI) { Ability(ABILITY_COMMANDER); Moves(MOVE_SPLASH); }
+        OPPONENT(SPECIES_VULPIX) { Level(50); Moves(MOVE_EMBER); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_EMBER, target: opponentLeft);
+            MOVE(playerRight, MOVE_RAZOR_LEAF, target: opponentRight);
+            EXPECT_SEND_OUT(opponentLeft, 2);
+            EXPECT_SEND_OUT(opponentRight, 3);
+        }
+    }
+}
+
+AI_DOUBLE_BATTLE_TEST("Commander pair: AI switches partner to Tatsugiri after sending out Dondozo post-KO")
+{
+    GIVEN {
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_SMART_MON_CHOICES | AI_FLAG_OMNISCIENT);
+        PLAYER(SPECIES_CHARMANDER) { Level(20); Speed(100); Moves(MOVE_EMBER); }
+        PLAYER(SPECIES_WOBBUFFET) { Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_ZIGZAGOON) { Level(1); HP(1); Speed(1); Moves(MOVE_CELEBRATE); }
+        OPPONENT(SPECIES_RATTATA) { Moves(MOVE_TACKLE); }
+        OPPONENT(SPECIES_DONDOZO) { Level(50); Moves(MOVE_WATER_GUN); }
+        OPPONENT(SPECIES_TATSUGIRI) { Ability(ABILITY_COMMANDER); Moves(MOVE_SPLASH); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_EMBER, target: opponentLeft);
+            MOVE(playerRight, MOVE_CELEBRATE);
+            EXPECT_MOVE(opponentRight, MOVE_TACKLE);
+            EXPECT_SEND_OUT(opponentLeft, 2);
+        }
+        TURN {
+            MOVE(playerLeft, MOVE_CELEBRATE);
+            MOVE(playerRight, MOVE_CELEBRATE);
+            EXPECT_SWITCH(opponentRight, 3);
+        }
+    }
+}
+
 AI_SINGLE_BATTLE_TEST("AI_FLAG_RANDOMIZE_SWITCHIN: AI will randomly choose between eligible switchin candidates of the same category")
 {
     u32 trials; // Two trial counts to ensure randomization is scalable

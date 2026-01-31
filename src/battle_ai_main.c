@@ -423,10 +423,21 @@ void AI_TrySwitchOrUseItem(enum BattlerId battler)
     enum BattlerId battlerIn1, battlerIn2;
     s32 firstId;
     s32 lastId; // + 1
+    u32 commanderSwitchinId = PARTY_SIZE;
     party = GetBattlerParty(battler);
 
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
     {
+        if (AI_ShouldForceCommanderPartnerSwitch(battler, &commanderSwitchinId))
+        {
+            BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_SWITCH, 0);
+            SetAIUsingGimmick(battler, NO_GIMMICK);
+            gBattleStruct->AI_monToSwitchIntoId[battler] = commanderSwitchinId;
+            gBattleStruct->monToSwitchIntoId[battler] = commanderSwitchinId;
+            gAiLogicData->monToSwitchInId[battler] = commanderSwitchinId;
+            return;
+        }
+
         if (gAiLogicData->shouldSwitch & (1u << battler) && IsSwitchinValid(battler))
         {
             BtlController_EmitTwoReturnValues(battler, B_COMM_TO_ENGINE, B_ACTION_SWITCH, 0);

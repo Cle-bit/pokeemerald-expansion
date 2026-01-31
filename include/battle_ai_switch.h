@@ -49,5 +49,7 @@ void ModifySwitchAfterMoveScoring(enum BattlerId battler);
 u32 AI_SelectRevivalBlessingMon(enum BattlerId battler);
 bool32 IsSwitchinValid(enum BattlerId battler);
 bool32 IsAceMon(enum BattlerId battler, u32 monPartyId);
+bool32 AI_ShouldForceCommanderPartnerSwitch(enum BattlerId battler, u32 *switchinId);
+void AI_ApplyCommanderPairSwitchIn(enum BattlerId battler, u32 chosenMonId);
 
 #endif // GUARD_BATTLE_AI_SWITCH_H
