@@ -4814,6 +4814,7 @@ static enum AIScore IncreaseStatUpScoreInternal(enum BattlerId battlerAtk, enum 
     enum Move predictedMoveSpeedCheck = GetIncomingMoveSpeedCheck(battlerAtk, battlerDef, gAiLogicData);
     bool32 aiIsFaster = AI_IsFaster(battlerAtk, battlerDef, MOVE_NONE, predictedMoveSpeedCheck, DONT_CONSIDER_PRIORITY); // Don't care about the priority of our setup move, care about outspeeding otherwise
     bool32 shouldSetUp = ((noOfHitsToFaint >= 2 && aiIsFaster) || (noOfHitsToFaint >= 3 && !aiIsFaster) || noOfHitsToFaint == UNKNOWN_NO_OF_HITS);
+    bool32 hasBodyPress = HasMoveWithEffect(battlerAtk, EFFECT_BODY_PRESS);
     enum Stat statId = GetStatBeingChanged(statChange);
     u32 stages = GetStagesOfStatChange(statChange);
 
@@ -4871,16 +4872,34 @@ static enum AIScore IncreaseStatUpScoreInternal(enum BattlerId battlerAtk, enum 
         }
         break;
     case STAT_DEF:
+    {
+        enum AIScore defenseScore = NO_INCREASE;
+        enum AIScore bodyPressScore = NO_INCREASE;
+
         if (HasMoveWithCategory(battlerDef, DAMAGE_CATEGORY_PHYSICAL) || !HasMoveWithCategory(battlerDef, DAMAGE_CATEGORY_SPECIAL))
         {
             if (gAiThinkingStruct->aiFlags[battlerAtk] & AI_FLAG_STALL)
-                tempScore += WEAK_EFFECT;
+                defenseScore += WEAK_EFFECT;
             if (stages == 1)
-                tempScore += WEAK_EFFECT;
+                defenseScore += WEAK_EFFECT;
             else
-                tempScore += DECENT_EFFECT;
+                defenseScore += DECENT_EFFECT;
         }
+
+        if (hasBodyPress && shouldSetUp)
+        {
+            if (stages == 1)
+                bodyPressScore += DECENT_EFFECT;
+            else
+                bodyPressScore += GOOD_EFFECT;
+        }
+
+        if (bodyPressScore > defenseScore)
+            defenseScore = bodyPressScore;
+
+        tempScore += defenseScore;
         break;
+    }
     case STAT_SPEED:
         if ((noOfHitsToFaint >= 3 && !aiIsFaster) || noOfHitsToFaint == UNKNOWN_NO_OF_HITS)
         {
@@ -4900,16 +4919,35 @@ static enum AIScore IncreaseStatUpScoreInternal(enum BattlerId battlerAtk, enum 
         }
         break;
     case STAT_SPDEF:
+    {
+        enum AIScore spDefScore = NO_INCREASE;
+        enum AIScore bodyPressScore = NO_INCREASE;
+
         if (HasMoveWithCategory(battlerDef, DAMAGE_CATEGORY_SPECIAL) || !HasMoveWithCategory(battlerDef, DAMAGE_CATEGORY_PHYSICAL))
         {
             if (gAiThinkingStruct->aiFlags[battlerAtk] & AI_FLAG_STALL)
-                tempScore += WEAK_EFFECT;
+                spDefScore += WEAK_EFFECT;
             if (stages == 1)
-                tempScore += WEAK_EFFECT;
+                spDefScore += WEAK_EFFECT;
             else
-                tempScore += DECENT_EFFECT;
+                spDefScore += DECENT_EFFECT;
         }
+
+        // Wonder Room makes Body Press use Sp. Def stages for its damage calculation.
+        if (hasBodyPress && shouldSetUp && (gFieldStatuses & STATUS_FIELD_WONDER_ROOM))
+        {
+            if (stages == 1)
+                bodyPressScore += DECENT_EFFECT;
+            else
+                bodyPressScore += GOOD_EFFECT;
+        }
+
+        if (bodyPressScore > spDefScore)
+            spDefScore = bodyPressScore;
+
+        tempScore += spDefScore;
         break;
+    }
     case STAT_ACC:
         if (gBattleMons[battlerAtk].statStages[statId] <= DEFAULT_STAT_STAGE - 3) // Increase only if necessary
             tempScore += DECENT_EFFECT;
