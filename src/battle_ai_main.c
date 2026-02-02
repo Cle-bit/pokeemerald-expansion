@@ -4384,6 +4384,26 @@ static s32 AI_CalcMoveEffectScore(enum BattlerId battlerAtk, enum BattlerId batt
         }
         break;
     }
+    case EFFECT_BODY_PRESS:
+    {
+        u8 defStage;
+
+        if (IsBattleMovePhysical(move))
+        {
+            if (gFieldStatuses & STATUS_FIELD_WONDER_ROOM)
+                defStage = gBattleMons[battlerAtk].statStages[STAT_SPDEF];
+            else
+                defStage = gBattleMons[battlerAtk].statStages[STAT_DEF];
+        }
+        else
+        {
+            defStage = gBattleMons[battlerAtk].statStages[STAT_SPDEF];
+        }
+
+        if (defStage > DEFAULT_STAT_STAGE)
+            ADJUST_SCORE(defStage >= DEFAULT_STAT_STAGE + 2 ? GOOD_EFFECT : DECENT_EFFECT);
+        break;
+    }
     case EFFECT_MEMENTO:
         if (gAiThinkingStruct->aiFlags[battlerAtk] & AI_FLAG_WILL_SUICIDE && gBattleMons[battlerDef].statStages[STAT_EVASION] <= DEFAULT_STAT_STAGE)
             ADJUST_SCORE(DECENT_EFFECT);

@@ -4886,7 +4886,7 @@ static enum AIScore IncreaseStatUpScoreInternal(enum BattlerId battlerAtk, enum 
                 defenseScore += DECENT_EFFECT;
         }
 
-        if (hasBodyPress && shouldSetUp)
+        if (hasBodyPress && shouldSetUp && !(gFieldStatuses & STATUS_FIELD_WONDER_ROOM))
         {
             if (stages == 1)
                 bodyPressScore += DECENT_EFFECT;
