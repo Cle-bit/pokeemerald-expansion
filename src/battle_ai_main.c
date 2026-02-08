@@ -47,6 +47,7 @@ static bool32 IsPinchBerryItemEffect(enum HoldEffect holdEffect);
 static bool32 DoesAbilityBenefitFromSunOrRain(enum BattlerId battler, enum Ability ability, u32 weather);
 static void AI_CompareDamagingMoves(enum BattlerId battlerAtk, enum BattlerId battlerDef);
 static u32 GetWindAbilityScore(enum BattlerId battlerAtk, enum BattlerId battlerDef, struct AiLogicData *aiData);
+static bool32 AI_HasUsableMoveWithEffect(enum BattlerId battler, enum BattleMoveEffects effect, u32 moveLimitations);
 
 // ewram
 EWRAM_DATA const u8 *gAIScriptPtr = NULL;   // Still used in contests
@@ -3785,21 +3786,28 @@ static s32 AI_DoubleBattle(enum BattlerId battlerAtk, enum BattlerId battlerDef,
                 }
                 break;
             case EFFECT_BEAT_UP:
-                if (atkPartnerAbility == ABILITY_JUSTIFIED
-                  && moveType == TYPE_DARK
-                  && !DoesBattlerIgnoreAbilityChecks(battlerAtk, aiData->abilities[battlerAtk], move)
-                  && !IsBattleMoveStatus(move)
-                  && HasMoveWithCategory(battlerAtkPartner, DAMAGE_CATEGORY_PHYSICAL)
-                  && BattlerStatCanRise(battlerAtkPartner, atkPartnerAbility, STAT_ATK)
-                  && !wouldPartnerFaint)
+            {
+                bool32 shouldBeatUpForJustified = (atkPartnerAbility == ABILITY_JUSTIFIED
+                                                && moveType == TYPE_DARK
+                                                && !DoesBattlerIgnoreAbilityChecks(battlerAtk, aiData->abilities[battlerAtk], move)
+                                                && !IsBattleMoveStatus(move)
+                                                && HasMoveWithCategory(battlerAtkPartner, DAMAGE_CATEGORY_PHYSICAL)
+                                                && BattlerStatCanRise(battlerAtkPartner, atkPartnerAbility, STAT_ATK)
+                                                && !wouldPartnerFaint
+                                                && isFriendlyFireOK);
+                bool32 shouldBeatUpForRageFist = (AI_HasUsableMoveWithEffect(battlerAtkPartner, EFFECT_RAGE_FIST, aiData->moveLimitations[battlerAtkPartner])
+                                               && GetBattlerPartyState(battlerAtkPartner)->timesGotHit < 4
+                                               && !IsBattleMoveStatus(move)
+                                               && !wouldPartnerFaint
+                                               && isFriendlyFireOK);
+
+                if (shouldBeatUpForJustified || shouldBeatUpForRageFist)
                 {
-                    if (isFriendlyFireOK)
-                    {
-                        ADJUST_SCORE(DECENT_EFFECT);
-                    }
+                    ADJUST_SCORE(DECENT_EFFECT);
                     RETURN_SCORE_PLUS(WEAK_EFFECT);
                 }
                 break;
+            }
             case EFFECT_SOAK:
                 if (atkPartnerAbility == ABILITY_WONDER_GUARD
                  && !IS_BATTLER_OF_TYPE(battlerAtkPartner, TYPE_WATER)
@@ -3988,6 +3996,22 @@ static u32 GetWindAbilityScore(enum BattlerId battlerAtk, enum BattlerId battler
     }
 
     return score;
+}
+
+static bool32 AI_HasUsableMoveWithEffect(enum BattlerId battler, enum BattleMoveEffects effect, u32 moveLimitations)
+{
+    for (u32 moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
+    {
+        enum Move battlerMove = gBattleMons[battler].moves[moveIndex];
+        if (!IsMoveUnusable(moveIndex, battlerMove, moveLimitations)
+         && GetMoveEffect(battlerMove) == effect
+        )
+        {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }
 
 static enum MoveComparisonResult CompareMoveAccuracies(enum BattlerId battlerAtk, enum BattlerId battlerDef, u32 moveSlot1, u32 moveSlot2)
