@@ -468,6 +468,33 @@ AI_DOUBLE_BATTLE_TEST("AI will choose Beat Up on an ally with Justified if it wi
     }
 }
 
+AI_DOUBLE_BATTLE_TEST("AI will choose Beat Up on an ally with Rage Fist if it will benefit the ally")
+{
+    ASSUME(GetMoveEffect(MOVE_BEAT_UP) == EFFECT_BEAT_UP);
+    ASSUME(GetMoveEffect(MOVE_RAGE_FIST) == EFFECT_RAGE_FIST);
+
+    u32 currentHP, movePP;
+    enum Move move;
+
+    PARAMETRIZE { currentHP = 400; move = MOVE_DRAIN_PUNCH; movePP = 10; }
+    PARAMETRIZE { currentHP = 400; move = MOVE_RAGE_FIST;   movePP = 10; }
+    PARAMETRIZE { currentHP = 400; move = MOVE_RAGE_FIST;   movePP = 0; }
+    PARAMETRIZE { currentHP = 1;   move = MOVE_RAGE_FIST;   movePP = 10; }
+
+    GIVEN {
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT);
+        PLAYER(SPECIES_WOBBUFFET);
+        PLAYER(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(MOVE_BEAT_UP); }
+        OPPONENT(SPECIES_ANNIHILAPE) { MovesWithPP({move, movePP}, {MOVE_CELEBRATE, 10}); HP(currentHP); }
+    } WHEN {
+        if ((currentHP > 1) && (move == MOVE_RAGE_FIST) && (movePP > 0))
+            TURN { EXPECT_MOVE(opponentLeft, MOVE_BEAT_UP, target: opponentRight); }
+        else
+            TURN { EXPECT_MOVE(opponentLeft, MOVE_BEAT_UP, target: playerLeft); }
+    }
+}
+
 AI_DOUBLE_BATTLE_TEST("AI will choose Earthquake if partner is not alive")
 {
     ASSUME(GetMoveTarget(MOVE_EARTHQUAKE) == TARGET_FOES_AND_ALLY);
