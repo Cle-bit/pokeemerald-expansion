@@ -5045,6 +5045,14 @@ static s32 AI_CalcMoveEffectScore(enum BattlerId battlerAtk, enum BattlerId batt
         if (isBattle1v1 && aiData->holdEffects[battlerAtk] == HOLD_EFFECT_METRONOME)
             ADJUST_SCORE(GOOD_EFFECT);
         break;
+    case EFFECT_RAGE_FIST:
+    {
+        s32 rageFistScore = GetBattlerPartyState(battlerAtk)->timesGotHit;
+        if (rageFistScore > BEST_EFFECT)
+            rageFistScore = BEST_EFFECT;
+        ADJUST_SCORE(rageFistScore);
+        break;
+    }
     case EFFECT_ATTRACT:
         if (isBattle1v1
         && (AI_IsSlower(battlerAtk, battlerDef, move, predictedMoveSpeedCheck, CONSIDER_PRIORITY))
