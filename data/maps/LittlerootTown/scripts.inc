@@ -1,4 +1,5 @@
 LittlerootTown_MapScripts::
+	map_script MAP_SCRIPT_ON_LOAD, LittlerootTown_OnLoad
 	map_script MAP_SCRIPT_ON_TRANSITION, LittlerootTown_OnTransition
 	map_script MAP_SCRIPT_ON_FRAME_TABLE, LittlerootTown_OnFrame
 	map_script MAP_SCRIPT_ON_WARP_INTO_MAP_TABLE, LittlerootTown_OnWarp
@@ -33,6 +34,201 @@ LittlerootTown_MapScripts::
 	@ 3: Met Rival
 	@ 4: Received Pokedex
 
+	@ Experimental fixed puddle toggle:
+	@ OFF: FLAG_UNUSED_0x020 clear -> restore grass
+	@ ON : FLAG_UNUSED_0x020 set   -> place puddles at fixed tiles
+
+LittlerootTown_OnLoad:
+	call LittlerootTown_EventScript_ApplyTestPuddleTiles
+	end
+
+LittlerootTown_EventScript_ApplyTestPuddleTiles::
+	goto_if_set FLAG_UNUSED_0x020, LittlerootTown_EventScript_SetTestPuddleTiles
+	goto LittlerootTown_EventScript_ClearTestPuddleTiles
+
+LittlerootTown_EventScript_SetTestPuddleTiles::
+	@ Randomized puddle layout:
+	@ Most puddles are 2x2, with one full 3x3 per layout.
+	@ 2x2: TL=0x0C8 TR=0x0CA BL=0x0D8 BR=0x0DA
+	@ 3x3:
+	@ 0x0C8 0x0C9 0x0CA
+	@ 0x0D0 0x0D1 0x0D2
+	@ 0x0D8 0x0D9 0x0DA
+	call LittlerootTown_EventScript_ClearTestPuddleTiles
+	random 4
+	goto_if_eq VAR_RESULT, 0, LittlerootTown_EventScript_SetTestPuddleTiles_Shape0
+	goto_if_eq VAR_RESULT, 1, LittlerootTown_EventScript_SetTestPuddleTiles_Shape1
+	goto_if_eq VAR_RESULT, 2, LittlerootTown_EventScript_SetTestPuddleTiles_Shape2
+	goto LittlerootTown_EventScript_SetTestPuddleTiles_Shape3
+
+LittlerootTown_EventScript_SetTestPuddleTiles_Shape0::
+	@ 3x3 core at (12,11)
+	setmetatile 12, 11, 0x0C8, FALSE
+	setmetatile 13, 11, 0x0C9, FALSE
+	setmetatile 14, 11, 0x0CA, FALSE
+	setmetatile 12, 12, 0x0D0, FALSE
+	setmetatile 13, 12, 0x0D1, FALSE
+	setmetatile 14, 12, 0x0D2, FALSE
+	setmetatile 12, 13, 0x0D8, FALSE
+	setmetatile 13, 13, 0x0D9, FALSE
+	setmetatile 14, 13, 0x0DA, FALSE
+	@ 2x2 blocks
+	setmetatile 10, 12, 0x0C8, FALSE
+	setmetatile 11, 12, 0x0CA, FALSE
+	setmetatile 10, 13, 0x0D8, FALSE
+	setmetatile 11, 13, 0x0DA, FALSE
+	setmetatile 15, 11, 0x0C8, FALSE
+	setmetatile 16, 11, 0x0CA, FALSE
+	setmetatile 15, 12, 0x0D8, FALSE
+	setmetatile 16, 12, 0x0DA, FALSE
+	setmetatile 11, 14, 0x0C8, FALSE
+	setmetatile 12, 14, 0x0CA, FALSE
+	setmetatile 11, 15, 0x0D8, FALSE
+	setmetatile 12, 15, 0x0DA, FALSE
+	setmetatile 14, 14, 0x0C8, FALSE
+	setmetatile 15, 14, 0x0CA, FALSE
+	setmetatile 14, 15, 0x0D8, FALSE
+	setmetatile 15, 15, 0x0DA, FALSE
+	return
+
+LittlerootTown_EventScript_SetTestPuddleTiles_Shape1::
+	@ 3x3 core at (11,12)
+	setmetatile 11, 12, 0x0C8, FALSE
+	setmetatile 12, 12, 0x0C9, FALSE
+	setmetatile 13, 12, 0x0CA, FALSE
+	setmetatile 11, 13, 0x0D0, FALSE
+	setmetatile 12, 13, 0x0D1, FALSE
+	setmetatile 13, 13, 0x0D2, FALSE
+	setmetatile 11, 14, 0x0D8, FALSE
+	setmetatile 12, 14, 0x0D9, FALSE
+	setmetatile 13, 14, 0x0DA, FALSE
+	@ 2x2 blocks
+	setmetatile 10, 11, 0x0C8, FALSE
+	setmetatile 11, 11, 0x0CA, FALSE
+	setmetatile 10, 12, 0x0D8, FALSE
+	setmetatile 11, 12, 0x0DA, FALSE
+	setmetatile 14, 11, 0x0C8, FALSE
+	setmetatile 15, 11, 0x0CA, FALSE
+	setmetatile 14, 12, 0x0D8, FALSE
+	setmetatile 15, 12, 0x0DA, FALSE
+	setmetatile 15, 14, 0x0C8, FALSE
+	setmetatile 16, 14, 0x0CA, FALSE
+	setmetatile 15, 15, 0x0D8, FALSE
+	setmetatile 16, 15, 0x0DA, FALSE
+	setmetatile 10, 15, 0x0C8, FALSE
+	setmetatile 11, 15, 0x0CA, FALSE
+	setmetatile 10, 16, 0x0D8, FALSE
+	setmetatile 11, 16, 0x0DA, FALSE
+	@ Intersections should use center puddle tile.
+	setmetatile 11, 12, 0x0D1, FALSE
+	return
+
+LittlerootTown_EventScript_SetTestPuddleTiles_Shape2::
+	@ 3x3 core at (13,12)
+	setmetatile 13, 12, 0x0C8, FALSE
+	setmetatile 14, 12, 0x0C9, FALSE
+	setmetatile 15, 12, 0x0CA, FALSE
+	setmetatile 13, 13, 0x0D0, FALSE
+	setmetatile 14, 13, 0x0D1, FALSE
+	setmetatile 15, 13, 0x0D2, FALSE
+	setmetatile 13, 14, 0x0D8, FALSE
+	setmetatile 14, 14, 0x0D9, FALSE
+	setmetatile 15, 14, 0x0DA, FALSE
+	@ 2x2 blocks
+	setmetatile 11, 11, 0x0C8, FALSE
+	setmetatile 12, 11, 0x0CA, FALSE
+	setmetatile 11, 12, 0x0D8, FALSE
+	setmetatile 12, 12, 0x0DA, FALSE
+	setmetatile 10, 13, 0x0C8, FALSE
+	setmetatile 11, 13, 0x0CA, FALSE
+	setmetatile 10, 14, 0x0D8, FALSE
+	setmetatile 11, 14, 0x0DA, FALSE
+	setmetatile 12, 15, 0x0C8, FALSE
+	setmetatile 13, 15, 0x0CA, FALSE
+	setmetatile 12, 16, 0x0D8, FALSE
+	setmetatile 13, 16, 0x0DA, FALSE
+	setmetatile 15, 15, 0x0C8, FALSE
+	setmetatile 16, 15, 0x0CA, FALSE
+	setmetatile 15, 16, 0x0D8, FALSE
+	setmetatile 16, 16, 0x0DA, FALSE
+	return
+
+LittlerootTown_EventScript_SetTestPuddleTiles_Shape3::
+	@ 3x3 core at (12,13)
+	setmetatile 12, 13, 0x0C8, FALSE
+	setmetatile 13, 13, 0x0C9, FALSE
+	setmetatile 14, 13, 0x0CA, FALSE
+	setmetatile 12, 14, 0x0D0, FALSE
+	setmetatile 13, 14, 0x0D1, FALSE
+	setmetatile 14, 14, 0x0D2, FALSE
+	setmetatile 12, 15, 0x0D8, FALSE
+	setmetatile 13, 15, 0x0D9, FALSE
+	setmetatile 14, 15, 0x0DA, FALSE
+	@ 2x2 blocks
+	setmetatile 10, 11, 0x0C8, FALSE
+	setmetatile 11, 11, 0x0CA, FALSE
+	setmetatile 10, 12, 0x0D8, FALSE
+	setmetatile 11, 12, 0x0DA, FALSE
+	setmetatile 15, 11, 0x0C8, FALSE
+	setmetatile 16, 11, 0x0CA, FALSE
+	setmetatile 15, 12, 0x0D8, FALSE
+	setmetatile 16, 12, 0x0DA, FALSE
+	setmetatile 15, 13, 0x0C8, FALSE
+	setmetatile 16, 13, 0x0CA, FALSE
+	setmetatile 15, 14, 0x0D8, FALSE
+	setmetatile 16, 14, 0x0DA, FALSE
+	setmetatile 11, 15, 0x0C8, FALSE
+	setmetatile 12, 15, 0x0CA, FALSE
+	setmetatile 11, 16, 0x0D8, FALSE
+	setmetatile 12, 16, 0x0DA, FALSE
+	@ Intersections should use center puddle tile.
+	setmetatile 12, 15, 0x0D1, FALSE
+	return
+
+LittlerootTown_EventScript_ClearTestPuddleTiles::
+	@ Clear the full test area used by all randomized layouts.
+	setmetatile 10, 11, METATILE_General_Grass, FALSE
+	setmetatile 11, 11, METATILE_General_Grass, FALSE
+	setmetatile 12, 11, METATILE_General_Grass, FALSE
+	setmetatile 13, 11, METATILE_General_Grass, FALSE
+	setmetatile 14, 11, METATILE_General_Grass, FALSE
+	setmetatile 15, 11, METATILE_General_Grass, FALSE
+	setmetatile 16, 11, METATILE_General_Grass, FALSE
+	setmetatile 10, 12, METATILE_General_Grass, FALSE
+	setmetatile 11, 12, METATILE_General_Grass, FALSE
+	setmetatile 12, 12, METATILE_General_Grass, FALSE
+	setmetatile 13, 12, METATILE_General_Grass, FALSE
+	setmetatile 14, 12, METATILE_General_Grass, FALSE
+	setmetatile 15, 12, METATILE_General_Grass, FALSE
+	setmetatile 16, 12, METATILE_General_Grass, FALSE
+	setmetatile 10, 13, METATILE_General_Grass, FALSE
+	setmetatile 11, 13, METATILE_General_Grass, FALSE
+	setmetatile 12, 13, METATILE_General_Grass, FALSE
+	setmetatile 13, 13, METATILE_General_Grass, FALSE
+	setmetatile 14, 13, METATILE_General_Grass, FALSE
+	setmetatile 15, 13, METATILE_General_Grass, FALSE
+	setmetatile 16, 13, METATILE_General_Grass, FALSE
+	setmetatile 10, 14, METATILE_General_Grass, FALSE
+	setmetatile 11, 14, METATILE_General_Grass, FALSE
+	setmetatile 12, 14, METATILE_General_Grass, FALSE
+	setmetatile 13, 14, METATILE_General_Grass, FALSE
+	setmetatile 14, 14, METATILE_General_Grass, FALSE
+	setmetatile 15, 14, METATILE_General_Grass, FALSE
+	setmetatile 16, 14, METATILE_General_Grass, FALSE
+	setmetatile 10, 15, METATILE_General_Grass, FALSE
+	setmetatile 11, 15, METATILE_General_Grass, FALSE
+	setmetatile 12, 15, METATILE_General_Grass, FALSE
+	setmetatile 13, 15, METATILE_General_Grass, FALSE
+	setmetatile 14, 15, METATILE_General_Grass, FALSE
+	setmetatile 15, 15, METATILE_General_Grass, FALSE
+	setmetatile 16, 15, METATILE_General_Grass, FALSE
+	setmetatile 10, 16, METATILE_General_Grass, FALSE
+	setmetatile 11, 16, METATILE_General_Grass, FALSE
+	setmetatile 12, 16, METATILE_General_Grass, FALSE
+	setmetatile 13, 16, METATILE_General_Grass, FALSE
+	setmetatile 15, 16, METATILE_General_Grass, FALSE
+	setmetatile 16, 16, METATILE_General_Grass, FALSE
+	return
 
 LittlerootTown_OnTransition:
 	setflag FLAG_VISITED_LITTLEROOT_TOWN
@@ -1013,4 +1209,3 @@ LittlerootTown_Text_BirchSomethingToShowYouAtLab:
 	.string "I gave you?\p"
 	.string "I have something to show you.\n"
 	.string "Let's go to my LAB.$"
-
