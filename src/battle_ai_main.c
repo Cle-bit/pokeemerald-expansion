@@ -140,6 +140,39 @@ static s32 (*const sBattleAiFuncTable[])(enum BattlerId, enum BattlerId, enum Mo
     [63] = AI_FirstBattle,          // AI_FLAG_FIRST_BATTLE
 };
 
+static bool32 AI_BreaksThroughSemiInvulnerableState(enum BattlerId battlerAtk, enum BattlerId battlerDef, enum Ability abilityAtk, enum Ability abilityDef, enum Move move, enum SemiInvulnerableState state)
+{
+    if (state != STATE_COMMANDER)
+    {
+        if (MoveAlwaysHitsOnSameType(move) && IS_BATTLER_OF_TYPE(battlerAtk, GetMoveType(move)))
+            return TRUE;
+        if (abilityAtk == ABILITY_NO_GUARD || abilityDef == ABILITY_NO_GUARD)
+            return TRUE;
+        if (gBattleMons[battlerDef].volatiles.lockOn && gBattleMons[battlerDef].volatiles.battlerWithSureHit == battlerAtk)
+            return TRUE;
+    }
+
+    switch (state)
+    {
+    case STATE_UNDERGROUND:
+        return MoveDamagesUnderground(move);
+    case STATE_UNDERWATER:
+        return MoveDamagesUnderWater(move);
+    case STATE_ON_AIR:
+    case STATE_SKY_DROP:
+        return MoveDamagesAirborne(move) || MoveDamagesAirborneDoubleDamage(move);
+    case STATE_PHANTOM_FORCE:
+        return FALSE;
+    case STATE_COMMANDER:
+        return GetMoveEffect(move) == EFFECT_TRANSFORM;
+    case STATE_NONE:
+    case SEMI_INVULNERABLE_COUNT:
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 // Functions
 void BattleAI_SetupItems(void)
 {
@@ -1179,6 +1212,21 @@ static s32 AI_CheckBadMove(enum BattlerId battlerAtk, enum BattlerId battlerDef,
      && moveEffect != EFFECT_SEMI_INVULNERABLE && AI_IsFaster(battlerAtk, battlerDef, move, predictedMoveSpeedCheck, CONSIDER_PRIORITY)
      && abilityAtk != ABILITY_NO_GUARD && abilityDef != ABILITY_NO_GUARD)
         RETURN_SCORE_MINUS(10);
+
+    // Avoid moves that cannot hit when a faster foe is predicted to enter a semi-invulnerable state this turn.
+    if (!IsSemiInvulnerable(battlerDef, CHECK_ALL)
+     && predictedMove != MOVE_NONE
+     && predictedMove != MOVE_UNAVAILABLE
+     && predictedMove == predictedMoveSpeedCheck
+     && (GetMoveEffect(predictedMove) == EFFECT_SEMI_INVULNERABLE || GetMoveEffect(predictedMove) == EFFECT_SKY_DROP)
+     && AI_IsSlower(battlerAtk, battlerDef, move, predictedMoveSpeedCheck, CONSIDER_PRIORITY)
+     && moveEffect != EFFECT_SEMI_INVULNERABLE
+     && aiData->holdEffects[battlerDef] != HOLD_EFFECT_POWER_HERB)
+    {
+        enum SemiInvulnerableState predictedState = GetMoveTwoTurnAttackStatus(predictedMove);
+        if (!AI_BreaksThroughSemiInvulnerableState(battlerAtk, battlerDef, abilityAtk, abilityDef, move, predictedState))
+            RETURN_SCORE_MINUS(10);
+    }
 
     if (CanTargetFaintAi(battlerDef, battlerAtk))
     {
