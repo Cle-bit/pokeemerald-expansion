@@ -40,6 +40,9 @@ static u32 GetBattlerTypeMatchup(enum BattlerId opposingBattler, enum BattlerId 
 static u32 GetSwitchinHitsToKO(s32 damageTaken, enum BattlerId battler, const struct IncomingHealInfo *healInfo, u32 originalHp);
 static void GetIncomingHealInfo(enum BattlerId battler, struct IncomingHealInfo *healInfo);
 static u32 GetWishHealAmountForBattler(enum BattlerId battler);
+static bool32 IsOpponentPhysicalAttacker(enum BattlerId battler, enum BattlerId opposingBattler);
+static bool32 CanIntimidateLowerOpponentAtk(enum BattlerId battler, enum BattlerId opposingBattler);
+static bool32 ShouldSwitchIfIntimidateBenefit(enum BattlerId battler);
 
 static void InitializeSwitchinCandidate(enum BattlerId switchinBattler, struct Pokemon *mon)
 {
@@ -170,6 +173,10 @@ u32 GetSwitchChance(enum ShouldSwitchScenario shouldSwitchScenario)
             return SHOULD_SWITCH_REGENERATOR_PERCENTAGE;
         case SHOULD_SWITCH_REGENERATOR_STATS_RAISED:
             return SHOULD_SWITCH_REGENERATOR_STATS_RAISED_PERCENTAGE;
+        case SHOULD_SWITCH_INTIMIDATE:
+            return SHOULD_SWITCH_INTIMIDATE_PERCENTAGE;
+        case SHOULD_SWITCH_INTIMIDATE_STATS_RAISED:
+            return SHOULD_SWITCH_INTIMIDATE_STATS_RAISED_PERCENTAGE;
         case SHOULD_SWITCH_ENCORE_STATUS:
             return SHOULD_SWITCH_ENCORE_STATUS_PERCENTAGE;
         case SHOULD_SWITCH_ENCORE_DAMAGE:
@@ -914,9 +921,83 @@ static bool32 GetHitEscapeTransformState(enum BattlerId battlerAtk, enum Move mo
     return isFasterThanAll;
 }
 
+static bool32 IsOpponentPhysicalAttacker(enum BattlerId battler, enum BattlerId opposingBattler)
+{
+    if (!IsBattlerAlive(opposingBattler))
+        return FALSE;
+
+    if (HasPhysicalBestMove(opposingBattler, battler, AI_DEFENDING))
+        return TRUE;
+
+    return HasMoveWithCategory(opposingBattler, DAMAGE_CATEGORY_PHYSICAL);
+}
+
+static bool32 CanIntimidateLowerOpponentAtk(enum BattlerId battler, enum BattlerId opposingBattler)
+{
+    enum Ability abilityDef = gAiLogicData->abilities[opposingBattler];
+    enum Move savedMove = gAiThinkingStruct->moveConsidered;
+    bool32 canLower = FALSE;
+
+    // If Attack is already at -2 or lower, repeated Intimidate cycles aren't worth it.
+    if (gBattleMons[opposingBattler].statStages[STAT_ATK] <= DEFAULT_STAT_STAGE - 2)
+        return FALSE;
+
+    if (GetConfig(B_UPDATED_INTIMIDATE) >= GEN_8)
+    {
+        switch (abilityDef)
+        {
+        case ABILITY_INNER_FOCUS:
+        case ABILITY_SCRAPPY:
+        case ABILITY_OWN_TEMPO:
+        case ABILITY_OBLIVIOUS:
+            return FALSE;
+        default:
+            break;
+        }
+    }
+
+    if (abilityDef == ABILITY_MIRROR_ARMOR)
+        return FALSE;
+
+    // Use a generic Attack-lowering status move to reuse CanLowerStat's immunity checks.
+    gAiThinkingStruct->moveConsidered = MOVE_GROWL;
+    canLower = CanLowerStat(battler, opposingBattler, gAiLogicData, STAT_ATK);
+    gAiThinkingStruct->moveConsidered = savedMove;
+
+    return canLower;
+}
+
+static bool32 ShouldSwitchIfIntimidateBenefit(enum BattlerId battler)
+{
+    enum BattlerId opposingBattler = GetOppositeBattler(battler);
+    enum BattlerId opposingPartner = BATTLE_PARTNER(opposingBattler);
+    bool32 hasValidTarget = FALSE;
+
+    if (IsBattlerAlive(opposingBattler))
+    {
+        enum Ability abilityDef = gAiLogicData->abilities[opposingBattler];
+        if (DoesIntimidateRaiseStats(abilityDef))
+            return FALSE;
+        if (IsOpponentPhysicalAttacker(battler, opposingBattler) && CanIntimidateLowerOpponentAtk(battler, opposingBattler))
+            hasValidTarget = TRUE;
+    }
+
+    if (IsDoubleBattle() && IsBattlerAlive(opposingPartner))
+    {
+        enum Ability abilityDef = gAiLogicData->abilities[opposingPartner];
+        if (DoesIntimidateRaiseStats(abilityDef))
+            return FALSE;
+        if (IsOpponentPhysicalAttacker(battler, opposingPartner) && CanIntimidateLowerOpponentAtk(battler, opposingPartner))
+            hasValidTarget = TRUE;
+    }
+
+    return hasValidTarget;
+}
+
 static bool32 ShouldSwitchIfAbilityBenefit(enum BattlerId battler)
 {
     bool32 hasStatRaised = AnyUsefulStatIsRaised(battler);
+    bool32 hasGoodSwitchin = gAiLogicData->mostSuitableMonId[battler] != PARTY_SIZE;
 
     //Check if ability is blocked
     if (gBattleMons[battler].volatiles.gastroAcid
@@ -928,13 +1009,13 @@ static bool32 ShouldSwitchIfAbilityBenefit(enum BattlerId battler)
         case ABILITY_NATURAL_CURE:
             //Attempt to cure bad ailment
             if (gBattleMons[battler].status1 & (STATUS1_SLEEP | STATUS1_FREEZE | STATUS1_TOXIC_POISON)
-                && gAiLogicData->mostSuitableMonId[battler] != PARTY_SIZE
+                && hasGoodSwitchin
                 && (hasStatRaised ? RandomPercentage(RNG_AI_SWITCH_NATURAL_CURE, GetSwitchChance(SHOULD_SWITCH_NATURAL_CURE_STRONG_STATS_RAISED)) : RandomPercentage(RNG_AI_SWITCH_NATURAL_CURE, GetSwitchChance(SHOULD_SWITCH_NATURAL_CURE_STRONG))))
                 break;
             //Attempt to cure lesser ailment
             if ((gBattleMons[battler].status1 & STATUS1_ANY)
                 && (gBattleMons[battler].hp >= gBattleMons[battler].maxHP / 2)
-                && gAiLogicData->mostSuitableMonId[battler] != PARTY_SIZE
+                && hasGoodSwitchin
                 && (hasStatRaised ? RandomPercentage(RNG_AI_SWITCH_NATURAL_CURE, GetSwitchChance(SHOULD_SWITCH_NATURAL_CURE_WEAK_STATS_RAISED)) : RandomPercentage(RNG_AI_SWITCH_NATURAL_CURE, GetSwitchChance(SHOULD_SWITCH_NATURAL_CURE_WEAK))))
                 break;
 
@@ -945,8 +1026,16 @@ static bool32 ShouldSwitchIfAbilityBenefit(enum BattlerId battler)
             if (gBattleMons[battler].status1 & STATUS1_ANY)
                 return FALSE;
             if ((gBattleMons[battler].hp <= ((gBattleMons[battler].maxHP * 2) / 3))
-                 && gAiLogicData->mostSuitableMonId[battler] != PARTY_SIZE
+                 && hasGoodSwitchin
                  && (hasStatRaised ? RandomPercentage(RNG_AI_SWITCH_REGENERATOR, GetSwitchChance(SHOULD_SWITCH_REGENERATOR_STATS_RAISED)) : RandomPercentage(RNG_AI_SWITCH_REGENERATOR, GetSwitchChance(SHOULD_SWITCH_REGENERATOR))))
+                break;
+
+            return FALSE;
+
+        case ABILITY_INTIMIDATE:
+            if (ShouldSwitchIfIntimidateBenefit(battler)
+                && hasGoodSwitchin
+                && (hasStatRaised ? RandomPercentage(RNG_AI_SWITCH_INTIMIDATE, GetSwitchChance(SHOULD_SWITCH_INTIMIDATE_STATS_RAISED)) : RandomPercentage(RNG_AI_SWITCH_INTIMIDATE, GetSwitchChance(SHOULD_SWITCH_INTIMIDATE))))
                 break;
 
             return FALSE;
