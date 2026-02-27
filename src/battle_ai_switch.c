@@ -956,9 +956,6 @@ static bool32 CanIntimidateLowerOpponentAtk(enum BattlerId battler, enum Battler
         }
     }
 
-    if (abilityDef == ABILITY_MIRROR_ARMOR)
-        return FALSE;
-
     // Use a generic Attack-lowering status move to reuse CanLowerStat's immunity checks.
     gAiThinkingStruct->moveConsidered = MOVE_GROWL;
     canLower = CanLowerStat(battler, opposingBattler, gAiLogicData, STAT_ATK);
@@ -976,7 +973,7 @@ static bool32 ShouldSwitchIfIntimidateBenefit(enum BattlerId battler)
     if (IsBattlerAlive(opposingBattler))
     {
         enum Ability abilityDef = gAiLogicData->abilities[opposingBattler];
-        if (DoesIntimidateRaiseStats(abilityDef))
+        if (DoesIntimidateRaiseStats(abilityDef) || abilityDef == ABILITY_MIRROR_ARMOR)
             return FALSE;
         if (IsOpponentPhysicalAttacker(battler, opposingBattler) && CanIntimidateLowerOpponentAtk(battler, opposingBattler))
             hasValidTarget = TRUE;
@@ -985,7 +982,7 @@ static bool32 ShouldSwitchIfIntimidateBenefit(enum BattlerId battler)
     if (IsDoubleBattle() && IsBattlerAlive(opposingPartner))
     {
         enum Ability abilityDef = gAiLogicData->abilities[opposingPartner];
-        if (DoesIntimidateRaiseStats(abilityDef))
+        if (DoesIntimidateRaiseStats(abilityDef) || abilityDef == ABILITY_MIRROR_ARMOR)
             return FALSE;
         if (IsOpponentPhysicalAttacker(battler, opposingPartner) && CanIntimidateLowerOpponentAtk(battler, opposingPartner))
             hasValidTarget = TRUE;
