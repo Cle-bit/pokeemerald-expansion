@@ -327,6 +327,7 @@ bool32 IsBattlerPredictedToSwitch(enum BattlerId battler);
 enum Move GetIncomingMove(enum BattlerId battler, enum BattlerId opposingBattler, struct AiLogicData *aiData);
 enum Move GetIncomingMoveSpeedCheck(enum BattlerId battler, enum BattlerId opposingBattler, struct AiLogicData *aiData);
 bool32 IsNaturalEnemy(u32 speciesAttacker, u32 speciesTarget);
+bool32 DoesIntimidateRaiseStats(enum Ability ability);
 bool32 AI_OpponentCanFaintAiWithMod(enum BattlerId battler, u32 healAmount);
 void SetBattlerFieldStatusForSwitchin(enum BattlerId battler);
 bool32 ShouldInstructPartner(enum BattlerId partner, enum Move move);

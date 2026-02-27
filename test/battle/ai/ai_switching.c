@@ -1270,6 +1270,159 @@ AI_SINGLE_BATTLE_TEST("Switch AI: AI will switch out if it has <= 66% HP remaini
     }
 }
 
+AI_SINGLE_BATTLE_TEST("Switch AI: Intimidate pivoting switches out under physical pressure")
+{
+    PASSES_RANDOMLY(SHOULD_SWITCH_INTIMIDATE_PERCENTAGE, 100, RNG_AI_SWITCH_INTIMIDATE);
+    GIVEN {
+        ASSUME(GetBattleMoveCategory(MOVE_SCRATCH) == DAMAGE_CATEGORY_PHYSICAL);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_OMNISCIENT);
+        PLAYER(SPECIES_ZIGZAGOON) { Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_ARCANINE) { Ability(ABILITY_INTIMIDATE); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_SLOWBRO) { Moves(MOVE_SURF); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_SCRATCH); EXPECT_SWITCH(opponent, 1); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("Switch AI: Intimidate pivoting does not switch against a special attacker")
+{
+    GIVEN {
+        ASSUME(GetBattleMoveCategory(MOVE_WATER_GUN) == DAMAGE_CATEGORY_SPECIAL);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_OMNISCIENT);
+        PLAYER(SPECIES_PSYDUCK) { Moves(MOVE_WATER_GUN); }
+        OPPONENT(SPECIES_ARCANINE) { Ability(ABILITY_INTIMIDATE); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_SLOWBRO) { Moves(MOVE_SURF); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_WATER_GUN); EXPECT_MOVE(opponent, MOVE_SCRATCH); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("Switch AI: Intimidate pivoting does not switch if target's Attack can't be lowered")
+{
+    GIVEN {
+        ASSUME(GetBattleMoveCategory(MOVE_SCRATCH) == DAMAGE_CATEGORY_PHYSICAL);
+        ASSUME(gItemsInfo[ITEM_CLEAR_AMULET].holdEffect == HOLD_EFFECT_CLEAR_AMULET);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_OMNISCIENT);
+        PLAYER(SPECIES_ZIGZAGOON) { Item(ITEM_CLEAR_AMULET); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_ARCANINE) { Ability(ABILITY_INTIMIDATE); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_SLOWBRO) { Moves(MOVE_SURF); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_SCRATCH); EXPECT_MOVE(opponent, MOVE_SCRATCH); }
+    }
+}
+
+AI_SINGLE_BATTLE_TEST("Switch AI: Intimidate pivoting does not switch if target benefits from stat drops")
+{
+    u32 species;
+    enum Ability ability;
+
+    PARAMETRIZE { species = SPECIES_CORVIKNIGHT; ability = ABILITY_MIRROR_ARMOR; }
+    PARAMETRIZE { species = SPECIES_MABOSSTIFF;  ability = ABILITY_GUARD_DOG; }
+
+    GIVEN {
+        ASSUME(GetBattleMoveCategory(MOVE_SCRATCH) == DAMAGE_CATEGORY_PHYSICAL);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_OMNISCIENT);
+        PLAYER(species) { Ability(ability); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_ARCANINE) { Ability(ABILITY_INTIMIDATE); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_SLOWBRO) { Moves(MOVE_SURF); }
+    } WHEN {
+        TURN { MOVE(player, MOVE_SCRATCH); EXPECT_MOVE(opponent, MOVE_SCRATCH); }
+    }
+}
+
+AI_DOUBLE_BATTLE_TEST("Switch AI: Intimidate pivoting in doubles switches if at least one target is valid")
+{
+    PASSES_RANDOMLY(SHOULD_SWITCH_INTIMIDATE_PERCENTAGE, 100, RNG_AI_SWITCH_INTIMIDATE);
+    GIVEN {
+        ASSUME(GetBattleMoveCategory(MOVE_SCRATCH) == DAMAGE_CATEGORY_PHYSICAL);
+        ASSUME(GetBattleMoveCategory(MOVE_WATER_GUN) == DAMAGE_CATEGORY_SPECIAL);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_OMNISCIENT);
+        PLAYER(SPECIES_PSYDUCK) { Moves(MOVE_SCRATCH); }
+        PLAYER(SPECIES_PSYDUCK) { Moves(MOVE_WATER_GUN); }
+        OPPONENT(SPECIES_ARCANINE) { Ability(ABILITY_INTIMIDATE); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_SLOWBRO) { Moves(MOVE_SURF); }
+        OPPONENT(SPECIES_SPINARAK) { Moves(MOVE_POISON_STING); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_SCRATCH, target:opponentLeft);
+            MOVE(playerRight, MOVE_WATER_GUN, target:opponentLeft);
+            EXPECT_SWITCH(opponentLeft, 2);
+            EXPECT_MOVE(opponentRight, MOVE_SCRATCH);
+        }
+    }
+}
+
+AI_DOUBLE_BATTLE_TEST("Switch AI: Intimidate pivoting in doubles does not switch if both targets are special attackers")
+{
+    GIVEN {
+        ASSUME(GetBattleMoveCategory(MOVE_WATER_GUN) == DAMAGE_CATEGORY_SPECIAL);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_OMNISCIENT);
+        PLAYER(SPECIES_PSYDUCK) { Moves(MOVE_WATER_GUN); }
+        PLAYER(SPECIES_PSYDUCK) { Moves(MOVE_WATER_GUN); }
+        OPPONENT(SPECIES_ARCANINE) { Ability(ABILITY_INTIMIDATE); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_SLOWBRO) { Moves(MOVE_SURF); }
+        OPPONENT(SPECIES_ARBOK) { Moves(MOVE_POISON_STING); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_WATER_GUN, target:opponentLeft);
+            MOVE(playerRight, MOVE_WATER_GUN, target:opponentLeft);
+            EXPECT_MOVE(opponentLeft, MOVE_SCRATCH);
+            EXPECT_MOVE(opponentRight, MOVE_SCRATCH);
+        }
+    }
+}
+
+AI_DOUBLE_BATTLE_TEST("Switch AI: Intimidate pivoting in doubles does not switch if either target benefits from stat drops")
+{
+    u32 species;
+    enum Ability ability;
+
+    PARAMETRIZE { species = SPECIES_CORVIKNIGHT; ability = ABILITY_MIRROR_ARMOR; }
+    PARAMETRIZE { species = SPECIES_MABOSSTIFF;  ability = ABILITY_GUARD_DOG; }
+
+    GIVEN {
+        ASSUME(GetBattleMoveCategory(MOVE_SCRATCH) == DAMAGE_CATEGORY_PHYSICAL);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_OMNISCIENT);
+        PLAYER(SPECIES_ZIGZAGOON) { Moves(MOVE_SCRATCH); }
+        PLAYER(species) { Ability(ability); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_ARCANINE) { Ability(ABILITY_INTIMIDATE); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_SLOWBRO) { Moves(MOVE_SURF); }
+        OPPONENT(SPECIES_SPINARAK) { Moves(MOVE_POISON_STING); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_SCRATCH, target:opponentLeft);
+            MOVE(playerRight, MOVE_SCRATCH, target:opponentLeft);
+            EXPECT_MOVE(opponentLeft, MOVE_SCRATCH);
+            EXPECT_MOVE(opponentRight, MOVE_SCRATCH);
+        }
+    }
+}
+
+AI_DOUBLE_BATTLE_TEST("Switch AI: Intimidate pivoting in doubles does not switch if neither target can be Attack-lowered")
+{
+    GIVEN {
+        ASSUME(GetBattleMoveCategory(MOVE_SCRATCH) == DAMAGE_CATEGORY_PHYSICAL);
+        ASSUME(gItemsInfo[ITEM_CLEAR_AMULET].holdEffect == HOLD_EFFECT_CLEAR_AMULET);
+        AI_FLAGS(AI_FLAG_CHECK_BAD_MOVE | AI_FLAG_CHECK_VIABILITY | AI_FLAG_TRY_TO_FAINT | AI_FLAG_OMNISCIENT);
+        PLAYER(SPECIES_ZIGZAGOON) { Item(ITEM_CLEAR_AMULET); Moves(MOVE_SCRATCH); }
+        PLAYER(SPECIES_ZIGZAGOON) { Item(ITEM_CLEAR_AMULET); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_ARCANINE) { Ability(ABILITY_INTIMIDATE); Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_WOBBUFFET) { Moves(MOVE_SCRATCH); }
+        OPPONENT(SPECIES_SLOWBRO) { Moves(MOVE_SURF); }
+        OPPONENT(SPECIES_ARBOK) { Moves(MOVE_POISON_STING); }
+    } WHEN {
+        TURN {
+            MOVE(playerLeft, MOVE_SCRATCH, target:opponentLeft);
+            MOVE(playerRight, MOVE_SCRATCH, target:opponentLeft);
+            EXPECT_MOVE(opponentLeft, MOVE_SCRATCH);
+            EXPECT_MOVE(opponentRight, MOVE_SCRATCH);
+        }
+    }
+}
+
 AI_SINGLE_BATTLE_TEST("AI_FLAG_SMART_SWITCHING: AI will switch out if it has been Encore'd into a status move")
 {
     PASSES_RANDOMLY(SHOULD_SWITCH_ENCORE_STATUS_PERCENTAGE, 100, RNG_AI_SWITCH_ENCORE);
