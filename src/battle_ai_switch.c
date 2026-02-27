@@ -935,12 +935,30 @@ static bool32 IsOpponentPhysicalAttacker(enum BattlerId battler, enum BattlerId 
 static bool32 CanIntimidateLowerOpponentAtk(enum BattlerId battler, enum BattlerId opposingBattler)
 {
     enum Ability abilityDef = gAiLogicData->abilities[opposingBattler];
-    enum Move savedMove = gAiThinkingStruct->moveConsidered;
-    bool32 canLower = FALSE;
 
     // If Attack is already at -2 or lower, repeated Intimidate cycles aren't worth it.
     if (gBattleMons[opposingBattler].statStages[STAT_ATK] <= DEFAULT_STAT_STAGE - 2)
         return FALSE;
+
+    if (gAiLogicData->holdEffects[opposingBattler] == HOLD_EFFECT_CLEAR_AMULET)
+        return FALSE;
+
+    if (gSideStatuses[GetBattlerSide(opposingBattler)] & SIDE_STATUS_MIST)
+        return FALSE;
+
+    if (IS_BATTLER_OF_TYPE(opposingBattler, TYPE_GRASS) && AI_IsAbilityOnSide(opposingBattler, ABILITY_FLOWER_VEIL))
+        return FALSE;
+
+    switch (abilityDef)
+    {
+    case ABILITY_HYPER_CUTTER:
+    case ABILITY_CLEAR_BODY:
+    case ABILITY_FULL_METAL_BODY:
+    case ABILITY_WHITE_SMOKE:
+        return FALSE;
+    default:
+        break;
+    }
 
     if (GetConfig(B_UPDATED_INTIMIDATE) >= GEN_8)
     {
@@ -956,12 +974,7 @@ static bool32 CanIntimidateLowerOpponentAtk(enum BattlerId battler, enum Battler
         }
     }
 
-    // Use a generic Attack-lowering status move to reuse CanLowerStat's immunity checks.
-    gAiThinkingStruct->moveConsidered = MOVE_GROWL;
-    canLower = CanLowerStat(battler, opposingBattler, gAiLogicData, STAT_ATK);
-    gAiThinkingStruct->moveConsidered = savedMove;
-
-    return canLower;
+    return TRUE;
 }
 
 static bool32 ShouldSwitchIfIntimidateBenefit(enum BattlerId battler)
