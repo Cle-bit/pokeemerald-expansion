@@ -1057,16 +1057,8 @@ static bool32 ShouldSwitchIfAbilityBenefit(enum BattlerId battler)
         {
             enum Move hitEscapeMove = MOVE_NONE;
 
-            for (u32 moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
-            {
-                enum Move move = gBattleMons[battler].moves[moveIndex];
-
-                if (move != MOVE_NONE && GetMoveEffect(move) == EFFECT_HIT_ESCAPE)
-                {
-                    hitEscapeMove = move;
-                    break;
-                }
-            }
+            if (GetBattlerMoveIndexWithEffect(battler, EFFECT_HIT_ESCAPE) < MAX_MON_MOVES)
+                hitEscapeMove = gBattleMons[battler].moves[GetBattlerMoveIndexWithEffect(battler, EFFECT_HIT_ESCAPE)];
 
             // Prefer to use a hit escape move if Palafin will move first and can hit
             if (hitEscapeMove != MOVE_NONE && GetHitEscapeTransformState(battler, hitEscapeMove))
