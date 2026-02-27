@@ -940,6 +940,9 @@ static bool32 CanIntimidateLowerOpponentAtk(enum BattlerId battler, enum Battler
     if (gBattleMons[opposingBattler].statStages[STAT_ATK] <= DEFAULT_STAT_STAGE - 2)
         return FALSE;
 
+    if (gBattleMons[opposingBattler].volatiles.substitute)
+        return FALSE;
+
     if (gAiLogicData->holdEffects[opposingBattler] == HOLD_EFFECT_CLEAR_AMULET)
         return FALSE;
 
