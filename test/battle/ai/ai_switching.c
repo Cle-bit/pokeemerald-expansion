@@ -1330,7 +1330,7 @@ AI_SINGLE_BATTLE_TEST("Switch AI: Intimidate pivoting does not switch if target 
     }
 }
 
-AI_DOUBLE_BATTLE_TEST("Switch AI: Intimidate pivoting in doubles switches if at least one target is valid")
+AI_DOUBLE_BATTLE_TEST("Switch AI: Intimidate pivoting in doubles switches if at least one target is a physical attacker")
 {
     PASSES_RANDOMLY(SHOULD_SWITCH_INTIMIDATE_PERCENTAGE, 100, RNG_AI_SWITCH_INTIMIDATE);
     GIVEN {
