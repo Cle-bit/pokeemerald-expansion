@@ -268,10 +268,10 @@ static void GetInFrontOfPlayerPosition(struct MapPosition *position)
 
     GetXYCoordsOneStepInFrontOfPlayer(&position->x, &position->y);
     PlayerGetDestCoords(&x, &y);
-    if (MapGridGetElevationAt(x, y) != ELEVATION_TRANSITION)
+    if (MapGridGetElevationAt(x, y) != 0)
         position->elevation = PlayerGetElevation();
     else
-        position->elevation = ELEVATION_TRANSITION;
+        position->elevation = 0;
 }
 
 static u16 GetPlayerCurMetatileBehavior(int runningState)
@@ -1114,7 +1114,7 @@ static s8 GetWarpEventAtPosition(struct MapHeader *mapHeader, u16 x, u16 y, u8 e
     {
         if ((u16)warpEvent->x == x && (u16)warpEvent->y == y)
         {
-            if (warpEvent->elevation == elevation || warpEvent->elevation == ELEVATION_TRANSITION)
+            if (warpEvent->elevation == elevation || warpEvent->elevation == 0)
                 return i;
         }
     }
@@ -1161,7 +1161,7 @@ static const u8 *GetCoordEventScriptAtPosition(struct MapHeader *mapHeader, u16 
     {
         if ((u16)coordEvents[i].x == x && (u16)coordEvents[i].y == y)
         {
-            if (coordEvents[i].elevation == elevation || coordEvents[i].elevation == ELEVATION_TRANSITION)
+            if (coordEvents[i].elevation == elevation || coordEvents[i].elevation == 0)
             {
                 const u8 *script = TryRunCoordEventScript(&coordEvents[i]);
                 if (script != NULL)
@@ -1187,7 +1187,7 @@ static const struct BgEvent *GetBackgroundEventAtPosition(struct MapHeader *mapH
     {
         if ((u16)bgEvents[i].x == x && (u16)bgEvents[i].y == y)
         {
-            if (bgEvents[i].elevation == elevation || bgEvents[i].elevation == ELEVATION_TRANSITION)
+            if (bgEvents[i].elevation == elevation || bgEvents[i].elevation == 0)
                 return &bgEvents[i];
         }
     }
