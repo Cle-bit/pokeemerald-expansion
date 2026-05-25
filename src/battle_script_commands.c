@@ -2674,6 +2674,7 @@ void SetMoveEffect(enum BattlerId battlerAtk, enum BattlerId effectBattler, enum
             gBattleMons[gEffectBattler].volatiles.wrapped = TRUE;
             gBattleMons[gEffectBattler].volatiles.wrappedMove = gCurrentMove;
             gBattleMons[gEffectBattler].volatiles.wrappedBy = gBattlerAttacker;
+            gBattleMons[gEffectBattler].volatiles.wrappedBindingBand = (GetBattlerHoldEffect(gBattlerAttacker) == HOLD_EFFECT_BINDING_BAND);
             BattleScriptPush(battleScript);
             gBattlescriptCurrInstr = BattleScript_MoveEffectWrap;
         }
@@ -3435,7 +3436,8 @@ void SetMoveEffect(enum BattlerId battlerAtk, enum BattlerId effectBattler, enum
                 gBattleMons[battler].volatiles.wrapped = TRUE;
                 SetWrapTurns(battler, GetBattlerHoldEffect(gBattlerAttacker));
                 // The Wrap effect does not expire when the user switches, so here's some cheese.
-                gBattleMons[battler].volatiles.wrappedBy = gBattlerTarget;
+                gBattleMons[battler].volatiles.wrappedBy = gBattlerAttacker;
+                gBattleMons[battler].volatiles.wrappedBindingBand = (GetBattlerHoldEffect(gBattlerAttacker) == HOLD_EFFECT_BINDING_BAND);
                 if (moveEffect == MOVE_EFFECT_SANDBLAST_SIDE)
                     gBattleMons[battler].volatiles.wrappedMove = MOVE_SAND_TOMB;
                 else
@@ -8694,6 +8696,7 @@ static void Cmd_setsubstitute(void)
     {
         gBattleMons[gBattlerAttacker].volatiles.substitute = TRUE;
         gBattleMons[gBattlerAttacker].volatiles.wrapped = FALSE;
+        gBattleMons[gBattlerAttacker].volatiles.wrappedBindingBand = FALSE;
         if (factor == 2)
             gBattleMons[gBattlerAttacker].volatiles.substituteHP = hp / 2;
         else
@@ -9445,6 +9448,7 @@ static void Cmd_rapidspinfree(void)
     {
         gBattleScripting.battler = gBattlerTarget;
         gBattleMons[gBattlerAttacker].volatiles.wrapped = FALSE;
+        gBattleMons[gBattlerAttacker].volatiles.wrappedBindingBand = FALSE;
         gBattlerTarget = gBattleMons[gBattlerAttacker].volatiles.wrappedBy;
         PREPARE_MOVE_BUFFER(gBattleTextBuff1, gBattleMons[gBattlerAttacker].volatiles.wrappedMove);
         BattleScriptCall(BattleScript_WrapFree);
