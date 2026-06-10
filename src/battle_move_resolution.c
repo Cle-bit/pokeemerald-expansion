@@ -4285,6 +4285,7 @@ static enum MoveEndResult MoveEndClearBits(struct BattleCalcValues *cv)
         gBattleStruct->battlerState[cv->battlerAtk].targetsDone[i] = FALSE;
         gBattleStruct->battlerState[i].redCardSwitched = FALSE;
         gBattleMons[i].volatiles.tryEjectPack = FALSE;
+        gSpecialStatuses[i].shellBellEmergencyExit = FALSE;
 
         if (gBattleStruct->battlerState[i].commanderSpecies != SPECIES_NONE && !IsBattlerAlive(i))
         {
