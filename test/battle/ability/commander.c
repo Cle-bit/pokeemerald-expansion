@@ -597,3 +597,61 @@ DOUBLE_BATTLE_TEST("Red Card is still consumed but cannot force out Dondozo afte
         EXPECT(opponentLeft->species == SPECIES_DONDOZO);
     }
 }
+
+DOUBLE_BATTLE_TEST("Commander Tatsugiri's sleep turns progress after Dondozo switches in")
+{
+    GIVEN {
+        PLAYER(SPECIES_WOBBUFFET);
+        PLAYER(SPECIES_TATSUGIRI) { Ability(ABILITY_COMMANDER); Status1(STATUS1_SLEEP_TURN(2)); }
+        PLAYER(SPECIES_DONDOZO);
+        OPPONENT(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WOBBUFFET);
+    } WHEN {
+        TURN { SWITCH(playerLeft, 2); }
+        TURN {}
+        TURN {}
+    } SCENE {
+        ABILITY_POPUP(playerRight, ABILITY_COMMANDER);
+        MESSAGE("Tatsugiri was swallowed by Dondozo and became Dondozo's commander!");
+    } THEN {
+        EXPECT_EQ(playerRight->status1, STATUS1_NONE);
+    }
+}
+
+DOUBLE_BATTLE_TEST("Commander Tatsugiri stays hidden and cannot be forced out after Yawn makes it fall asleep")
+{
+    u8 invisibility;
+    bool32 useWhirlwind;
+
+    PARAMETRIZE { useWhirlwind = FALSE; }
+    PARAMETRIZE { useWhirlwind = TRUE; }
+
+    GIVEN {
+        ASSUME(GetMoveEffect(MOVE_YAWN) == EFFECT_YAWN);
+        ASSUME(GetMoveEffect(MOVE_WHIRLWIND) == EFFECT_ROAR);
+        PLAYER(SPECIES_WOBBUFFET);
+        PLAYER(SPECIES_TATSUGIRI) { Ability(ABILITY_COMMANDER); }
+        PLAYER(SPECIES_DONDOZO);
+        OPPONENT(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WOBBUFFET);
+    } WHEN {
+        TURN { MOVE(opponentRight, MOVE_YAWN, target: playerRight); }
+        TURN { SWITCH(playerLeft, 2); }
+        if (useWhirlwind)
+            TURN { MOVE(opponentRight, MOVE_WHIRLWIND, target: playerRight); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_YAWN, opponentRight);
+        ABILITY_POPUP(playerRight, ABILITY_COMMANDER);
+        MESSAGE("Tatsugiri was swallowed by Dondozo and became Dondozo's commander!");
+        ANIMATION(ANIM_TYPE_STATUS, B_ANIM_STATUS_SLP, playerRight);
+        STATUS_ICON(playerRight, sleep: TRUE);
+        if (useWhirlwind)
+            NOT ANIMATION(ANIM_TYPE_MOVE, MOVE_WHIRLWIND, opponentRight);
+    } THEN {
+        invisibility = gBattleSpritesDataPtr->battlerData[GetBattlerAtPosition(B_POSITION_PLAYER_RIGHT)].invisible;
+        EXPECT_EQ(invisibility, TRUE);
+        EXPECT(playerRight->status1 & STATUS1_SLEEP);
+        EXPECT_EQ(playerLeft->species, SPECIES_DONDOZO);
+        EXPECT_EQ(playerRight->species, SPECIES_TATSUGIRI);
+    }
+}
