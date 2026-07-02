@@ -3795,16 +3795,18 @@ static bool32 DoesAbilityBenefitFromSunOrRain(enum BattlerId battler, enum Abili
         return (weather & B_WEATHER_RAIN);
     case ABILITY_HARVEST:
         if (GetItemPocket(gAiLogicData->items[battler]) != POCKET_BERRIES
-            && GetItemPocket(GetBattlerPartyState(battler)->usedHeldItem) != POCKET_BERRIES)
+         && GetItemPocket(GetBattlerPartyState(battler)->usedHeldItem) != POCKET_BERRIES)
         {
             return FALSE;
         }
     case ABILITY_CHLOROPHYLL:
     case ABILITY_FLOWER_GIFT:
     case ABILITY_LEAF_GUARD:
-    case ABILITY_SOLAR_POWER:
-    case ABILITY_ORICHALCUM_PULSE:
         return (weather & B_WEATHER_SUN);
+    case ABILITY_SOLAR_POWER:
+        return (weather & B_WEATHER_SUN) && HasMoveWithCategory(battler, DAMAGE_CATEGORY_SPECIAL);
+    case ABILITY_ORICHALCUM_PULSE:
+        return (weather & B_WEATHER_SUN) && HasMoveWithCategory(battler, DAMAGE_CATEGORY_PHYSICAL);
     default:
         break;
     }

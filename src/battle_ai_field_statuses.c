@@ -168,9 +168,7 @@ static bool32 DoesAbilityBenefitFromWeather(enum Ability ability, u32 weather)
     case ABILITY_FLOWER_GIFT:
     case ABILITY_HARVEST:
     case ABILITY_LEAF_GUARD:
-    case ABILITY_ORICHALCUM_PULSE:
     case ABILITY_PROTOSYNTHESIS:
-    case ABILITY_SOLAR_POWER:
         return (weather & B_WEATHER_SUN);
     default:
         break;
@@ -241,14 +239,19 @@ static enum FieldEffectOutcome BenefitsFromSun(enum BattlerId battler)
             return FIELD_EFFECT_NEUTRAL;
     }
 
-    if (DoesAbilityBenefitFromWeather(ability, B_WEATHER_SUN)
+    if ((ability == ABILITY_ORICHALCUM_PULSE && HasMoveWithCategory(battler, DAMAGE_CATEGORY_PHYSICAL))
+     || (ability == ABILITY_SOLAR_POWER && HasMoveWithCategory(battler, DAMAGE_CATEGORY_SPECIAL))
+     || DoesAbilityBenefitFromWeather(ability, B_WEATHER_SUN)
      || HasLightSensitiveMove(battler)
      || HasDamagingMoveOfType(battler, TYPE_FIRE)
      || HasMoveWithEffect(battler, EFFECT_WEATHER_BALL)
      || HasMoveWithEffect(battler, EFFECT_HYDRO_STEAM))
         return FIELD_EFFECT_POSITIVE;
 
-    if (HasMoveWithFlag(battler, MoveHas50AccuracyInSun) || HasDamagingMoveOfType(battler, TYPE_WATER) || gAiLogicData->abilities[battler] == ABILITY_DRY_SKIN)
+    if (HasMoveWithFlag(battler, MoveHas50AccuracyInSun)
+     || HasDamagingMoveOfType(battler, TYPE_WATER)
+     || gAiLogicData->abilities[battler] == ABILITY_DRY_SKIN
+     || gAiLogicData->abilities[battler] == ABILITY_SOLAR_POWER)
         return FIELD_EFFECT_NEGATIVE;
 
     return FIELD_EFFECT_NEUTRAL;
