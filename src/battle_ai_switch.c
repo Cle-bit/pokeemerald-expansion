@@ -307,7 +307,7 @@ static bool32 AI_DoesChoiceEffectBlockMove(enum BattlerId battler, enum Move mov
 {
     // Choice locked into something else
     if (gAiLogicData->lastUsedMove[battler] != MOVE_NONE && gAiLogicData->lastUsedMove[battler] != move
-    && (IsHoldEffectChoice(GetBattlerHoldEffect(battler) && IsBattlerItemEnabled(battler))
+    && ((IsHoldEffectChoice(GetBattlerHoldEffect(battler)) && IsBattlerItemEnabled(battler))
         || gAiLogicData->abilities[battler] == ABILITY_GORILLA_TACTICS))
         return TRUE;
     return FALSE;
@@ -750,7 +750,8 @@ static bool32 ShouldSwitchIfBadlyStatused(struct SwitchAiContext *switchContext)
             if ((monAbility == ABILITY_NATURAL_CURE
                 || monAbility == ABILITY_SHED_SKIN
                 || monAbility == ABILITY_EARLY_BIRD)
-                || holdEffect == (HOLD_EFFECT_CURE_SLP | HOLD_EFFECT_CURE_STATUS)
+                || holdEffect == HOLD_EFFECT_CURE_SLP
+                || holdEffect == HOLD_EFFECT_CURE_STATUS
                 || HasMoveWithEffect(switchContext->battler, EFFECT_SLEEP_TALK)
                 || (HasMoveWithEffect(switchContext->battler, EFFECT_SNORE) && gAiLogicData->effectiveness[switchContext->battler][switchContext->opposingBattler][GetBattlerMoveIndexWithEffect(switchContext->battler, EFFECT_SNORE)] >= UQ_4_12(1.0))
                 || (IsBattlerGrounded(switchContext->battler, monAbility, gAiLogicData->holdEffects[switchContext->battler])
@@ -763,7 +764,7 @@ static bool32 ShouldSwitchIfBadlyStatused(struct SwitchAiContext *switchContext)
                 && gAiLogicData->abilities[switchContext->opposingBattler] != ABILITY_UNAWARE
                 && gAiLogicData->abilities[switchContext->opposingBattler] != ABILITY_KEEN_EYE
                 && gAiLogicData->abilities[switchContext->opposingBattler] != ABILITY_MINDS_EYE
-                && (GetConfig(B_ILLUMINATE_EFFECT) >= GEN_9 && gAiLogicData->abilities[switchContext->opposingBattler] != ABILITY_ILLUMINATE)
+                && (GetConfig(B_ILLUMINATE_EFFECT) < GEN_9 || gAiLogicData->abilities[switchContext->opposingBattler] != ABILITY_ILLUMINATE)
                 && !gBattleMons[switchContext->battler].volatiles.foresight
                 && !gBattleMons[switchContext->battler].volatiles.miracleEye)
                 switchMon = FALSE;
@@ -1115,12 +1116,16 @@ static bool32 CanMonSurviveHazardSwitchin(struct SwitchAiContext *switchContext)
     enum Move aiMove;
 
     if (ability == ABILITY_REGENERATOR)
-        battlerHp = (battlerHp * 133) / 100; // Account for Regenerator healing
+    {
+        battlerHp += gBattleMons[switchContext->battler].maxHP / 3;
+        if (battlerHp > gBattleMons[switchContext->battler].maxHP)
+            battlerHp = gBattleMons[switchContext->battler].maxHP;
+    }
 
     hazardDamage = GetSwitchinHazardsDamage(switchContext->battler);
 
     // Battler will faint to hazards, check to see if another mon can clear them
-    if (hazardDamage > battlerHp)
+    if (hazardDamage >= battlerHp)
     {
         for (u32 monIndex = 0; monIndex < switchContext->lastId; monIndex++)
         {
@@ -1552,7 +1557,7 @@ bool32 IsSwitchinValid(enum BattlerId battler)
         else // Override switch
         {
             if ((gAiLogicData->shouldSwitch & (1u << partner))
-             && gAiLogicData->monToSwitchInId[partner] == gAiLogicData->mostSuitableMonId[battler]
+             && gAiLogicData->monToSwitchInId[partner] == gBattleStruct->AI_monToSwitchIntoId[battler]
              && BattlersShareParty(battler, partner))
             {
                 return FALSE;
@@ -1617,16 +1622,17 @@ static u32 GetSwitchinHazardsDamage(enum BattlerId battler)
     u32 status = gBattleMons[battler].status1;
     u32 spikesDamage = 0, tSpikesDamage = 0, hazardDamage = 0;
     enum BattleSide side = GetBattlerSide(battler);
+    bool32 bootsActive = (heldItemEffect == HOLD_EFFECT_HEAVY_DUTY_BOOTS
+                       && !((gFieldStatuses & STATUS_FIELD_MAGIC_ROOM) || ability == ABILITY_KLUTZ));
 
     // Check ways mon might avoid all hazards
-    if (ability != ABILITY_MAGIC_GUARD || (heldItemEffect == HOLD_EFFECT_HEAVY_DUTY_BOOTS &&
-        !((gFieldStatuses & STATUS_FIELD_MAGIC_ROOM) || ability == ABILITY_KLUTZ)))
+    if (ability != ABILITY_MAGIC_GUARD && !bootsActive)
     {
         // Stealth Rock
-        if (IsHazardOnSide(side, HAZARDS_STEALTH_ROCK) && heldItemEffect != HOLD_EFFECT_HEAVY_DUTY_BOOTS)
+        if (IsHazardOnSide(side, HAZARDS_STEALTH_ROCK))
             hazardDamage += GetStealthHazardDamage(TYPE_SIDE_HAZARD_POINTED_STONES, battler);
         // G-Max Steelsurge
-        if (IsHazardOnSide(side, HAZARDS_STEELSURGE) && heldItemEffect != HOLD_EFFECT_HEAVY_DUTY_BOOTS)
+        if (IsHazardOnSide(side, HAZARDS_STEELSURGE))
             hazardDamage += GetStealthHazardDamage(TYPE_SIDE_HAZARD_SHARP_STEEL, battler);
         // Spikes
         if (IsHazardOnSide(side, HAZARDS_SPIKES) && AI_IsBattlerGrounded(battler))
@@ -2851,7 +2857,12 @@ static void SetBattlerHPChangeForSwitch(enum BattlerId battler, enum BattlerId o
 {
     s32 maxHP = gBattleMons[battler].maxHP;
     s32 currentHP = gBattleMons[battler].hp - GetSwitchinHazardsDamage(battler);
-    s32 itemHeal = GetSwitchinSingleUseItemHealing(battler, opposingBattler, currentHP);
+    s32 itemHeal;
+
+    if (currentHP < 0)
+        currentHP = 0;
+
+    itemHeal = GetSwitchinSingleUseItemHealing(battler, opposingBattler, currentHP);
 
     if (itemHeal > 0)
     {
