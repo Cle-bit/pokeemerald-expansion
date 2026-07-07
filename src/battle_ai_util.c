@@ -1518,20 +1518,26 @@ u32 NoOfHitsForTargetToFaintBattler(enum BattlerId battlerDef, enum BattlerId ba
 
 u32 NoOfHitsForTargetToFaintBattlerWithMod(enum BattlerId battlerDef, enum BattlerId battlerAtk, s32 hpMod)
 {
+    struct AiLogicData *aiData = gAiLogicData;
     u32 currNumberOfHits;
     u32 leastNumberOfHits = UNKNOWN_NO_OF_HITS;
     u32 hpCheck = gBattleMons[battlerAtk].hp + hpMod;
     u32 damageDealt = 0;
+    enum Move *moves = GetMovesArray(battlerDef);
+    u32 moveLimitations = aiData->moveLimitations[battlerDef];
 
     if (hpCheck > gBattleMons[battlerAtk].maxHP)
         hpCheck = gBattleMons[battlerAtk].maxHP;
 
     for (u32 moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
     {
-        damageDealt = AI_GetDamage(battlerDef, battlerAtk, moveIndex, AI_DEFENDING, gAiLogicData);
+        if (IsMoveUnusable(moveIndex, moves[moveIndex], moveLimitations))
+            continue;
+
+        damageDealt = AI_GetDamage(battlerDef, battlerAtk, moveIndex, AI_DEFENDING, aiData);
         if (damageDealt == 0)
             continue;
-        currNumberOfHits = hpCheck / (damageDealt + 1) + 1;
+        currNumberOfHits = GetNoOfHitsToKO(damageDealt, hpCheck);
         if (currNumberOfHits != 0)
         {
             if (currNumberOfHits < leastNumberOfHits)
@@ -1722,7 +1728,7 @@ bool32 CanTargetFaintAiWithMod(enum BattlerId battlerDef, enum BattlerId battler
     s32 dmg;
     enum Move *moves = GetMovesArray(battlerDef);
     u32 hpCheck = gBattleMons[battlerAtk].hp + hpMod;
-    u32 moveLimitations = aiData->moveLimitations[battlerAtk];
+    u32 moveLimitations = aiData->moveLimitations[battlerDef];
 
     if (hpCheck > gBattleMons[battlerAtk].maxHP)
         hpCheck = gBattleMons[battlerAtk].maxHP;
@@ -1738,14 +1744,14 @@ bool32 CanTargetFaintAiWithMod(enum BattlerId battlerDef, enum BattlerId battler
             dmg *= dmgMod;
 
         // Applies modified HP percent to AI data for consideration when running CanEndureHit
-        gAiLogicData->hpPercents[battlerAtk] = (hpCheck/gBattleMons[battlerAtk].maxHP)*100;
+        gAiLogicData->hpPercents[battlerAtk] = (hpCheck * 100) / gBattleMons[battlerAtk].maxHP;
 
         if (dmg >= hpCheck && !(CanEndureHit(battlerDef, battlerAtk, moves[moveIndex]) && (dmgMod <= 1)))
         {
-            gAiLogicData->hpPercents[battlerAtk] = (gBattleMons[battlerAtk].hp / gBattleMons[battlerAtk].maxHP) * 100;
+            gAiLogicData->hpPercents[battlerAtk] = (gBattleMons[battlerAtk].hp * 100) / gBattleMons[battlerAtk].maxHP;
             return TRUE;
         }
-        gAiLogicData->hpPercents[battlerAtk] = (gBattleMons[battlerAtk].hp / gBattleMons[battlerAtk].maxHP) * 100;
+        gAiLogicData->hpPercents[battlerAtk] = (gBattleMons[battlerAtk].hp * 100) / gBattleMons[battlerAtk].maxHP;
     }
 
     return FALSE;
@@ -4829,7 +4835,7 @@ void IncreaseBurnScore(enum BattlerId battlerAtk, enum BattlerId battlerDef, enu
             enum Move defBestMoves[MAX_MON_MOVES] = {MOVE_NONE};
             bool32 hasPhysical = FALSE;
 
-            GetBestDmgMovesFromBattler(battlerAtk, battlerDef, AI_DEFENDING, defBestMoves);
+            GetBestDmgMovesFromBattler(battlerDef, battlerAtk, AI_DEFENDING, defBestMoves);
 
             for (u32 moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
             {
@@ -4942,7 +4948,7 @@ void IncreaseFrostbiteScore(enum BattlerId battlerAtk, enum BattlerId battlerDef
             enum Move defBestMoves[MAX_MON_MOVES] = {MOVE_NONE};
             bool32 hasSpecial = FALSE;
 
-            GetBestDmgMovesFromBattler(battlerAtk, battlerDef, AI_DEFENDING, defBestMoves);
+            GetBestDmgMovesFromBattler(battlerDef, battlerAtk, AI_DEFENDING, defBestMoves);
 
             for (u32 moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
             {
