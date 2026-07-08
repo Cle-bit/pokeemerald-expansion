@@ -1501,17 +1501,20 @@ bool32 CanTargetFaintAi(enum BattlerId battlerDef, enum BattlerId battlerAtk)
 
 u32 NoOfHitsForTargetToFaintBattler(enum BattlerId battlerDef, enum BattlerId battlerAtk, enum DamageCalcContext calcContext, enum AiConsiderEndure considerEndure)
 {
+    struct AiLogicData *aiData = gAiLogicData;
     u32 currNumberOfHits;
     u32 leastNumberOfHits = UNKNOWN_NO_OF_HITS;
+    enum Move *moves = GetMovesArray(battlerDef);
+    u32 moveLimitations = aiData->moveLimitations[battlerDef];
 
     for (u32 moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
     {
+        if (IsMoveUnusable(moveIndex, moves[moveIndex], moveLimitations))
+            continue;
+
         currNumberOfHits = GetNoOfHitsToKOBattler(battlerDef, battlerAtk, moveIndex, calcContext, considerEndure);
-        if (currNumberOfHits != 0)
-        {
-            if (currNumberOfHits < leastNumberOfHits)
-                leastNumberOfHits = currNumberOfHits;
-        }
+        if (currNumberOfHits != 0 && currNumberOfHits < leastNumberOfHits)
+            leastNumberOfHits = currNumberOfHits;
     }
     return leastNumberOfHits;
 }
@@ -1521,13 +1524,15 @@ u32 NoOfHitsForTargetToFaintBattlerWithMod(enum BattlerId battlerDef, enum Battl
     struct AiLogicData *aiData = gAiLogicData;
     u32 currNumberOfHits;
     u32 leastNumberOfHits = UNKNOWN_NO_OF_HITS;
-    u32 hpCheck = gBattleMons[battlerAtk].hp + hpMod;
+    s32 currHp = gBattleMons[battlerAtk].hp;
+    s32 maxHp = gBattleMons[battlerAtk].maxHP;
+    s32 hpCheck = min(currHp + hpMod, maxHp);
     u32 damageDealt = 0;
     enum Move *moves = GetMovesArray(battlerDef);
     u32 moveLimitations = aiData->moveLimitations[battlerDef];
 
-    if (hpCheck > gBattleMons[battlerAtk].maxHP)
-        hpCheck = gBattleMons[battlerAtk].maxHP;
+    if (hpCheck <= 0)
+        return 0;
 
     for (u32 moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
     {
@@ -1559,6 +1564,9 @@ void GetBestDmgMovesFromBattler(enum BattlerId battlerAtk, enum BattlerId battle
     {
         for (u32 moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
         {
+            if (IsMoveUnusable(moveIndex, moves[moveIndex], moveLimitations))
+                continue;
+
             if (CanIndexMoveFaintTarget(battlerAtk, battlerDef, moveIndex, calcContext))
                 bestMoves[countBestMoves++] = moves[moveIndex];
         }
@@ -1727,11 +1735,14 @@ bool32 CanTargetFaintAiWithMod(enum BattlerId battlerDef, enum BattlerId battler
     struct AiLogicData *aiData = gAiLogicData;
     s32 dmg;
     enum Move *moves = GetMovesArray(battlerDef);
-    u32 hpCheck = gBattleMons[battlerAtk].hp + hpMod;
+    s32 currHp = gBattleMons[battlerAtk].hp;
+    s32 maxHp = gBattleMons[battlerAtk].maxHP;
+    s32 hpCheck = min(currHp + hpMod, maxHp);
     u32 moveLimitations = aiData->moveLimitations[battlerDef];
+    u32 originalHpPercent = aiData->hpPercents[battlerAtk];
 
-    if (hpCheck > gBattleMons[battlerAtk].maxHP)
-        hpCheck = gBattleMons[battlerAtk].maxHP;
+    if (hpCheck <= 0)
+        return TRUE;
 
     for (u32 moveIndex = 0; moveIndex < MAX_MON_MOVES; moveIndex++)
     {
@@ -1744,14 +1755,14 @@ bool32 CanTargetFaintAiWithMod(enum BattlerId battlerDef, enum BattlerId battler
             dmg *= dmgMod;
 
         // Applies modified HP percent to AI data for consideration when running CanEndureHit
-        gAiLogicData->hpPercents[battlerAtk] = (hpCheck * 100) / gBattleMons[battlerAtk].maxHP;
+        aiData->hpPercents[battlerAtk] = (hpCheck * 100) / gBattleMons[battlerAtk].maxHP;
 
         if (dmg >= hpCheck && !(CanEndureHit(battlerDef, battlerAtk, moves[moveIndex]) && (dmgMod <= 1)))
         {
-            gAiLogicData->hpPercents[battlerAtk] = (gBattleMons[battlerAtk].hp * 100) / gBattleMons[battlerAtk].maxHP;
+            aiData->hpPercents[battlerAtk] = originalHpPercent;
             return TRUE;
         }
-        gAiLogicData->hpPercents[battlerAtk] = (gBattleMons[battlerAtk].hp * 100) / gBattleMons[battlerAtk].maxHP;
+        aiData->hpPercents[battlerAtk] = originalHpPercent;
     }
 
     return FALSE;
@@ -3383,7 +3394,7 @@ bool32 BattlerHasMaxHPProtection(enum BattlerId battler)
         return FALSE;
     if (gAiLogicData->holdEffects[battler] == HOLD_EFFECT_FOCUS_SASH)
         return TRUE;
-    if (B_STURDY >= GEN_5 && ability == ABILITY_STURDY)
+    if (GetConfig(B_STURDY) >= GEN_5 && ability == ABILITY_STURDY)
         return TRUE;
     if (ability == ABILITY_MULTISCALE || ability == ABILITY_SHADOW_SHIELD)
         return TRUE;
@@ -6311,9 +6322,17 @@ s32 GetSelfStatChangeScore(enum BattlerId battlerAtk, enum BattlerId battlerDef,
          && effect->moveEffect != STAT_CHANGE_EFFECT_MINUS)
             continue;
 
-        for (enum Stat stat = STAT_ATK; stat < NUM_STATS; stat++)
+        for (enum Stat stat = STAT_ATK; stat < NUM_BATTLE_STATS; stat++)
         {
-            s32 stage = AI_GetAdjustedStatStage(battlerAtk, move, GetStatStage(stat, effect));
+            s32 stage = GetStatStage(stat, effect);
+
+            if (stage == 0)
+                continue;
+
+            if (effect->moveEffect == STAT_CHANGE_EFFECT_MINUS)
+                stage = -1 * stage;
+
+            stage = AI_GetAdjustedStatStage(battlerAtk, move, stage);
 
             if (stage > 0)
             {
@@ -6355,9 +6374,17 @@ s32 GetFoeStatChangeScore(enum BattlerId battlerAtk, enum BattlerId battlerDef, 
     {
         const struct AdditionalEffect *effect = GetMoveAdditionalEffectById(move, effectIndex);
 
-        for (enum Stat stat = STAT_ATK; stat < NUM_STATS; stat++)
+        for (enum Stat stat = STAT_ATK; stat < NUM_BATTLE_STATS; stat++)
         {
-            s32 stage = AI_GetAdjustedStatStage(battlerDef, move, GetStatStage(stat, effect));
+            s32 stage = GetStatStage(stat, effect);
+
+            if (stage == 0)
+                continue;
+
+            if (effect->moveEffect == STAT_CHANGE_EFFECT_MINUS)
+                stage = -1 * stage;
+
+            stage = AI_GetAdjustedStatStage(battlerDef, move, stage);
 
             if (stage > 0)
             {
@@ -6405,7 +6432,7 @@ s32 GetAllyStatChangeScore(u32 battlerAtk, u32 partner, u32 move)
     {
         const struct AdditionalEffect *effect = GetMoveAdditionalEffectById(move, effectIndex);
 
-        for (enum Stat stat = STAT_ATK; stat < NUM_STATS; stat++)
+        for (enum Stat stat = STAT_ATK; stat < NUM_BATTLE_STATS; stat++)
         {
             s32 stage = GetStatStage(stat, effect);
 
