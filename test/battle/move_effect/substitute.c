@@ -92,3 +92,21 @@ SINGLE_BATTLE_TEST("Baton Pass passes Substitutes")
         EXPECT_EQ((u32)player->volatiles.substituteHP, 99);
     }
 }
+
+DOUBLE_BATTLE_TEST("Substitute does not print a damage message when its partner is attacked")
+{
+    GIVEN {
+        PLAYER(SPECIES_WOBBUFFET);
+        PLAYER(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WYNAUT);
+    } WHEN {
+        TURN { MOVE(opponentLeft, MOVE_SUBSTITUTE); }
+        TURN { MOVE(playerLeft, MOVE_SCRATCH, target: opponentRight); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SUBSTITUTE, opponentLeft);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SCRATCH, playerLeft);
+        NOT MESSAGE("The substitute took damage for the opposing Wynaut!");
+        HP_BAR(opponentRight);
+    }
+}
