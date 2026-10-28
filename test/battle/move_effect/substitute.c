@@ -96,6 +96,7 @@ SINGLE_BATTLE_TEST("Baton Pass passes Substitutes")
 DOUBLE_BATTLE_TEST("Substitute does not print a damage message when its partner is attacked")
 {
     GIVEN {
+        ASSUME(GetMoveTarget(MOVE_SCRATCH) == TARGET_SELECTED);
         PLAYER(SPECIES_WOBBUFFET);
         PLAYER(SPECIES_WOBBUFFET);
         OPPONENT(SPECIES_WOBBUFFET);
@@ -108,5 +109,48 @@ DOUBLE_BATTLE_TEST("Substitute does not print a damage message when its partner 
         ANIMATION(ANIM_TYPE_MOVE, MOVE_SCRATCH, playerLeft);
         NOT MESSAGE("The substitute took damage for the opposing Wynaut!");
         HP_BAR(opponentRight);
+    }
+}
+
+DOUBLE_BATTLE_TEST("Spread moves name the substitute user and damage its unprotected partner")
+{
+    GIVEN {
+        ASSUME(GetMoveTarget(MOVE_SWIFT) == TARGET_BOTH);
+        PLAYER(SPECIES_WOBBUFFET);
+        PLAYER(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WYNAUT);
+    } WHEN {
+        TURN { MOVE(opponentRight, MOVE_SUBSTITUTE); }
+        TURN { MOVE(playerLeft, MOVE_SWIFT, target: opponentLeft); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SUBSTITUTE, opponentRight);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SWIFT, playerLeft);
+        NOT MESSAGE("The substitute took damage for the opposing Wobbuffet!");
+        HP_BAR(opponentLeft);
+        MESSAGE("The substitute took damage for the opposing Wynaut!");
+        SUB_HIT(opponentRight);
+    }
+}
+
+DOUBLE_BATTLE_TEST("Spread moves name each substitute user when both opponents have substitutes")
+{
+    GIVEN {
+        ASSUME(GetMoveTarget(MOVE_SWIFT) == TARGET_BOTH);
+        PLAYER(SPECIES_WOBBUFFET);
+        PLAYER(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WOBBUFFET);
+        OPPONENT(SPECIES_WYNAUT);
+    } WHEN {
+        TURN { MOVE(opponentLeft, MOVE_SUBSTITUTE); MOVE(opponentRight, MOVE_SUBSTITUTE); }
+        TURN { MOVE(playerLeft, MOVE_SWIFT, target: opponentLeft); }
+    } SCENE {
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SUBSTITUTE, opponentLeft);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SUBSTITUTE, opponentRight);
+        ANIMATION(ANIM_TYPE_MOVE, MOVE_SWIFT, playerLeft);
+        MESSAGE("The substitute took damage for the opposing Wobbuffet!");
+        MESSAGE("The substitute took damage for the opposing Wynaut!");
+        SUB_HIT(opponentLeft);
+        SUB_HIT(opponentRight);
     }
 }

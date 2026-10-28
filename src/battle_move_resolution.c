@@ -2947,6 +2947,7 @@ static enum CancelerResult CancelerHealthBarUpdate(struct BattleCalcValues *cv)
 
         if (DoesSubstituteBlockMove(cv->battlerAtk, battlerDef, cv->move))
         {
+            PREPARE_MON_NICK_WITH_PREFIX_LOWER_BUFFER(gBattleTextBuff1, battlerDef, gBattlerPartyIndexes[battlerDef]);
             PrepareStringBattle(STRINGID_SUBSTITUTEDAMAGED, battlerDef);
             continue;
         }
